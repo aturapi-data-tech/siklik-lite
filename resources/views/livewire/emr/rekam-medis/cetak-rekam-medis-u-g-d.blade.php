@@ -642,18 +642,42 @@
                                                 Perawat / Terapis :
                                             </td>
                                             <td class="w-1/2">
-                                                .
-                                                <br>
-                                                <br>
-                                                <br>
-                                                <br>
-                                                ttd
-                                                <br>
-                                                {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
-                                                    ? ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima']
-                                                        ? strtoupper($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
-                                                        : 'Perawat Penerima')
-                                                    : 'Perawat Penerima' }}
+                                                <div class ="text-center">
+                                                    <div class="">
+                                                        <br>
+
+                                                        {{-- @php
+                                                            $perawatPenerima = isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima']) ? ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'] ? $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'] : 'Perawat Penerima') : 'Perawat Penerima';
+                                                        @endphp
+                                                        {!! DNS2D::getBarcodeHTML($perawatPenerima, 'QRCODE', 3, 3) !!} --}}
+
+                                                        @isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
+                                                            @if ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
+                                                                @isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'])
+                                                                    @if ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'])
+                                                                        @isset(App\Models\User::where(
+                                                                                'myuser_code',
+                                                                                $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'])->first()->myuser_ttd_image)
+                                                                            <img class="h-24"
+                                                                                src="{{ 'storage/' . App\Models\User::where('myuser_code', $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'])->first()->myuser_ttd_image }}"
+                                                                                alt="">
+                                                                        @endisset
+                                                                    @endif
+                                                                @endisset
+                                                            @endif
+                                                        @endisset
+                                                        <br>
+                                                        ttd
+                                                        <br>
+                                                        {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
+                                                            ? ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima']
+                                                                ? strtoupper($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
+                                                                : 'Perawat Penerima')
+                                                            : 'Perawat Penerima' }}
+
+                                                    </div>
+
+                                                </div>
                                             </td>
                                         </tr>
 
@@ -1045,7 +1069,17 @@
                                             @isset($dataDaftarTxn['pemeriksaan']['anatomi'])
                                                 @foreach ($dataDaftarTxn['pemeriksaan']['anatomi'] as $key => $pAnatomi)
                                                     @php
-                                                        $kelainan = isset($dataDaftarTxn['pemeriksaan']['anatomi'][$key]['kelainan']) ? ($dataDaftarTxn['pemeriksaan']['anatomi'][$key]['kelainan'] ? $dataDaftarTxn['pemeriksaan']['anatomi'][$key]['kelainan'] : false) : false;
+                                                        $kelainan = isset(
+                                                            $dataDaftarTxn['pemeriksaan']['anatomi'][$key]['kelainan'],
+                                                        )
+                                                            ? ($dataDaftarTxn['pemeriksaan']['anatomi'][$key][
+                                                                'kelainan'
+                                                            ]
+                                                                ? $dataDaftarTxn['pemeriksaan']['anatomi'][$key][
+                                                                    'kelainan'
+                                                                ]
+                                                                : false)
+                                                            : false;
                                                     @endphp
                                                     @if ($kelainan && $kelainan !== 'Tidak Diperiksa')
                                                         <span class="font-normal">
@@ -1303,24 +1337,35 @@
                                     </td>
                                     @inject('carbon', 'Carbon\Carbon')
                                     <td class="w-1/4 text-center">
-                                        Tulungagung,
-                                        {{ isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'])
-                                            ? ($dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan']
-                                                ? $dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan']
-                                                : 'Tanggal')
-                                            : 'Tanggal' }}
+                                        <div class ="text-center">
+                                            <span>
+                                                Tulungagung,{{ isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'])
+                                                    ? ($dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan']
+                                                        ? $dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan']
+                                                        : 'Tanggal')
+                                                    : 'Tanggal' }}
+                                            </span>
+                                            <div>
+                                                @isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa'])
+                                                    @if ($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa'])
+                                                        @isset(App\Models\User::where('myuser_code', $dataDaftarTxn['drId'])->first()->myuser_ttd_image)
+                                                            <img class="h-24 mx-auto"
+                                                                src="{{ 'storage/' . App\Models\User::where('myuser_code', $dataDaftarTxn['drId'])->first()->myuser_ttd_image }}"
+                                                                alt="">
+                                                        @endisset
+                                                    @endif
+                                                @endisset
+                                            </div>
 
-                                        <br>
-                                        <br>
-                                        <br>
-                                        <br>
-                                        ttd
-                                        <br>
-                                        {{ isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa'])
-                                            ? ($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa']
-                                                ? $dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa']
-                                                : 'Dokter Pemeriksa')
-                                            : 'Dokter Pemeriksa' }}
+                                            <span>
+                                                {{ isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa'])
+                                                    ? ($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa']
+                                                        ? $dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa']
+                                                        : 'Dokter Pemeriksa')
+                                                    : 'Dokter Pemeriksa' }}
+                                            </span>
+
+                                        </div>
                                     </td>
                                 </tbody>
                             </table>

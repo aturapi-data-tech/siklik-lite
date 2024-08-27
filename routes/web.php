@@ -9,12 +9,8 @@ use App\Http\Livewire\MasterPoli\MasterPoli;
 use App\Http\Livewire\MasterDokter\MasterDokter;
 
 
-use App\Http\Livewire\PendaftaranMandiriPasienPoli\PendaftaranMandiriPasienPoli;
 use App\Http\Livewire\DaftarRJ\DaftarRJ;
-use App\Http\Livewire\DaftarUGD\DaftarUGD;
 
-use App\Http\Livewire\RJskdp\RJskdp;
-use App\Http\Livewire\RIskdp\RIskdp;
 
 use App\Http\Livewire\PelayananRJ\PelayananRJ;
 use App\Http\Livewire\DisplayPelayananRJ\DisplayPelayananRJ;
@@ -23,11 +19,8 @@ use App\Http\Livewire\EmrRJ\EmrRJ;
 use App\Http\Livewire\BookingRJ\BookingRJ;
 
 use App\Http\Livewire\EmrRJ\TelaahResepRJ\TelaahResepRJ;
-use App\Http\Livewire\EmrUGD\TelaahResepUGD\TelaahResepUGD;
 
-use App\Http\Livewire\EmrUGD\EmrUGD;
 
-use App\Http\Livewire\SetupHfisBpjs\SetupHfisBpjs;
 
 
 /*
@@ -67,9 +60,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker']], function () {
-    Route::get('pendaftaranMandiriPasienPoli', PendaftaranMandiriPasienPoli::class)->middleware('auth')->name('pendaftaranMandiriPasienPoli');
-    // Route::view('/cetak-tiket', 'livewire.pendaftaran-mandiri-pasien-poli.cetak-tiket');
-
 
     // Master Pasien
     Route::get('MasterPasien', MasterPasien::class)->middleware('auth')->name('MasterPasien');
@@ -86,24 +76,13 @@ Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker']], functi
     Route::get('daftarRJ', DaftarRJ::class)->middleware('auth')->name('daftarRJ');
     Route::get('pelayananRJ', PelayananRJ::class)->middleware('auth')->name('pelayananRJ');
     Route::get('displayPelayananRJ', displayPelayananRJ::class)->middleware('auth')->name('displayPelayananRJ');
-    Route::get('SetupHfisBpjs', SetupHfisBpjs::class)->middleware('auth')->name('SetupHfisBpjs');
 
-    Route::get('RJskdp', RJskdp::class)->middleware('auth')->name('RJskdp');
-    Route::get('RIskdp', RIskdp::class)->middleware('auth')->name('RIskdp');
 
     Route::get('EmrRJ', EmrRJ::class)->middleware('auth')->name('EmrRJ');
     Route::get('BookingRJ', BookingRJ::class)->middleware('auth')->name('BookingRJ');
     Route::get('TelaahResepRJ', TelaahResepRJ::class)->middleware('auth')->name('TelaahResepRJ');
 
     Route::get('EmrRJAdministrasi', AdministrasiRJ::class)->middleware('auth')->name('EmrRJAdministrasi');
-
-
-
-    // UGD
-    Route::get('daftarUGD', DaftarUGD::class)->middleware('auth')->name('daftarUGD');
-
-    Route::get('EmrUGD', EmrUGD::class)->middleware('auth')->name('EmrUGD');
-    Route::get('TelaahResepUGD', TelaahResepUGD::class)->middleware('auth')->name('TelaahResepUGD');
 });
 
 

@@ -1277,7 +1277,7 @@
                                 <div class="flex items-center mb-2">
                                     <x-text-input placeholder="Poli" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.poliId'))"
                                         :disabled=$disabledProperty
-                                        value="{{ $dataDaftarPoliRJ['poliId'] . ' ' . $dataDaftarPoliRJ['poliDesc'] }}" />
+                                        value="{{ $dataDaftarPoliRJ['poliId'] }}{{ isset($dataDaftarPoliRJ['poliDesc']) ? $dataDaftarPoliRJ['poliDesc'] : '' }}" />
                                 </div>
                                 @error('dataDaftarPoliRJ.poliId')
                                     <x-input-error :messages=$message />

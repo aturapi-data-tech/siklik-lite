@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Sirus (System Informasi Rumah Sakit dan E-Rekam Medis)</title>
+    <title>SIKlik (System Informasi Klinik dan E-Rekam Medis)</title>
 
     <link rel="icon" href="{{ URL::asset('favicon.ico') }}" type="image/x-icon" />
 
@@ -82,7 +82,7 @@
                     Selamat Datang
                 </h1>
                 <p class="max-w-2xl mb-8 text-xl font-light text-white md:text-lg dark:text-gray-400">
-                    <span class="font-bold">SIRus (Sistem Informasi Rumah Sakit dan E-Rekam Medis)</span>
+                    <span class="font-bold">SIKlik (Sistem Informasi Klinik dan E-Rekam Medis)</span>
                     <br>
                     <br>
                     Rekam Medis adalah berkas, catatan, dan dokumen tentang pasien yang berisi identitas, pemeriksaan,
@@ -107,7 +107,7 @@
 
             {{-- <hr class="my-4 border-gray-200 sm:mx-auto dark:border-gray-700" /> --}}
             <span class="block text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2023 <a
-                    href="https://flowbite.com/" class="hover:underline">SIRus</a>. All Rights Reserved.</span>
+                    href="https://flowbite.com/" class="hover:underline">SIKlik</a>. All Rights Reserved.</span>
 
             <x-theme-line :themeline="__('1')"></x-theme-line>
 

@@ -9,11 +9,12 @@ use Livewire\WithPagination;
 use Carbon\Carbon;
 
 use Spatie\ArrayToXml\ArrayToXml;
+use App\Http\Traits\EmrRJ\EmrRJTrait;
 
 
 class AdministrasiRJ extends Component
 {
-    use WithPagination;
+    use WithPagination, EmrRJTrait;
 
     protected $listeners = [
         'syncronizeAssessmentDokterRJFindData' => 'sumAll',
@@ -142,122 +143,10 @@ class AdministrasiRJ extends Component
     {
         $dataRawatJalan = [];
 
-        $findData = DB::table('rsview_rjkasir')
-            ->select('datadaftarpolirj_json', 'vno_sep')
-            ->where('rj_no', $rjNo)
-            ->first();
+        $findDataRJ = $this->findDataRJ($rjNo);
+        $dataRawatJalan  = $findDataRJ['dataDaftarRJ'];
 
-        $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json   : null;
-        // if meta_data_pasien_json = null
-        // then cari Data Pasien By Key Collection (exception when no data found)
-        //
-        // else json_decode
-        if ($dataDaftarPoliRJ_json) {
-            $dataRawatJalan = json_decode($findData->datadaftarpolirj_json, true);
-        } else {
 
-            $this->emit('toastr-error', "Data tidak dapat di proses json.");
-            $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
-                ->select(
-                    DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
-                    DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
-                    'rj_no',
-                    'reg_no',
-                    'reg_name',
-                    'sex',
-                    'address',
-                    'thn',
-                    DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
-                    'poli_id',
-                    'poli_desc',
-                    'dr_id',
-                    'dr_name',
-                    'klaim_id',
-                    // 'entry_id',
-                    'shift',
-                    'vno_sep',
-                    'no_antrian',
-
-                    'nobooking',
-                    'push_antrian_bpjs_status',
-                    'push_antrian_bpjs_json',
-                    'kd_dr_bpjs',
-                    'kd_poli_bpjs',
-                    'rj_status',
-                    'txn_status',
-                    'erm_status',
-                )
-                ->where('rj_no', '=', $rjNo)
-                ->first();
-
-            $dataRawatJalan = [
-                "regNo" =>  $dataDaftarPoliRJ->reg_no,
-
-                "drId" =>  $dataDaftarPoliRJ->dr_id,
-                "drDesc" =>  $dataDaftarPoliRJ->dr_name,
-
-                "poliId" =>  $dataDaftarPoliRJ->poli_id,
-                "klaimId" => $dataDaftarPoliRJ->klaim_id,
-                // "poliDesc" =>  $dataDaftarPoliRJ->poli_desc ,
-
-                // "kddrbpjs" =>  $dataDaftarPoliRJ->kd_dr_bpjs ,
-                // "kdpolibpjs" =>  $dataDaftarPoliRJ->kd_poli_bpjs ,
-
-                "rjDate" =>  $dataDaftarPoliRJ->rj_date,
-                "rjNo" =>  $dataDaftarPoliRJ->rj_no,
-                "shift" =>  $dataDaftarPoliRJ->shift,
-                "noAntrian" =>  $dataDaftarPoliRJ->no_antrian,
-                "noBooking" =>  $dataDaftarPoliRJ->nobooking,
-                "slCodeFrom" => "02",
-                "passStatus" => "",
-                "rjStatus" =>  $dataDaftarPoliRJ->rj_status,
-                "txnStatus" =>  $dataDaftarPoliRJ->txn_status,
-                "ermStatus" =>  $dataDaftarPoliRJ->erm_status,
-                "cekLab" => "0",
-                "kunjunganInternalStatus" => "0",
-                "noReferensi" =>  $dataDaftarPoliRJ->reg_no,
-                "postInap" => [],
-                "internal12" => "1",
-                "internal12Desc" => "Faskes Tingkat 1",
-                "internal12Options" => [
-                    [
-                        "internal12" => "1",
-                        "internal12Desc" => "Faskes Tingkat 1"
-                    ],
-                    [
-                        "internal12" => "2",
-                        "internal12Desc" => "Faskes Tingkat 2 RS"
-                    ]
-                ],
-                "kontrol12" => "1",
-                "kontrol12Desc" => "Faskes Tingkat 1",
-                "kontrol12Options" => [
-                    [
-                        "kontrol12" => "1",
-                        "kontrol12Desc" => "Faskes Tingkat 1"
-                    ],
-                    [
-                        "kontrol12" => "2",
-                        "kontrol12Desc" => "Faskes Tingkat 2 RS"
-                    ],
-                ],
-                "taskIdPelayanan" => [
-                    "taskId1" => "",
-                    "taskId2" => "",
-                    "taskId3" =>  $dataDaftarPoliRJ->rj_date,
-                    "taskId4" => "",
-                    "taskId5" => "",
-                    "taskId6" => "",
-                    "taskId7" => "",
-                    "taskId99" => "",
-                ],
-                'sep' => [
-                    "noSep" =>  $dataDaftarPoliRJ->vno_sep,
-                    "reqSep" => [],
-                    "resSep" => [],
-                ]
-            ];
-        }
 
         $rsAdmin = DB::table('rstxn_rjhdrs')
             ->select('rs_admin', 'rj_admin', 'poli_price', 'klaim_id', 'pass_status')

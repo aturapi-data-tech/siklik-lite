@@ -81,7 +81,7 @@ class MasterPoli extends Component
     {
         // Proses Validasi///////////////////////////////////////////
         $r = ['poliId' => $poliId];
-        $rules = ['poliId' => 'required|numeric|unique:rstxn_rjhdrs,poli_id'];
+        $rules = ['poliId' => 'required|numeric|unique:rstxn_rjhdrs,poli_id|unique:rsmst_doctors,poli_id'];
         $customErrorMessagesTrait = customErrorMessagesTrait::messages();
         $customErrorMessagesTrait['unique'] = 'Data :attribute sudah dipakai pada transaksi Rawat Jalan.';
         $attribute = ['poliId' => 'Poliklinik'];

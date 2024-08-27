@@ -84,7 +84,7 @@ class Condition
             throw new Exception('Kode ICD10 tidak ditemukan');
         }
 
-        $display = $display ? $display : $code_check->icdx;
+        $display = $display ? $display : $code_check->diag_desc;
 
         $this->condition['code']['coding'][] = [
             'system' => 'http://hl7.org/fhir/sid/icd-10',

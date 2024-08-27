@@ -15,7 +15,7 @@ trait EmrUGDTrait
         try {
             $findData = DB::table('rsview_ugdkasir')
                 ->select('datadaftarugd_json', 'vno_sep')
-                ->where('rj_no', $rjno)
+                ->where('rj_no', '=', $rjno)
                 ->first();
 
             $datadaftarugd_json = isset($findData->datadaftarugd_json) ? $findData->datadaftarugd_json : null;
@@ -68,6 +68,7 @@ trait EmrUGDTrait
                     "drDesc" => "" . $dataDaftarUgd->dr_name . "",
 
                     "poliId" => "" . $dataDaftarUgd->poli_id . "",
+                    "klaimId" => "" . $dataDaftarUgd->klaim_id == 'JM' ? 'JM' : 'UM' . "",
                     // "poliDesc" => "" . $dataDaftarUgd->poli_desc . "",
 
                     // "kddrbpjs" => "" . $dataDaftarUgd->kd_dr_bpjs . "",
@@ -131,7 +132,8 @@ trait EmrUGDTrait
 
             return $dataDaftarUgd;
         } catch (Exception $e) {
-            return [];
+            dd($e->getMessage());
+            return ["errorMessages" => $e->getMessage()];
         }
     }
 
@@ -139,7 +141,7 @@ trait EmrUGDTrait
     {
         $lastInserted = DB::table('rstxn_ugdhdrs')
             ->select('rj_status')
-            ->where('rj_no', $rjNo)
+            ->where('rj_no', '=', $rjNo)
             ->first();
 
         if ($lastInserted->rj_status !== 'A') {

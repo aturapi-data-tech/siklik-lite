@@ -2,9 +2,11 @@
 
 namespace App\Http\Traits\EmrRJ;
 
+
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use Spatie\ArrayToXml\ArrayToXml;
 
 trait EmrRJTrait
 {
@@ -14,7 +16,7 @@ trait EmrRJTrait
         try {
             $findData = DB::table('rsview_rjkasir')
                 ->select('datadaftarpolirj_json', 'vno_sep')
-                ->where('rj_no', $rjno)
+                ->where('rj_no', '=', $rjno)
                 ->first();
 
             $datadaftarpolirj_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json : null;
@@ -26,7 +28,6 @@ trait EmrRJTrait
                 $dataDaftarRJ = json_decode($findData->datadaftarpolirj_json, true);
             } else {
 
-                $this->emit('toastr-error', "Data tidak dapat di proses json.");
                 $dataDaftarRJ = DB::table('rsview_rjkasir')
                     ->select(
                         DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
@@ -43,7 +44,7 @@ trait EmrRJTrait
                         'dr_id',
                         'dr_name',
                         'klaim_id',
-                        'entry_id',
+                        // 'entry_id',
                         'shift',
                         'vno_sep',
                         'no_antrian',
@@ -68,6 +69,7 @@ trait EmrRJTrait
 
                     "poliId" => "" . $dataDaftarRJ->poli_id . "",
                     "poliDesc" => "" . $dataDaftarRJ->poli_desc . "",
+                    "klaimId" => "" . $dataDaftarRJ->klaim_id == 'JM' ? 'JM' : 'UM' . "",
 
                     "kddrbpjs" => "" . $dataDaftarRJ->kd_dr_bpjs . "",
                     "kdpolibpjs" => "" . $dataDaftarRJ->kd_poli_bpjs . "",
@@ -129,7 +131,6 @@ trait EmrRJTrait
             }
 
 
-
             // dataPasienRJ
             $dataPasienRJ = DB::table('rsview_rjkasir')
                 ->select(
@@ -171,20 +172,36 @@ trait EmrRJTrait
                 "dataPasienRJ" => $dataPasienRJ
             ]);
         } catch (Exception $e) {
-            return [];
+
+            dd($e->getMessage());
+            return [
+                "dataDaftarRJ" => [],
+                "dataPasienRJ" => [],
+                "errorMessages" => $e->getMessage()
+            ];
         }
     }
 
-    protected function checkRJStatus($rjNo): bool
+    protected  function checkRJStatus($rjNo): bool
     {
         $lastInserted = DB::table('rstxn_rjhdrs')
             ->select('rj_status')
-            ->where('rj_no', $rjNo)
+            ->where('rj_no', '=', $rjNo)
             ->first();
 
         if ($lastInserted->rj_status !== 'A') {
             return true;
         }
         return false;
+    }
+
+    public static function updateJsonRJ($rjNo, array $rjArr): void
+    {
+        DB::table('rstxn_rjhdrs')
+            ->where('rj_no', $rjNo)
+            ->update([
+                'datadaftarpolirj_json' => json_encode($rjArr, true),
+                'datadaftarpolirj_xml' => ArrayToXml::convert($rjArr),
+            ]);
     }
 }

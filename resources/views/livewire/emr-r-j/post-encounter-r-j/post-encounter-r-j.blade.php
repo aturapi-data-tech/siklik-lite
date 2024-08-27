@@ -5,4 +5,7 @@
     <div wire:loading wire:target="PostEncounterSatuSehat">
         <x-loading />
     </div>
+    <div class="text-xs text-gray-700">
+        {{ $EncounterID }}
+    </div>
 </div>
