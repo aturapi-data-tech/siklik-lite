@@ -3,22 +3,23 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Livewire\MasterPasien\MasterPasien;
+use App\Http\Livewire\Master\MasterPasien\MasterPasien;
 
-use App\Http\Livewire\MasterPoli\MasterPoli;
-use App\Http\Livewire\MasterDokter\MasterDokter;
-
-
-use App\Http\Livewire\DaftarRJ\DaftarRJ;
+use App\Http\Livewire\Master\MasterPoli\MasterPoli;
+use App\Http\Livewire\Master\MasterDokter\MasterDokter;
 
 
-use App\Http\Livewire\PelayananRJ\PelayananRJ;
-use App\Http\Livewire\DisplayPelayananRJ\DisplayPelayananRJ;
-use App\Http\Livewire\EmrRJ\AdministrasiRJ\AdministrasiRJ;
-use App\Http\Livewire\EmrRJ\EmrRJ;
-use App\Http\Livewire\BookingRJ\BookingRJ;
+use App\Http\Livewire\RJ\DaftarRJx\DaftarRJx;
 
-use App\Http\Livewire\EmrRJ\TelaahResepRJ\TelaahResepRJ;
+
+
+// use App\Http\Livewire\PelayananRJ\PelayananRJ;
+// use App\Http\Livewire\DisplayPelayananRJ\DisplayPelayananRJ;
+// use App\Http\Livewire\EmrRJ\AdministrasiRJ\AdministrasiRJ;
+// use App\Http\Livewire\EmrRJ\EmrRJ;
+// use App\Http\Livewire\BookingRJ\BookingRJ;
+
+// use App\Http\Livewire\EmrRJ\TelaahResepRJ\TelaahResepRJ;
 
 
 
@@ -73,16 +74,21 @@ Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker']], functi
 
 
     // RJ
-    Route::get('daftarRJ', DaftarRJ::class)->middleware('auth')->name('daftarRJ');
-    Route::get('pelayananRJ', PelayananRJ::class)->middleware('auth')->name('pelayananRJ');
-    Route::get('displayPelayananRJ', displayPelayananRJ::class)->middleware('auth')->name('displayPelayananRJ');
+
+    Route::get('daftarRJx', DaftarRJx::class)->middleware('auth')->name('daftarRJx');
 
 
-    Route::get('EmrRJ', EmrRJ::class)->middleware('auth')->name('EmrRJ');
-    Route::get('BookingRJ', BookingRJ::class)->middleware('auth')->name('BookingRJ');
-    Route::get('TelaahResepRJ', TelaahResepRJ::class)->middleware('auth')->name('TelaahResepRJ');
 
-    Route::get('EmrRJAdministrasi', AdministrasiRJ::class)->middleware('auth')->name('EmrRJAdministrasi');
+
+    // Route::get('pelayananRJ', PelayananRJ::class)->middleware('auth')->name('pelayananRJ');
+    // Route::get('displayPelayananRJ', displayPelayananRJ::class)->middleware('auth')->name('displayPelayananRJ');
+
+
+    // Route::get('EmrRJ', EmrRJ::class)->middleware('auth')->name('EmrRJ');
+    // Route::get('BookingRJ', BookingRJ::class)->middleware('auth')->name('BookingRJ');
+    // Route::get('TelaahResepRJ', TelaahResepRJ::class)->middleware('auth')->name('TelaahResepRJ');
+
+    // Route::get('EmrRJAdministrasi', AdministrasiRJ::class)->middleware('auth')->name('EmrRJAdministrasi');
 });
 
 
