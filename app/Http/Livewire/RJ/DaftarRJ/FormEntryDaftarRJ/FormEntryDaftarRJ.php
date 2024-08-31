@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\RJ\DaftarRJx\FormEntryDaftarRJx;
+namespace App\Http\Livewire\RJ\DaftarRJ\FormEntryDaftarRJ;
 
 use Illuminate\Support\Facades\DB;
 use Exception;
@@ -17,7 +17,7 @@ use App\Http\Traits\LOV\LOVPasien\LOVPasienTrait;
 
 use Livewire\Component;
 
-class FormEntryDaftarRJx extends Component
+class FormEntryDaftarRJ extends Component
 {
     use EmrRJTrait, LOVDokterTrait, LOVPasienTrait;
     // listener from blade////////////////
@@ -354,6 +354,6 @@ class FormEntryDaftarRJx extends Component
         $this->syncDataFormEntry();
 
 
-        return view('livewire.r-j.daftar-r-jx.form-entry-daftar-r-jx.form-entry-daftar-r-jx');
+        return view('livewire.r-j.daftar-r-j.form-entry-daftar-r-j.form-entry-daftar-r-j');
     }
 }

@@ -156,7 +156,7 @@
             </div>
 
             @if ($isOpen)
-                @include('livewire.r-j.daftar-r-jx.create')
+                @include('livewire.r-j.daftar-r-j.create')
             @endif
 
 

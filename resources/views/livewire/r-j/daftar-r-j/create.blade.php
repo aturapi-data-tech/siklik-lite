@@ -46,8 +46,8 @@
 
                 {{-- Display Pasien Componen --}}
                 <div class="grid grid-cols-1">
-                    <livewire:r-j.daftar-r-jx.form-entry-daftar-r-jx.form-entry-daftar-r-jx :rjNoRef="$rjNoRef"
-                        :isOpenMode="$isOpenMode" :wire:key="$rjNoRef.'form-entry-daftar-r-jx'">
+                    <livewire:r-j.daftar-r-j.form-entry-daftar-r-j.form-entry-daftar-r-j :rjNoRef="$rjNoRef"
+                        :isOpenMode="$isOpenMode" :wire:key="$rjNoRef.'form-entry-daftar-r-j'">
 
                 </div>
             </div>

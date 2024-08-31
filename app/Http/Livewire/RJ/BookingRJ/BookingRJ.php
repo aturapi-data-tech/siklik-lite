@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\BookingRJ;
+namespace App\Http\Livewire\RJ\BookingRJ;
 
 use Illuminate\Support\Facades\DB;
 
@@ -445,7 +445,7 @@ class BookingRJ extends Component
 
 
         return view(
-            'livewire.booking-r-j.booking-r-j',
+            'livewire.r-j.booking-r-j.booking-r-j',
             ['myQueryData' => $query->paginate($this->limitPerPage)]
         );
     }

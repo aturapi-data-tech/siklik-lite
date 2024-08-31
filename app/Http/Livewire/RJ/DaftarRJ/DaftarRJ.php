@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\RJ\DaftarRJx;
+namespace App\Http\Livewire\RJ\DaftarRJ;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
@@ -10,7 +10,7 @@ use Carbon\Carbon;
 
 use App\Http\Traits\customErrorMessagesTrait;
 
-class DaftarRJx extends Component
+class DaftarRJ extends Component
 {
 
     use WithPagination;
@@ -283,6 +283,6 @@ class DaftarRJx extends Component
         // end Query
         ///////////////////////////////////////////////
 
-        return view('livewire.r-j.daftar-r-jx.daftar-r-jx', ['myQueryData' => $query->paginate($this->limitPerPage)]);
+        return view('livewire.r-j.daftar-r-j.daftar-r-j', ['myQueryData' => $query->paginate($this->limitPerPage)]);
     }
 }
