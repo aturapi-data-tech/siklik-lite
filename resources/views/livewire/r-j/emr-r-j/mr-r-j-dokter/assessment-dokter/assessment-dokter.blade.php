@@ -15,7 +15,7 @@
 
                 {{-- Subjective / Subjektif --}}
                 <div class="w-full mx-2 mr-2 bg-green-100 rounded-lg ">
-                    <livewire:emr-r-j.mr-r-j-dokter.assessment-dokter-anamnesa.assessment-dokter-anamnesa
+                    <livewire:r-j.emr-r-j.mr-r-j-dokter.assessment-dokter-anamnesa.assessment-dokter-anamnesa
                         :wire:key="'content-assessment-dokter-anamnesaRj'" :rjNoRef="$rjNoRef">
                 </div>
 
@@ -27,7 +27,7 @@
                 {{-- Objective / Objektif  --}}
                 <div class="w-full mx-2 mr-2 bg-green-200 rounded-lg ">
 
-                    <livewire:emr-r-j.mr-r-j-dokter.assessment-dokter-pemeriksaan.assessment-dokter-pemeriksaan
+                    <livewire:r-j.emr-r-j.mr-r-j-dokter.assessment-dokter-pemeriksaan.assessment-dokter-pemeriksaan
                         :wire:key="'content-assessment-dokter-pemeriksaanRj'" :rjNoRef="$rjNoRef">
                 </div>
 
@@ -45,7 +45,7 @@
                 {{-- Assesment / Penilaian / Diagnosis --}}
                 <div class="w-full mx-2 mr-2 bg-green-300 rounded-lg ">
 
-                    <livewire:emr-r-j.mr-r-j-dokter.assessment-dokter-diagnosis.assessment-dokter-diagnosis
+                    <livewire:r-j.emr-r-j.mr-r-j-dokter.assessment-dokter-diagnosis.assessment-dokter-diagnosis
                         :wire:key="'content-assessment-dokter-diagnosisRj'" :rjNoRef="$rjNoRef">
                 </div>
 
@@ -57,7 +57,7 @@
                 {{-- Plan /Perencanaan --}}
                 <div class="w-full mx-2 mr-2 bg-green-400 rounded-lg ">
 
-                    <livewire:emr-r-j.mr-r-j-dokter.assessment-dokter-perencanaan.assessment-dokter-perencanaan
+                    <livewire:r-j.emr-r-j.mr-r-j-dokter.assessment-dokter-perencanaan.assessment-dokter-perencanaan
                         :wire:key="'content-assessment-dokter-perencanaanRj'" :rjNoRef="$rjNoRef">
                 </div>
 
@@ -69,7 +69,7 @@
                 {{-- Plan /Perencanaan --}}
                 <div class="w-full mx-2 mr-2 bg-gray-400 rounded-lg ">
 
-                    <livewire:emr.rekam-medis.rekam-medis-display :wire:key="'content-rekamMedisDisplay'"
+                    <livewire:penunjang.emr.rekam-medis.rekam-medis-display :wire:key="'content-rekamMedisDisplay'"
                         :rjNoRefCopyTo="$rjNoRef" :regNoRef="$regNoRef">
                 </div>
 

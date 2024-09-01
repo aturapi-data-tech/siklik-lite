@@ -61,7 +61,7 @@
                                 'active': activeTab === '{{ $dataDaftarPoliRJ['perencanaan']['terapiTab'] }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['perencanaan']['terapiTab'] }}'">
-                            @include('livewire.emr-r-j.mr-r-j.perencanaan.terapiTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.perencanaan.terapiTab')
 
                         </div>
 
@@ -70,7 +70,7 @@
                                 'active': activeTab === '{{ $dataDaftarPoliRJ['perencanaan']['tindakLanjutTab'] }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['perencanaan']['tindakLanjutTab'] }}'">
-                            @include('livewire.emr-r-j.mr-r-j.perencanaan.tindakLanjutTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.perencanaan.tindakLanjutTab')
 
                         </div>
 
@@ -79,7 +79,7 @@
                                 'active': activeTab === '{{ $dataDaftarPoliRJ['perencanaan']['pengkajianMedisTab'] }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['perencanaan']['pengkajianMedisTab'] }}'">
-                            @include('livewire.emr-r-j.mr-r-j.perencanaan.pengkajianMedisTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.perencanaan.pengkajianMedisTab')
 
                         </div>
 
@@ -92,8 +92,8 @@
 
                             <div id="TransaksiRawatJalanskdp" class="px-4">
 
-                                <livewire:emr-r-j.mr-r-j.skdp-r-j.skdp-r-j :wire:key="'content-skdpRj'"
-                                    :rjNoRef="$rjNoRef">
+                                {{-- <livewire:emr-r-j.mr-r-j.skdp-r-j.skdp-r-j :wire:key="'content-skdpRj'"
+                                    :rjNoRef="$rjNoRef"> --}}
 
                             </div>
 

@@ -239,11 +239,8 @@
 
                         </div>
                     </div>
-                    @if ($isOpenRekamMedisUGD)
-                        @include('livewire.emr.rekam-medis.create-rekam-medis-u-g-d')
-                    @endif
                     @if ($isOpenRekamMedisRJ)
-                        @include('livewire.emr.rekam-medis.create-rekam-medis-r-j')
+                        @include('livewire.penunjang.emr.rekam-medis.create-rekam-medis-r-j')
                     @endif
                 </div>
             </div>

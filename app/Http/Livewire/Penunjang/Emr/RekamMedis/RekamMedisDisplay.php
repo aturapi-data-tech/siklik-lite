@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Emr\RekamMedis;
+namespace App\Http\Livewire\Penunjang\Emr\RekamMedis;
 
 use Illuminate\Support\Facades\DB;
 
@@ -375,8 +375,7 @@ class RekamMedisDisplay extends Component
                 'kd_dr_bpjs',
                 'nokartu_bpjs',
                 DB::raw("(CASE WHEN layanan_status='RJ' THEN (select datadaftarpolirj_json from rsview_rjkasir where rj_no=txn_no)
-                                        WHEN layanan_status='UGD' THEN (select datadaftarugd_json from rsview_ugdkasir where rj_no=txn_no)
-                                            ELSE null END) as datadaftar_json")
+                                ELSE null END) as datadaftar_json")
 
             )
             ->where('reg_no', $this->regNoRef)
@@ -385,7 +384,7 @@ class RekamMedisDisplay extends Component
             ->orderBy('poli',  'asc');
 
 
-        $queryIdentitas = DB::table('rsmst_identitases')
+        $queryIdentitas = DB::table('dimst_identitases')
             ->select(
                 'int_name',
                 'int_phone1',
@@ -400,7 +399,7 @@ class RekamMedisDisplay extends Component
         ///////////////////////////////////////////////
 
         return view(
-            'livewire.emr.rekam-medis.rekam-medis-display',
+            'livewire.penunjang.emr.rekam-medis.rekam-medis-display',
             [
                 'myQueryData' => $query->paginate(3),
                 'myQueryIdentitas' => $queryIdentitas

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Emr\Laborat;
+namespace App\Http\Livewire\Penunjang\Emr\Laborat;
 
 use Illuminate\Support\Facades\DB;
 
@@ -58,7 +58,7 @@ class Laborat extends Component
         rsmst_pasiens c,
         rsmst_doctors f,
         immst_employers g
-        
+
         where a.dr_id=f.dr_id
         and a.emp_id=g.emp_id
         and a.reg_no=c.reg_no
@@ -73,33 +73,33 @@ class Laborat extends Component
         item_code,high_limit_m,high_limit_f,low_limit_m,low_limit_f,normal_m,normal_f,
         lowhigh_status,lab_result_status,
         to_char(checkup_date,'dd/mm/yyyy')checkup_date1x,WAKTU_SELESAI_PELAYANAN,
-        
-        
+
+
         (SELECT count(*)
-        FROM lbtxn_checkupdtls z,LBMST_CLABITEMS x 
-        where a.checkup_no=z.checkup_no 
-        and z.clabitem_id=x.clabitem_id  
-        
+        FROM lbtxn_checkupdtls z,LBMST_CLABITEMS x
+        where a.checkup_no=z.checkup_no
+        and z.clabitem_id=x.clabitem_id
+
         and x.LOW_LIMIT_K is not null
         and x.HIGH_LIMIT_K is not null
         and to_number(lab_result)<=to_number(LOW_LIMIT_K))+
         (SELECT count(*)
-        FROM lbtxn_checkupdtls z,LBMST_CLABITEMS x 
-        where a.checkup_no=z.checkup_no 
-        and z.clabitem_id=x.clabitem_id  
-        
+        FROM lbtxn_checkupdtls z,LBMST_CLABITEMS x
+        where a.checkup_no=z.checkup_no
+        and z.clabitem_id=x.clabitem_id
+
         and x.LOW_LIMIT_K is not null
         and x.HIGH_LIMIT_K is not null
         and to_number(lab_result)>=to_number(HIGH_LIMIT_K))
         K_1
-        
-        
-        
+
+
+
         from lbtxn_checkuphdrs a,lbtxn_checkupdtls b,
         rsmst_pasiens c,lbmst_clabitems d,
         lbmst_clabs e,rsmst_doctors f,
         immst_employers g
-        
+
         where a.checkup_no=b.checkup_no
         and d.clab_id=e.clab_id
         and a.dr_id=f.dr_id
@@ -117,7 +117,7 @@ class Laborat extends Component
         from lbtxn_checkuphdrs a,lbtxn_checkupoutdtls b,
         rsmst_pasiens c,rsmst_doctors d,
         immst_employers e
-        
+
         where a.checkup_no=b.checkup_no
         and a.dr_id=d.dr_id
         and a.emp_id=e.emp_id
@@ -145,7 +145,7 @@ class Laborat extends Component
         $meta_data_pasien_json = isset($findData->meta_data_pasien_json) ? $findData->meta_data_pasien_json : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($meta_data_pasien_json == null) {
 
@@ -332,7 +332,7 @@ class Laborat extends Component
 
     public function cetakRekamMedisUGD()
     {
-        $queryIdentitas = DB::table('rsmst_identitases')
+        $queryIdentitas = DB::table('dimst_identitases')
             ->select(
                 'int_name',
                 'int_phone1',
@@ -353,14 +353,14 @@ class Laborat extends Component
         $this->emit('toastr-success', 'Cetak RM IGD');
 
         return response()->streamDownload(
-            fn () => print($pdfContent),
+            fn() => print($pdfContent),
             "rmUGD.pdf"
         );
     }
 
     public function cetakRekamMedisRJ()
     {
-        $queryIdentitas = DB::table('rsmst_identitases')
+        $queryIdentitas = DB::table('dimst_identitases')
             ->select(
                 'int_name',
                 'int_phone1',
@@ -381,14 +381,14 @@ class Laborat extends Component
         $this->emit('toastr-success', 'Cetak RM RJ');
 
         return response()->streamDownload(
-            fn () => print($pdfContent),
+            fn() => print($pdfContent),
             "rmRJ.pdf"
         );
     }
 
     public function cetakRekamMedisRJGrid($txnNo = null, $layananStatus = null, $dataDaftarTxn = [])
     {
-        $queryIdentitas = DB::table('rsmst_identitases')
+        $queryIdentitas = DB::table('dimst_identitases')
             ->select(
                 'int_name',
                 'int_phone1',
@@ -418,7 +418,7 @@ class Laborat extends Component
 
 
                 return response()->streamDownload(
-                    fn () => print($pdfContent),
+                    fn() => print($pdfContent),
                     "rmRJ.pdf"
                 );
             } else if ($layananStatus === 'UGD') {
@@ -439,7 +439,7 @@ class Laborat extends Component
                 $this->emit('toastr-success', 'Cetak RM IGD');
 
                 return response()->streamDownload(
-                    fn () => print($pdfContent),
+                    fn() => print($pdfContent),
                     "rmUGD.pdf"
                 );
             } else if ($layananStatus === 'RI') {
@@ -456,9 +456,7 @@ class Laborat extends Component
     }
 
     // when new form instance
-    public function mount()
-    {
-    }
+    public function mount() {}
 
 
 
@@ -481,11 +479,11 @@ class Laborat extends Component
                 'address',
                 'checkup_status',
                 'checkup_rjri',
-                DB::raw(" (select string_agg(clabitem_desc) from lbtxn_checkupdtls a,lbmst_clabitems b 
-                where a.clabitem_id=b.clabitem_id 
+                DB::raw(" (select string_agg(clabitem_desc) from lbtxn_checkupdtls a,lbmst_clabitems b
+                where a.clabitem_id=b.clabitem_id
                 and checkup_no=rsview_checkups.checkup_no
                 and a.price is not null) AS checkup_dtl_pasien
-                
+
                 ")
 
             )
@@ -494,7 +492,7 @@ class Laborat extends Component
             ->orderBy('checkup_status',  'desc');
 
 
-        $queryIdentitas = DB::table('rsmst_identitases')
+        $queryIdentitas = DB::table('dimst_identitases')
             ->select(
                 'int_name',
                 'int_phone1',
@@ -509,7 +507,7 @@ class Laborat extends Component
         ///////////////////////////////////////////////
 
         return view(
-            'livewire.emr.laborat.laborat',
+            'livewire.penunjang.emr.laborat.laborat',
             [
                 'myQueryData' => $query->paginate(3),
                 'myQueryIdentitas' => $queryIdentitas

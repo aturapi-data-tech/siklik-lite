@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\EmrRJ\MrRJ\Perencanaan;
+namespace App\Http\Livewire\RJ\EmrRJ\MrRJ\Perencanaan;
 
 use Illuminate\Support\Facades\DB;
 
@@ -9,7 +9,7 @@ use Livewire\WithPagination;
 
 use Carbon\Carbon;
 
-use Spatie\ArrayToXml\ArrayToXml;
+// use Spatie\ArrayToXml\ArrayToXml;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
 
 class Perencanaan extends Component
@@ -160,7 +160,7 @@ class Perencanaan extends Component
             ->where('rj_no', $rjNo)
             ->update([
                 'dataDaftarPoliRJ_json' => json_encode($this->dataDaftarPoliRJ, true),
-                'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+                // 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
         $this->emit('toastr-success', 'Perencanaan berhasil disimpan.');
@@ -342,7 +342,7 @@ class Perencanaan extends Component
     // select data start////////////////
     public function render()
     {
-        return view('livewire.emr-r-j.mr-r-j.perencanaan.perencanaan', [
+        return view('livewire.r-j.emr-r-j.mr-r-j.perencanaan.perencanaan', [
             // 'RJpasiens' => $query->paginate($this->limitPerPage),
             'myTitle' => 'Perencanaan',
             'mySnipt' => 'Rekam Medis Pasien',

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\EmrRJ\MrRJDokter\AssessmentDokterDiagnosis;
+namespace App\Http\Livewire\RJ\EmrRJ\MrRJDokter\AssessmentDokterDiagnosis;
 
 use Illuminate\Support\Facades\DB;
 
@@ -10,7 +10,7 @@ use Livewire\WithPagination;
 use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
 
-use Spatie\ArrayToXml\ArrayToXml;
+// use Spatie\ArrayToXml\ArrayToXml;
 use Exception;
 
 
@@ -509,14 +509,7 @@ class AssessmentDokterDiagnosis extends Component
 
     private function updateDataRJ($rjNo): void
     {
-
-        // update table trnsaksi
-        DB::table('rstxn_rjhdrs')
-            ->where('rj_no', $rjNo)
-            ->update([
-                'dataDaftarPoliRJ_json' => json_encode($this->dataDaftarPoliRJ, true),
-                'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-            ]);
+        $this->updateJsonRJ($rjNo, $this->dataDaftarPoliRJ);
 
         $this->emit('toastr-success', "Diagnosa berhasil disimpan.");
     }
@@ -560,7 +553,7 @@ class AssessmentDokterDiagnosis extends Component
     {
 
         return view(
-            'livewire.emr-r-j.mr-r-j-dokter.assessment-dokter-diagnosis.assessment-dokter-diagnosis',
+            'livewire.r-j.emr-r-j.mr-r-j-dokter.assessment-dokter-diagnosis.assessment-dokter-diagnosis',
             [
                 // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Data Pasien Rawat Jalan',

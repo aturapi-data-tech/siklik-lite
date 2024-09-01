@@ -155,7 +155,7 @@
                                     'active': activeTabAdministrasi === 'JasaKaryawan'
                                 }"
                                 x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'JasaKaryawan'">
-                                <livewire:emr-r-j.administrasi-r-j.jasa-karyawan-r-j
+                                <livewire:r-j.emr-r-j.administrasi-r-j.jasa-karyawan-r-j
                                     :wire:key="'content-jasa-karyawan-r-j'" :rjNoRef="$rjNoRef">
 
                             </div>
@@ -165,7 +165,7 @@
                                     'active': activeTabAdministrasi === 'JasaDokter'
                                 }"
                                 x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'JasaDokter'">
-                                <livewire:emr-r-j.administrasi-r-j.jasa-dokter-r-j
+                                <livewire:r-j.emr-r-j.administrasi-r-j.jasa-dokter-r-j
                                     :wire:key="'content-jasa-dokter-r-j2'" :rjNoRef="$rjNoRef">
 
                             </div>
@@ -175,8 +175,8 @@
                                     'active': activeTabAdministrasi === 'JasaMedis'
                                 }"
                                 x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'JasaMedis'">
-                                <livewire:emr-r-j.administrasi-r-j.jasa-medis-r-j :wire:key="'content-jasa-medis-r-j'"
-                                    :rjNoRef="$rjNoRef">
+                                <livewire:r-j.emr-r-j.administrasi-r-j.jasa-medis-r-j
+                                    :wire:key="'content-jasa-medis-r-j'" :rjNoRef="$rjNoRef">
 
                             </div>
 
@@ -185,7 +185,7 @@
                                     'active': activeTabAdministrasi === 'Obat'
                                 }"
                                 x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'Obat'">
-                                <livewire:emr-r-j.administrasi-r-j.obat-r-j :wire:key="'content-obat-r-j'"
+                                <livewire:r-j.emr-r-j.administrasi-r-j.obat-r-j :wire:key="'content-obat-r-j'"
                                     :rjNoRef="$rjNoRef">
 
                             </div>
@@ -195,7 +195,7 @@
                                     'active': activeTabAdministrasi === 'Laboratorium'
                                 }"
                                 x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'Laboratorium'">
-                                <livewire:emr-r-j.administrasi-r-j.laboratorium-r-j
+                                <livewire:r-j.emr-r-j.administrasi-r-j.laboratorium-r-j
                                     :wire:key="'content-laboratorium-r-j'" :rjNoRef="$rjNoRef">
 
                             </div>
@@ -205,7 +205,7 @@
                                     'active': activeTabAdministrasi === 'Radiologi'
                                 }"
                                 x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'Radiologi'">
-                                <livewire:emr-r-j.administrasi-r-j.radiologi-r-j :wire:key="'content-radiologi-r-j'"
+                                <livewire:r-j.emr-r-j.administrasi-r-j.radiologi-r-j :wire:key="'content-radiologi-r-j'"
                                     :rjNoRef="$rjNoRef">
 
                             </div>
@@ -215,8 +215,8 @@
                                     'active': activeTabAdministrasi === 'LainLain'
                                 }"
                                 x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'LainLain'">
-                                <livewire:emr-r-j.administrasi-r-j.lain-lain-r-j :wire:key="'content-lain-lain-r-j2'"
-                                    :rjNoRef="$rjNoRef">
+                                <livewire:r-j.emr-r-j.administrasi-r-j.lain-lain-r-j
+                                    :wire:key="'content-lain-lain-r-j2'" :rjNoRef="$rjNoRef">
 
                             </div>
 

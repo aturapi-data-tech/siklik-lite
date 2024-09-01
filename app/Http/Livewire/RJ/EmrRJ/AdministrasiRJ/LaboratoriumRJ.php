@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Http\Livewire\EmrRJ\AdministrasiRJ;
+namespace App\Http\Livewire\RJ\EmrRJ\AdministrasiRJ;
 
 use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 use Livewire\WithPagination;
 // use Carbon\Carbon;
-use Illuminate\Support\Facades\Validator;
+// use Illuminate\Support\Facades\Validator;
 
 
-use App\Http\Traits\customErrorMessagesTrait;
+// use App\Http\Traits\customErrorMessagesTrait;
 
 // use Illuminate\Support\Str;
-use Spatie\ArrayToXml\ArrayToXml;
+// use Spatie\ArrayToXml\ArrayToXml;
 use Exception;
 
 
@@ -90,7 +90,7 @@ class LaboratoriumRJ extends Component
     {
 
         return view(
-            'livewire.emr-r-j.administrasi-r-j.laboratorium-r-j',
+            'livewire.r-j.emr-r-j.administrasi-r-j.laboratorium-r-j',
             [
                 // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Data Pasien Rawat Jalan',

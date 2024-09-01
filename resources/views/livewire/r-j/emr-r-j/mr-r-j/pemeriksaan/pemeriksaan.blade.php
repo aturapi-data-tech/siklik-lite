@@ -80,7 +80,7 @@
                                 'active': activeTab === '{{ $dataDaftarPoliRJ['pemeriksaan']['umumTab'] }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['pemeriksaan']['umumTab'] }}'">
-                            @include('livewire.emr-r-j.mr-r-j.pemeriksaan.umumTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.pemeriksaan.umumTab')
 
                         </div>
 
@@ -89,7 +89,7 @@
                                 'active': activeTab === '{{ 'Fisik' }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ 'Fisik' }}'">
-                            @include('livewire.emr-r-j.mr-r-j.pemeriksaan.fisikTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.pemeriksaan.fisikTab')
 
                         </div>
 
@@ -98,7 +98,7 @@
                                 'active': activeTab === '{{ 'Anatomi' }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ 'Anatomi' }}'">
-                            @include('livewire.emr-r-j.mr-r-j.pemeriksaan.anatomiTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.pemeriksaan.anatomiTab')
 
                         </div>
 
@@ -107,7 +107,7 @@
                                 'active': activeTab === '{{ 'UjiFungsi' }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ 'UjiFungsi' }}'">
-                            @include('livewire.emr-r-j.mr-r-j.pemeriksaan.UjiFungsiTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.pemeriksaan.UjiFungsiTab')
 
                         </div>
 
@@ -116,7 +116,7 @@
                                 'active': activeTab === '{{ 'Penunjang' }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ 'Penunjang' }}'">
-                            @include('livewire.emr-r-j.mr-r-j.pemeriksaan.penunjangTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.pemeriksaan.penunjangTab')
 
                         </div>
 
@@ -125,7 +125,7 @@
                                 'active': activeTab === '{{ 'PenunjangHasil' }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ 'PenunjangHasil' }}'">
-                            @include('livewire.emr-r-j.mr-r-j.pemeriksaan.penunjangHasilTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.pemeriksaan.penunjangHasilTab')
 
                         </div>
 

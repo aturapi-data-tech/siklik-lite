@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\EmrRJ\EresepRJ;
+namespace App\Http\Livewire\RJ\EmrRJ\EresepRJ;
 
 use Illuminate\Support\Facades\DB;
 
@@ -11,7 +11,7 @@ use Livewire\WithPagination;
 use App\Http\Traits\customErrorMessagesTrait;
 
 // use Illuminate\Support\Str;
-use Spatie\ArrayToXml\ArrayToXml;
+// use Spatie\ArrayToXml\ArrayToXml;
 use Exception;
 use Illuminate\Support\Facades\Validator;
 
@@ -82,18 +82,18 @@ class EresepRJRacikan extends Component
         $search = $this->dataProductLovSearch;
 
         // check LOV by dr_id rs id
-        $dataProductLovs = DB::table('immst_products')
+        $dataProductLovs = DB::table('tkmst_products')
             ->select(
                 'product_id',
                 'product_name',
                 'sales_price',
                 DB::raw("(select replace(string_agg(cont_desc),',','')||product_name
                                             from immst_productcontents z,immst_contents x
-                                            where z.product_id=immst_products.product_id
+                                            where z.product_id=tkmst_products.product_id
                                             and z.cont_id=x.cont_id) as elasticSearch"),
                 DB::raw("(select string_agg(cont_desc)
                                             from immst_productcontents z,immst_contents x
-                                            where z.product_id=immst_products.product_id
+                                            where z.product_id=tkmst_products.product_id
                                             and z.cont_id=x.cont_id) as product_content"),
             )
             ->where('active_status', '1')
@@ -125,7 +125,7 @@ class EresepRJRacikan extends Component
                     where z.product_id=a.product_id
                     and z.cont_id=x.cont_id)product_content
 
-                    from immst_products a
+                    from tkmst_products a
                     where active_status='1'
                     group by product_id,product_name, sales_price
                     order by product_name)
@@ -146,18 +146,18 @@ class EresepRJRacikan extends Component
     public function setMydataProductLov($id)
     {
         $this->checkRjStatus();
-        $dataProductLovs = DB::table('immst_products')
+        $dataProductLovs = DB::table('tkmst_products')
             ->select(
                 'product_id',
                 'product_name',
                 'sales_price',
                 DB::raw("(select replace(string_agg(cont_desc),',','')||product_name
                                                             from immst_productcontents z,immst_contents x
-                                                            where z.product_id=immst_products.product_id
+                                                            where z.product_id=tkmst_products.product_id
                                                             and z.cont_id=x.cont_id) as elasticSearch"),
                 DB::raw("(select string_agg(cont_desc)
                                                             from immst_productcontents z,immst_contents x
-                                                            where z.product_id=immst_products.product_id
+                                                            where z.product_id=tkmst_products.product_id
                                                             and z.cont_id=x.cont_id) as product_content"),
             )
             ->where('active_status', '1')
@@ -238,7 +238,7 @@ class EresepRJRacikan extends Component
             ->where('rj_no', $rjNo)
             ->update([
                 'dataDaftarPoliRJ_json' => json_encode($this->dataDaftarPoliRJ, true),
-                'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+                // 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
         $this->emit('toastr-success', "Eresep Racikan berhasil disimpan.");
@@ -381,9 +381,7 @@ class EresepRJRacikan extends Component
     }
 
 
-    private function setDataPrimer(): void
-    {
-    }
+    private function setDataPrimer(): void {}
 
     private function addProduct($productId, $productName, $salesPrice): void
     {
@@ -617,7 +615,7 @@ class EresepRJRacikan extends Component
     {
 
         return view(
-            'livewire.emr-r-j.eresep-r-j.eresep-r-j-racikan',
+            'livewire.r-j.emr-r-j.eresep-r-j.eresep-r-j-racikan',
             [
                 // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Data Pasien Rawat Jalan',

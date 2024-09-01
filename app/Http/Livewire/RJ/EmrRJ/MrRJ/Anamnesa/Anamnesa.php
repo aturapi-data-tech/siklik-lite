@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\EmrRJ\MrRJ\Anamnesa;
+namespace App\Http\Livewire\RJ\EmrRJ\MrRJ\Anamnesa;
 
 use Illuminate\Support\Facades\DB;
 
@@ -8,7 +8,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 
-use Spatie\ArrayToXml\ArrayToXml;
+// use Spatie\ArrayToXml\ArrayToXml;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
 
 
@@ -504,7 +504,7 @@ class Anamnesa extends Component
             ->where('rj_no', $rjNo)
             ->update([
                 'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
-                'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+                // 'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
         $this->emit('toastr-success', "Anamnesa berhasil disimpan.");
@@ -802,7 +802,7 @@ class Anamnesa extends Component
             DB::table('rsmst_pasiens')->where('reg_no', $regNo)
                 ->update([
                     'meta_data_pasien_json' => json_encode($this->dataPasien, true),
-                    'meta_data_pasien_xml' => ArrayToXml::convert($this->dataPasien)
+                    // 'meta_data_pasien_xml' => ArrayToXml::convert($this->dataPasien)
                 ]);
 
             $this->emit('toastr-success', "Data Alergi " . $this->dataPasien['pasien']['regName'] . " berhasil diupdate.");
@@ -859,7 +859,7 @@ class Anamnesa extends Component
     {
 
         return view(
-            'livewire.emr-r-j.mr-r-j.anamnesa.anamnesa',
+            'livewire.r-j.emr-r-j.mr-r-j.anamnesa.anamnesa',
             [
                 // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Anamnesa',

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\EmrRJ\MrRJ\Diagnosis;
+namespace App\Http\Livewire\RJ\EmrRJ\MrRJ\Diagnosis;
 
 use Illuminate\Support\Facades\DB;
 
@@ -10,7 +10,7 @@ use Livewire\WithPagination;
 use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
 
-use Spatie\ArrayToXml\ArrayToXml;
+// use Spatie\ArrayToXml\ArrayToXml;
 use Exception;
 
 
@@ -511,7 +511,7 @@ class Diagnosis extends Component
             ->where('rj_no', $rjNo)
             ->update([
                 'dataDaftarPoliRJ_json' => json_encode($this->dataDaftarPoliRJ, true),
-                'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+                // 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
         $this->emit('toastr-success', "Diagnosa berhasil disimpan.");
@@ -555,7 +555,7 @@ class Diagnosis extends Component
     {
 
         return view(
-            'livewire.emr-r-j.mr-r-j.diagnosis.diagnosis',
+            'livewire.r-j.emr-r-j.mr-r-j.diagnosis.diagnosis',
             [
                 // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Data Pasien Rawat Jalan',

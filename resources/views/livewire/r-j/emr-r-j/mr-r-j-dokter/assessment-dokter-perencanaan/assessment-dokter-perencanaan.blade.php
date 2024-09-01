@@ -14,9 +14,9 @@
                     <div id="TransaksiRawatJalan">
 
                         <div class="p-2 rounded-lg bg-gray-50">
-                            @include('livewire.emr-r-j.mr-r-j.perencanaan.terapiTab')
-                            @include('livewire.emr-r-j.mr-r-j.perencanaan.tindakLanjutTab')
-                            @include('livewire.emr-r-j.mr-r-j.perencanaan.pengkajianMedisTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.perencanaan.terapiTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.perencanaan.tindakLanjutTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.perencanaan.pengkajianMedisTab')
                         </div>
                     </div>
                 </div>

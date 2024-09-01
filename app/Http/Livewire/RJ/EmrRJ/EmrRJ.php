@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\EmrRJ;
+namespace App\Http\Livewire\RJ\EmrRJ;
 
 use Illuminate\Support\Facades\DB;
 
@@ -417,8 +417,7 @@ class EmrRJ extends Component
                 'no_antrian',
                 'rj_status',
                 'nobooking',
-                'push_antrian_bpjs_status',
-                'push_antrian_bpjs_json',
+
                 'datadaftarpolirj_json'
             )
             ->where(DB::raw("nvl(erm_status,'A')"), '=', $myRefstatusId)
@@ -450,7 +449,7 @@ class EmrRJ extends Component
 
 
         return view(
-            'livewire.emr-r-j.emr-r-j',
+            'livewire.r-j.emr-r-j.emr-r-j',
             ['myQueryData' => $query->paginate($this->limitPerPage)]
         );
     }

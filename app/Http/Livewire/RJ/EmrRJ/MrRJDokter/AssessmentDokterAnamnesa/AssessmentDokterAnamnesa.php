@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\EmrRJ\MrRJDokter\AssessmentDokterAnamnesa;
+namespace App\Http\Livewire\RJ\EmrRJ\MrRJDokter\AssessmentDokterAnamnesa;
 
 use Illuminate\Support\Facades\DB;
 
@@ -499,14 +499,7 @@ class AssessmentDokterAnamnesa extends Component
 
     private function updateDataRj($rjNo): void
     {
-
-        // update table trnsaksi
-        DB::table('rstxn_rjhdrs')
-            ->where('rj_no', $rjNo)
-            ->update([
-                'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
-                'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-            ]);
+        $this->updateJsonRJ($rjNo, $this->dataDaftarPoliRJ);
 
         $this->emit('toastr-success', "Anamnesa berhasil disimpan.");
     }
@@ -823,7 +816,7 @@ class AssessmentDokterAnamnesa extends Component
     {
 
         return view(
-            'livewire.emr-r-j.mr-r-j-dokter.assessment-dokter-anamnesa.assessment-dokter-anamnesa',
+            'livewire.r-j.emr-r-j.mr-r-j-dokter.assessment-dokter-anamnesa.assessment-dokter-anamnesa',
             [
                 // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Anamnesa',

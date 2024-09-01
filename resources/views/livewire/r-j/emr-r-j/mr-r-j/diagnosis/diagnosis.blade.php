@@ -16,7 +16,7 @@
                 {{-- ICD10 --}}
                 <div>
                     {{-- LOV Diagnosa --}}
-                    @include('livewire.emr-r-j.mr-r-j.diagnosis.list-of-value-caridataDiagnosaICD10')
+                    @include('livewire.r-j.emr-r-j.mr-r-j.diagnosis.list-of-value-caridataDiagnosaICD10')
                 </div>
 
                 <!-- Table -->
@@ -132,7 +132,7 @@
                 {{-- ICD 9 CM --}}
                 <div>
                     {{-- LOV Diagnosa --}}
-                    @include('livewire.emr-r-j.mr-r-j.diagnosis.list-of-value-caridataProcedureICD9Cm')
+                    @include('livewire.r-j.emr-r-j.mr-r-j.diagnosis.list-of-value-caridataProcedureICD9Cm')
                 </div>
 
                 <!-- Table -->

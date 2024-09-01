@@ -95,8 +95,8 @@
                     ttd Dokter
                 </x-yellow-button>
 
-                <livewire:cetak.cetak-eresep-r-j :rjNoRef="$rjNoRef"
-                    wire:key="cetak.cetak-eresep-r-j-{{ $rjNoRef }}">
+                <livewire:component.cetak.cetak-eresep-r-j :rjNoRef="$rjNoRef"
+                    wire:key="component.cetak.cetak-eresep-r-j-{{ $rjNoRef }}">
 
             </div>
             @error('dataDaftarPoliRJ.perencanaan.pengkajianMedis.drPemeriksa')

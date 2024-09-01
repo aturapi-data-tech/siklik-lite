@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Emr\Radiologi;
+namespace App\Http\Livewire\Penunjang\Emr\Radiologi;
 
 use Illuminate\Support\Facades\DB;
 
@@ -270,7 +270,7 @@ class Radiologi extends Component
 
     public function cetakRekamMedisUGD()
     {
-        $queryIdentitas = DB::table('rsmst_identitases')
+        $queryIdentitas = DB::table('dimst_identitases')
             ->select(
                 'int_name',
                 'int_phone1',
@@ -291,14 +291,14 @@ class Radiologi extends Component
         $this->emit('toastr-success', 'Cetak RM IGD');
 
         return response()->streamDownload(
-            fn () => print($pdfContent),
+            fn() => print($pdfContent),
             "rmUGD.pdf"
         );
     }
 
     public function cetakRekamMedisRJ()
     {
-        $queryIdentitas = DB::table('rsmst_identitases')
+        $queryIdentitas = DB::table('dimst_identitases')
             ->select(
                 'int_name',
                 'int_phone1',
@@ -319,14 +319,14 @@ class Radiologi extends Component
         $this->emit('toastr-success', 'Cetak RM RJ');
 
         return response()->streamDownload(
-            fn () => print($pdfContent),
+            fn() => print($pdfContent),
             "rmRJ.pdf"
         );
     }
 
     public function cetakRekamMedisRJGrid($txnNo = null, $layananStatus = null, $dataDaftarTxn = [])
     {
-        $queryIdentitas = DB::table('rsmst_identitases')
+        $queryIdentitas = DB::table('dimst_identitases')
             ->select(
                 'int_name',
                 'int_phone1',
@@ -356,7 +356,7 @@ class Radiologi extends Component
 
 
                 return response()->streamDownload(
-                    fn () => print($pdfContent),
+                    fn() => print($pdfContent),
                     "rmRJ.pdf"
                 );
             } else if ($layananStatus === 'UGD') {
@@ -377,7 +377,7 @@ class Radiologi extends Component
                 $this->emit('toastr-success', 'Cetak RM IGD');
 
                 return response()->streamDownload(
-                    fn () => print($pdfContent),
+                    fn() => print($pdfContent),
                     "rmUGD.pdf"
                 );
             } else if ($layananStatus === 'RI') {
@@ -394,9 +394,7 @@ class Radiologi extends Component
     }
 
     // when new form instance
-    public function mount()
-    {
-    }
+    public function mount() {}
 
 
 
@@ -427,7 +425,7 @@ class Radiologi extends Component
             ->orderBy('rad_date1',  'desc');
 
 
-        $queryIdentitas = DB::table('rsmst_identitases')
+        $queryIdentitas = DB::table('dimst_identitases')
             ->select(
                 'int_name',
                 'int_phone1',
@@ -442,7 +440,7 @@ class Radiologi extends Component
         ///////////////////////////////////////////////
 
         return view(
-            'livewire.emr.radiologi.radiologi',
+            'livewire.penunjang.emr.radiologi.radiologi',
             [
                 'myQueryData' => $query->paginate(3),
                 'myQueryIdentitas' => $queryIdentitas

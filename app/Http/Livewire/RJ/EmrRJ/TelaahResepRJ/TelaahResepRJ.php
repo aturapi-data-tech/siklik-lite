@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\EmrRJ\TelaahResepRJ;
+namespace App\Http\Livewire\RJ\EmrRJ\TelaahResepRJ;
 
 use Illuminate\Support\Facades\DB;
 
@@ -51,14 +51,16 @@ class TelaahResepRJ extends Component
                 ["tepatObat" => "Tidak"],
             ],
             "desc" => "",
-        ], "tepatDosis" => [
+        ],
+        "tepatDosis" => [
             "tepatDosis" => "Ya",
             "tepatDosisOptions" => [
                 ["tepatDosis" => "Ya"],
                 ["tepatDosis" => "Tidak"],
             ],
             "desc" => "",
-        ], "tepatRute" => [
+        ],
+        "tepatRute" => [
             "tepatRute" => "Ya",
             "tepatRuteOptions" => [
                 ["tepatRute" => "Ya"],
@@ -132,14 +134,16 @@ class TelaahResepRJ extends Component
                 ["jmlDosisdgnResep" => "Tidak"],
             ],
             "desc" => "",
-        ], "rutedgnResep" => [
+        ],
+        "rutedgnResep" => [
             "rutedgnResep" => "Ya",
             "rutedgnResepOptions" => [
                 ["rutedgnResep" => "Ya"],
                 ["rutedgnResep" => "Tidak"],
             ],
             "desc" => "",
-        ], "waktuFrekPemberiandgnResep" => [
+        ],
+        "waktuFrekPemberiandgnResep" => [
             "waktuFrekPemberiandgnResep" => "Ya",
             "waktuFrekPemberiandgnResepOptions" => [
                 ["waktuFrekPemberiandgnResep" => "Ya"],
@@ -541,8 +545,7 @@ class TelaahResepRJ extends Component
                     'no_antrian',
 
                     'nobooking',
-                    'push_antrian_bpjs_status',
-                    'push_antrian_bpjs_json',
+
                     'kd_dr_bpjs',
                     'kd_poli_bpjs',
                     'rj_status',
@@ -797,8 +800,7 @@ class TelaahResepRJ extends Component
                 'no_antrian',
                 'rj_status',
                 'nobooking',
-                'push_antrian_bpjs_status',
-                'push_antrian_bpjs_json',
+
                 'datadaftarpolirj_json'
             )
             ->where(DB::raw("nvl(rj_status,'A')"), '=', $myRefstatusId)
@@ -845,7 +847,7 @@ class TelaahResepRJ extends Component
 
 
         return view(
-            'livewire.emr-r-j.telaah-resep-r-j.telaah-resep-r-j',
+            'livewire.r-j.emr-r-j.telaah-resep-r-j.telaah-resep-r-j',
             // ['myQueryData' => $query->paginate($this->limitPerPage)],
             ['myQueryData' => $myQueryPagination],
 

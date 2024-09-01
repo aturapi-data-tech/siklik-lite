@@ -10,9 +10,9 @@
             <div id="TransaksiRawatJalan" class="p-2">
                 <div id="TransaksiRawatJalan">
 
-                    <div class="p-2 rounded-lg  bg-gray-50">
-                        {{-- @include('livewire.emr-r-j.mr-r-j.anamnesa.pengkajianPerawatanTab') --}}
-                        {{-- @include('livewire.emr-r-j.mr-r-j.anamnesa.keluhanUtamaTab') --}}
+                    <div class="p-2 rounded-lg bg-gray-50">
+                        {{-- @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.pengkajianPerawatanTab') --}}
+                        {{-- @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.keluhanUtamaTab') --}}
 
                         <div>
 
@@ -31,15 +31,15 @@
                             </p>
 
                         </div>
-                        {{-- @include('livewire.emr-r-j.mr-r-j.anamnesa.anamnesaDiperolehTab') --}}
-                        @include('livewire.emr-r-j.mr-r-j.anamnesa.riwayatPenyakitSekarangUmumTab')
-                        @include('livewire.emr-r-j.mr-r-j.anamnesa.riwayatPenyakitDahuluTab')
-                        {{-- @include('livewire.emr-r-j.mr-r-j.anamnesa.penyakitKeluargaTab') --}}
-                        {{-- @include('livewire.emr-r-j.mr-r-j.anamnesa.statusFungsionalTab') --}}
-                        {{-- @include('livewire.emr-r-j.mr-r-j.anamnesa.statusPsikologisTab') --}}
-                        {{-- @include('livewire.emr-r-j.mr-r-j.anamnesa.edukasiTab')
-                        @include('livewire.emr-r-j.mr-r-j.anamnesa.screeningGiziTab') --}}
-                        {{-- @include('livewire.emr-r-j.mr-r-j.anamnesa.batukTab') --}}
+                        {{-- @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.anamnesaDiperolehTab') --}}
+                        @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.riwayatPenyakitSekarangUmumTab')
+                        @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.riwayatPenyakitDahuluTab')
+                        {{-- @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.penyakitKeluargaTab') --}}
+                        {{-- @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.statusFungsionalTab') --}}
+                        {{-- @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.statusPsikologisTab') --}}
+                        {{-- @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.edukasiTab')
+                        @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.screeningGiziTab') --}}
+                        {{-- @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.batukTab') --}}
                     </div>
 
 

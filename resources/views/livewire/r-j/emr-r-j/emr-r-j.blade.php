@@ -135,15 +135,15 @@
 
 
             @if ($isOpen)
-                @include('livewire.emr-r-j.create-emr-r-j')
+                @include('livewire.r-j.emr-r-j.create-emr-r-j')
             @endif
 
             @if ($isOpenDokter)
-                @include('livewire.emr-r-j.create-emr-r-j-dokter')
+                @include('livewire.r-j.emr-r-j.create-emr-r-j-dokter')
             @endif
 
             @if ($isOpenScreening)
-                @include('livewire.emr-r-j.create-screening-r-j')
+                @include('livewire.r-j.emr-r-j.create-screening-r-j')
             @endif
 
         </div>
@@ -316,7 +316,7 @@
 
                                 <div class="inline-flex">
 
-                                    <livewire:cetak.cetak-etiket :regNo="$myQData->reg_no"
+                                    <livewire:component.cetak.cetak-etiket :regNo="$myQData->reg_no"
                                         :wire:key="'cetak-etiket-'.$myQData->rj_no">
 
                                         <!-- Dropdown Action menu Flowbite-->
@@ -427,10 +427,10 @@
                                             </div>
                                         </div>
                                         <!-- End Dropdown Action Open menu -->
-                                        @role(['Admin', 'Mr', 'Perawat'])
+                                        {{-- @role(['Admin', 'Mr', 'Perawat'])
                                             <livewire:emr-r-j.post-encounter-r-j.post-encounter-r-j :rjNoRef="$myQData->rj_no"
                                                 :wire:key="'post-encounter-r-j-'.$myQData->rj_no">
-                                            @endrole
+                                            @endrole --}}
 
                                 </div>
 

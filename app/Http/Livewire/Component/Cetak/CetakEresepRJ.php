@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Cetak;
+namespace App\Http\Livewire\Component\Cetak;
 
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
@@ -476,7 +476,7 @@ class CetakEresepRJ extends Component
 
     public function cetak()
     {
-        $queryIdentitas = DB::table('rsmst_identitases')
+        $queryIdentitas = DB::table('dimst_identitases')
             ->select(
                 'int_name',
                 'int_phone1',
@@ -501,7 +501,7 @@ class CetakEresepRJ extends Component
 
 
                 return response()->streamDownload(
-                    fn () => print($pdfContent),
+                    fn() => print($pdfContent),
                     "eresep.pdf"
                 );
             } else {
@@ -520,6 +520,6 @@ class CetakEresepRJ extends Component
     }
     public function render()
     {
-        return view('livewire.cetak.cetak-eresep-r-j');
+        return view('livewire.component.cetak.cetak-eresep-r-j');
     }
 }

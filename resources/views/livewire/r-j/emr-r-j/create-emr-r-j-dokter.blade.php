@@ -49,7 +49,7 @@
                     {{-- Display Pasien --}}
                     {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
 
-                    <livewire:emr-r-j.display-pasien.display-pasien :wire:key="$regNo.'display-pasien'"
+                    <livewire:r-j.emr-r-j.display-pasien.display-pasien :wire:key="$regNo.'display-pasien'"
                         :rjNoRef="$rjNoRef">
 
                         {{-- <livewire:emr-r-j.form-entry-r-j.form-entry-r-j :rjNo="$regNo"
@@ -88,7 +88,7 @@
                             'active': activeTabDokter === 'assessmentDokter'
                         }"
                         x-show.transition.in.opacity.duration.600="activeTabDokter === 'assessmentDokter'">
-                        <livewire:emr-r-j.mr-r-j-dokter.assessment-dokter.assessment-dokter
+                        <livewire:r-j.emr-r-j.mr-r-j-dokter.assessment-dokter.assessment-dokter
                             :wire:key="'content-assessmentDokter'" :rjNoRef="$rjNoRef" :regNoRef="$regNoRef">
                     </div>
 
@@ -97,8 +97,9 @@
                             'active': activeTabDokter === 'pelayananPenunjang'
                         }"
                         x-show.transition.in.opacity.duration.600="activeTabDokter === 'pelayananPenunjang'">
-                        <livewire:emr.laborat.laborat :wire:key="'content-pelayananPenunjangLab'" :regNoRef="$regNoRef">
-                            <livewire:emr.radiologi.radiologi :wire:key="'content-pelayananPenunjangRad'"
+                        <livewire:penunjang.emr.laborat.laborat :wire:key="'content-pelayananPenunjangLab'"
+                            :regNoRef="$regNoRef">
+                            <livewire:penunjang.emr.radiologi.radiologi :wire:key="'content-pelayananPenunjangRad'"
                                 :regNoRef="$regNoRef">
                     </div>
 
@@ -107,7 +108,8 @@
                             'active': activeTabDokter === 'rekamMedis'
                         }"
                         x-show.transition.in.opacity.duration.600="activeTabDokter === 'rekamMedis'">
-                        <livewire:emr.rekam-medis.rekam-medis :wire:key="'content-rekamMedis'" :regNoRef="$regNoRef">
+                        <livewire:penunjang.emr.rekam-medis.rekam-medis :wire:key="'content-rekamMedis'"
+                            :regNoRef="$regNoRef">
                     </div>
 
                 </div>

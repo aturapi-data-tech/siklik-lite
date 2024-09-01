@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\EmrRJ\MrRJDokter\AssessmentDokter;
+namespace App\Http\Livewire\RJ\EmrRJ\MrRJDokter\AssessmentDokter;
 
 use Illuminate\Support\Facades\DB;
 
@@ -40,7 +40,7 @@ class AssessmentDokter extends Component
     {
 
         return view(
-            'livewire.emr-r-j.mr-r-j-dokter.assessment-dokter.assessment-dokter',
+            'livewire.r-j.emr-r-j.mr-r-j-dokter.assessment-dokter.assessment-dokter',
             []
         );
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\EmrRJ\MrRJ\Pemeriksaan;
+namespace App\Http\Livewire\RJ\EmrRJ\MrRJ\Pemeriksaan;
 
 use Illuminate\Support\Facades\DB;
 
@@ -8,7 +8,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 
-use Spatie\ArrayToXml\ArrayToXml;
+// use Spatie\ArrayToXml\ArrayToXml;
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
@@ -923,7 +923,7 @@ class Pemeriksaan extends Component
             ->where('rj_no', $rjNo)
             ->update([
                 'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
-                'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+                // 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
         $this->emit('toastr-success', "Pemeriksaan berhasil disimpan.");
@@ -1039,7 +1039,7 @@ class Pemeriksaan extends Component
     {
 
         return view(
-            'livewire.emr-r-j.mr-r-j.pemeriksaan.pemeriksaan',
+            'livewire.r-j.emr-r-j.mr-r-j.pemeriksaan.pemeriksaan',
             [
                 // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Anamnesia',

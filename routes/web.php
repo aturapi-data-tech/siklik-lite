@@ -10,15 +10,15 @@ use App\Http\Livewire\Master\MasterDokter\MasterDokter;
 
 use App\Http\Livewire\RJ\BookingRJ\BookingRJ;
 use App\Http\Livewire\RJ\DaftarRJ\DaftarRJ;
+use App\Http\Livewire\RJ\EmrRJ\EmrRJ;
+use App\Http\Livewire\RJ\EmrRJ\TelaahResepRJ\TelaahResepRJ;
 
 
 
 // use App\Http\Livewire\PelayananRJ\PelayananRJ;
 // use App\Http\Livewire\DisplayPelayananRJ\DisplayPelayananRJ;
 // use App\Http\Livewire\EmrRJ\AdministrasiRJ\AdministrasiRJ;
-// use App\Http\Livewire\EmrRJ\EmrRJ;
 
-// use App\Http\Livewire\EmrRJ\TelaahResepRJ\TelaahResepRJ;
 
 
 
@@ -75,6 +75,8 @@ Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker']], functi
     // RJ
     Route::get('BookingRJ', BookingRJ::class)->middleware('auth')->name('BookingRJ');
     Route::get('daftarRJ', DaftarRJ::class)->middleware('auth')->name('daftarRJ');
+    Route::get('EmrRJ', EmrRJ::class)->middleware('auth')->name('EmrRJ');
+    Route::get('TelaahResepRJ', TelaahResepRJ::class)->middleware('auth')->name('TelaahResepRJ');
 
 
 
@@ -83,8 +85,6 @@ Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker']], functi
     // Route::get('displayPelayananRJ', displayPelayananRJ::class)->middleware('auth')->name('displayPelayananRJ');
 
 
-    // Route::get('EmrRJ', EmrRJ::class)->middleware('auth')->name('EmrRJ');
-    // Route::get('TelaahResepRJ', TelaahResepRJ::class)->middleware('auth')->name('TelaahResepRJ');
 
     // Route::get('EmrRJAdministrasi', AdministrasiRJ::class)->middleware('auth')->name('EmrRJAdministrasi');
 });

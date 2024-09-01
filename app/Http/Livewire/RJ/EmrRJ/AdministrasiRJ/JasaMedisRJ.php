@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\EmrRJ\AdministrasiRJ;
+namespace App\Http\Livewire\RJ\EmrRJ\AdministrasiRJ;
 
 use Illuminate\Support\Facades\DB;
 
@@ -14,7 +14,7 @@ use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
 
 // use Illuminate\Support\Str;
-use Spatie\ArrayToXml\ArrayToXml;
+// use Spatie\ArrayToXml\ArrayToXml;
 use Exception;
 
 
@@ -225,7 +225,7 @@ class JasaMedisRJ extends Component
             ->where('rj_no', $rjNo)
             ->update([
                 'dataDaftarPoliRJ_json' => json_encode($this->dataDaftarPoliRJ, true),
-                'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+                // 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
         $this->emit('toastr-success', "Jasa Medis berhasil disimpan.");
@@ -671,7 +671,7 @@ class JasaMedisRJ extends Component
     {
 
         return view(
-            'livewire.emr-r-j.administrasi-r-j.jasa-medis-r-j',
+            'livewire.r-j.emr-r-j.administrasi-r-j.jasa-medis-r-j',
             [
                 // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Data Pasien Rawat Jalan',

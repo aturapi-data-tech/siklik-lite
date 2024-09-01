@@ -41,7 +41,7 @@
 
                 {{-- Display Pasien Componen --}}
                 <div>
-                    <livewire:emr-r-j.display-pasien.display-pasien :wire:key="$regNo.'display-pasienEresep'"
+                    <livewire:r-j.emr-r-j.display-pasien.display-pasien :wire:key="$regNo.'display-pasienEresep'"
                         :rjNoRef="$rjNoRef">
                 </div>
 
@@ -74,7 +74,8 @@
                             'active': activeTab === 'anamnesa'
                         }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'anamnesa'">
-                        <livewire:emr-r-j.mr-r-j.anamnesa.anamnesa :wire:key="'content-anamnesaRj'" :rjNoRef="$rjNoRef">
+                        <livewire:r-j.emr-r-j.mr-r-j.anamnesa.anamnesa :wire:key="'content-anamnesaRj'"
+                            :rjNoRef="$rjNoRef">
 
                     </div>
 
@@ -83,7 +84,7 @@
                             'active': activeTab === 'pemeriksaan'
                         }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'pemeriksaan'">
-                        <livewire:emr-r-j.mr-r-j.pemeriksaan.pemeriksaan :wire:key="'content-pemeriksaanRj'"
+                        <livewire:r-j.emr-r-j.mr-r-j.pemeriksaan.pemeriksaan :wire:key="'content-pemeriksaanRj'"
                             :rjNoRef="$rjNoRef">
 
                     </div>
@@ -93,7 +94,7 @@
                             'active': activeTab === 'penilaian'
                         }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'penilaian'">
-                        <livewire:emr-r-j.mr-r-j.penilaian.penilaian :wire:key="'content-penilaianRj'"
+                        <livewire:r-j.emr-r-j.mr-r-j.penilaian.penilaian :wire:key="'content-penilaianRj'"
                             :rjNoRef="$rjNoRef">
 
                     </div>
@@ -103,7 +104,7 @@
                             'active': activeTab === 'diagnosis'
                         }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'diagnosis'">
-                        <livewire:emr-r-j.mr-r-j.diagnosis.diagnosis :wire:key="'content-diagnosisRj'"
+                        <livewire:r-j.emr-r-j.mr-r-j.diagnosis.diagnosis :wire:key="'content-diagnosisRj'"
                             :rjNoRef="$rjNoRef">
 
                     </div>
@@ -113,7 +114,7 @@
                             'active': activeTab === 'perencanaan'
                         }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'perencanaan'">
-                        <livewire:emr-r-j.mr-r-j.perencanaan.perencanaan :wire:key="'content-perencanaanRj'"
+                        <livewire:r-j.emr-r-j.mr-r-j.perencanaan.perencanaan :wire:key="'content-perencanaanRj'"
                             :rjNoRef="$rjNoRef">
 
                     </div>
@@ -123,7 +124,8 @@
                             'active': activeTab === 'rekamMedis'
                         }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'rekamMedis'">
-                        <livewire:emr.rekam-medis.rekam-medis :wire:key="'content-rekamMedisRj'" :regNoRef="$regNoRef">
+                        <livewire:penunjang.emr.rekam-medis.rekam-medis :wire:key="'content-rekamMedisRj'"
+                            :regNoRef="$regNoRef">
 
                     </div>
 
@@ -133,7 +135,7 @@
                         }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'administrasi'">
 
-                        <livewire:emr-r-j.administrasi-r-j.administrasi-r-j :wire:key="'content-administrasiRj'"
+                        <livewire:r-j.emr-r-j.administrasi-r-j.administrasi-r-j :wire:key="'content-administrasiRj'"
                             :rjNoRef="$rjNoRef">
 
                     </div>
@@ -143,7 +145,7 @@
                             'active': activeTab === 'suket'
                         }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'suket'">
-                        <livewire:emr-r-j.mr-r-j.suket.suket :wire:key="'content-suketRj'" :rjNoRef="$rjNoRef">
+                        <livewire:r-j.emr-r-j.mr-r-j.suket.suket :wire:key="'content-suketRj'" :rjNoRef="$rjNoRef">
 
                     </div>
 

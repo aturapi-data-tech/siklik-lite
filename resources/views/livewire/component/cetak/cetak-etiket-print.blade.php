@@ -22,7 +22,7 @@
     <table class="w-full">
         <tr>
             <td class="text-start">
-                <img src="madinahlogo.png" class="object-fill h-8">
+                <img src="madinahlogo.png" class="object-fill h-6">
             </td>
         </tr>
 

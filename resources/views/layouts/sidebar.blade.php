@@ -96,16 +96,6 @@
                                     </x-nav-link>
                                 @endrole
 
-
-
-                                {{--
-
-                                @role(['Perawat', 'Mr', 'Admin'])
-                                    <x-nav-link class="pl-4" :href="route('pelayananRJ')" :active="request()->routeIs('pelayananRJ')">
-                                        {{ __('Pelayanan Rawat Jalan') }}
-                                    </x-nav-link>
-                                @endrole
-
                                 @role(['Dokter', 'Perawat', 'Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('EmrRJ')" :active="request()->routeIs('EmrRJ')">
                                         <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
@@ -123,6 +113,18 @@
                                         {{ __('Resep Rawat Jalan') }}
                                     </x-nav-link>
                                 @endrole
+
+                                {{--
+
+                                @role(['Perawat', 'Mr', 'Admin'])
+                                    <x-nav-link class="pl-4" :href="route('pelayananRJ')" :active="request()->routeIs('pelayananRJ')">
+                                        {{ __('Pelayanan Rawat Jalan') }}
+                                    </x-nav-link>
+                                @endrole
+
+
+
+
 
 
 

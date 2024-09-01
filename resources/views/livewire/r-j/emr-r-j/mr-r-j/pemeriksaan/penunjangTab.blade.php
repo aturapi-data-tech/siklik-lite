@@ -33,7 +33,7 @@
                 </div>
 
                 @if ($isOpenLaboratorium)
-                    @include('livewire.emr-r-j.mr-r-j.pemeriksaan.create-penunjang-laboratorium')
+                    @include('livewire.r-j.emr-r-j.mr-r-j.pemeriksaan.create-penunjang-laboratorium')
                 @endif
 
 
@@ -119,7 +119,7 @@
                 </div>
 
                 @if ($isOpenRadiologi)
-                    @include('livewire.emr-r-j.mr-r-j.pemeriksaan.create-penunjang-radiologi')
+                    @include('livewire.r-j.emr-r-j.mr-r-j.pemeriksaan.create-penunjang-radiologi')
                 @endif
 
 
@@ -191,7 +191,7 @@
             </div>
 
             {{-- Lain --}}
-            @include('livewire.emr-r-j.mr-r-j.pemeriksaan.uploadpenunjangHasil')
+            @include('livewire.r-j.emr-r-j.mr-r-j.pemeriksaan.uploadpenunjangHasil')
 
 
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\EmrRJ\AdministrasiRJ;
+namespace App\Http\Livewire\RJ\EmrRJ\AdministrasiRJ;
 
 use Illuminate\Support\Facades\DB;
 
@@ -8,7 +8,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 
-use Spatie\ArrayToXml\ArrayToXml;
+// use Spatie\ArrayToXml\ArrayToXml;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
 
 
@@ -128,7 +128,7 @@ class AdministrasiRJ extends Component
                 ->where('rj_no', $rjNo)
                 ->update([
                     'dataDaftarPoliRJ_json' => json_encode($dataDaftarPoliRJ, true),
-                    'dataDaftarPoliRJ_xml' => ArrayToXml::convert($dataDaftarPoliRJ),
+                    // 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($dataDaftarPoliRJ),
                 ]);
 
             $this->emit('toastr-success', "Administrasi berhasil disimpan.");
@@ -260,7 +260,7 @@ class AdministrasiRJ extends Component
     {
 
         return view(
-            'livewire.emr-r-j.administrasi-r-j.administrasi-r-j',
+            'livewire.r-j.emr-r-j.administrasi-r-j.administrasi-r-j',
             [
                 // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Administrasi RJ',

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\EmrRJ\MrRJ\Penilaian;
+namespace App\Http\Livewire\RJ\EmrRJ\MrRJ\Penilaian;
 
 use Illuminate\Support\Facades\DB;
 
@@ -8,7 +8,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 
-use Spatie\ArrayToXml\ArrayToXml;
+// use Spatie\ArrayToXml\ArrayToXml;
 
 
 class Penilaian extends Component
@@ -28,7 +28,7 @@ class Penilaian extends Component
     // dataDaftarPoliRJ RJ
     public array $dataDaftarPoliRJ = [];
 
-    // data penilaian=>[] 
+    // data penilaian=>[]
     public array $penilaian =
     [
         "fisikTab" => "Fisik",
@@ -419,7 +419,7 @@ class Penilaian extends Component
             ->where('rj_no', $rjNo)
             ->update([
                 'dataDaftarPoliRJ_json' => json_encode($this->dataDaftarPoliRJ, true),
-                'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+                // 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
         $this->emit('toastr-success', "Penilaian Fisik berhasil disimpan.");
@@ -439,7 +439,7 @@ class Penilaian extends Component
         $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json   : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($dataDaftarPoliRJ_json) {
             $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
@@ -561,9 +561,7 @@ class Penilaian extends Component
     }
 
     // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-    private function setDataPrimer(): void
-    {
-    }
+    private function setDataPrimer(): void {}
 
     private function scoringSkalaMorse(): void
     {
@@ -620,7 +618,7 @@ class Penilaian extends Component
     {
 
         return view(
-            'livewire.emr-r-j.mr-r-j.penilaian.penilaian',
+            'livewire.r-j.emr-r-j.mr-r-j.penilaian.penilaian',
             [
                 // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Penilaian',

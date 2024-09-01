@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Cetak;
+namespace App\Http\Livewire\Component\Cetak;
 
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
@@ -136,8 +136,9 @@ class CetakEtiket extends Component
             ->where('reg_no', $value)
             ->first();
 
-        if (!$findData) {
+        $findData = isset($findData->meta_data_pasien_json) ? $findData->meta_data_pasien_json : null;
 
+        if (!$findData) {
             $findData = $this->cariDataPasienByKeyCollection('reg_no', $value);
 
             $this->dataPasien['pasien']['regDate'] = $findData->reg_date;
@@ -205,8 +206,9 @@ class CetakEtiket extends Component
             // dd($this->dataPasien);
         } else {
             // ubah data Pasien
-            $this->dataPasien = json_decode($findData->meta_data_pasien_json, true);
+            $this->dataPasien = json_decode($findData, true);
             $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $this->dataPasien['pasien']['tglLahir'])->diff(Carbon::now())->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
+            // dd($this->dataPasien);
 
         }
     }
@@ -270,7 +272,7 @@ class CetakEtiket extends Component
 
         ];
         // $pdfContent = PDF::loadView('livewire.cetak.cetak-etiket', $data)->output();
-        $pdfContent = PDF::loadView('livewire.cetak.cetak-etiket-print', $data)->output();
+        $pdfContent = PDF::loadView('livewire.component.cetak.cetak-etiket-print', $data)->output();
 
         return response()->streamDownload(
             fn() => print($pdfContent),
@@ -280,11 +282,10 @@ class CetakEtiket extends Component
 
     public function mount()
     {
-        // setDataPasien
         $this->setDataPasien($this->regNo);
     }
     public function render()
     {
-        return view('livewire.cetak.cetak-etiket');
+        return view('livewire.component.cetak.cetak-etiket');
     }
 }

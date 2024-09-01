@@ -49,16 +49,16 @@
                     {{-- Display Pasien --}}
                     {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
 
-                    <livewire:emr-u-g-d.display-pasien.display-pasien :wire:key="$regNo.'display-pasien'"
-                        :rjNoRef="$rjNoRef">
+                    {{-- <livewire:emr-u-g-d.display-pasien.display-pasien :wire:key="$regNo.'display-pasien'"
+                        :rjNoRef="$rjNoRef"> --}}
 
-                        {{-- <livewire:emr-u-g-d.form-entry-u-g-d.form-entry-u-g-d :rjNo="$regNo"
+                    {{-- <livewire:emr-u-g-d.form-entry-u-g-d.form-entry-u-g-d :rjNo="$regNo"
                             :wire:key="$regNo.'form-entry-u-g-d'"> --}}
                 </div>
                 <div>
 
-                    <livewire:emr-u-g-d.mr-u-g-d.anamnesa.anamnesa.screening
-                        :wire:key="$regNo.'display-pasien-screening'" :rjNoRef="$rjNoRef">
+                    {{-- <livewire:emr-u-g-d.mr-u-g-d.anamnesa.anamnesa.screening
+                        :wire:key="$regNo.'display-pasien-screening'" :rjNoRef="$rjNoRef"> --}}
                 </div>
             </div>
 

@@ -37,7 +37,7 @@
                     </x-green-button>
                 </div>
                 {{-- LOV tingkatKesadaran --}}
-                @include('livewire.mr-r-j.pemeriksaan.list-of-value-tingkatKesadaran')
+                @include('livewire.r-j.emr-r-j.mr-r-j.pemeriksaan.list-of-value-tingkatKesadaran')
             </div>
 
 

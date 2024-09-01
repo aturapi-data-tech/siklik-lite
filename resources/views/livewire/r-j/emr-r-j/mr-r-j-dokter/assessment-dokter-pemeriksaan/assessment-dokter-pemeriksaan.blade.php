@@ -17,8 +17,8 @@
                 <div id="TransaksiRawatJalan" class="p-2">
 
                     <div class="p-2 rounded-lg bg-gray-50">
-                        {{-- @include('livewire.emr-r-j.mr-r-j.anamnesa.pengkajianPerawatanTab') --}}
-                        {{-- @include('livewire.emr-r-j.mr-r-j.anamnesa.keluhanUtamaTab') --}}
+                        {{-- @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.pengkajianPerawatanTab') --}}
+                        {{-- @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.keluhanUtamaTab') --}}
 
                         <div>
 
@@ -244,8 +244,8 @@
 
 
 
-                        {{-- @include('livewire.emr-r-j.mr-r-j.pemeriksaan.umumTab') --}}
-                        @include('livewire.emr-r-j.mr-r-j.pemeriksaan.fisikTab')
+                        {{-- @include('livewire.r-j.emr-r-j.mr-r-j.pemeriksaan.umumTab') --}}
+                        @include('livewire.r-j.emr-r-j.mr-r-j.pemeriksaan.fisikTab')
 
                         {{-- suspekAkibatKerja --}}
                         <div class="mb-2 ">
@@ -276,10 +276,10 @@
 
                         </div>
                         {{-- Ujifungsi --}}
-                        @include('livewire.emr-r-j.mr-r-j.pemeriksaan.UjiFungsiTab')
+                        @include('livewire.r-j.emr-r-j.mr-r-j.pemeriksaan.UjiFungsiTab')
 
-                        {{-- @include('livewire.emr-r-j.mr-r-j.pemeriksaan.anatomiTab') --}}
-                        @include('livewire.emr-r-j.mr-r-j.pemeriksaan.penunjangTab')
+                        {{-- @include('livewire.r-j.emr-r-j.mr-r-j.pemeriksaan.anatomiTab') --}}
+                        @include('livewire.r-j.emr-r-j.mr-r-j.pemeriksaan.penunjangTab')
 
                     </div>
 

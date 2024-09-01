@@ -112,7 +112,7 @@
                                 'active': activeTab === '{{ $dataDaftarPoliRJ['penilaian']['fisikTab'] }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['fisikTab'] }}'">
-                            @include('livewire.emr-r-j.mr-r-j.penilaian.fisikTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.penilaian.fisikTab')
 
                         </div>
 
@@ -121,7 +121,7 @@
                                 'active': activeTab === '{{ $dataDaftarPoliRJ['penilaian']['statusMedikTab'] }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['statusMedikTab'] }}'">
-                            @include('livewire.emr-r-j.mr-r-j.penilaian.statusMedikTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.penilaian.statusMedikTab')
 
                         </div> --}}
 
@@ -130,7 +130,7 @@
                                 'active': activeTab === '{{ $dataDaftarPoliRJ['penilaian']['nyeriTab'] }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['nyeriTab'] }}'">
-                            @include('livewire.emr-r-j.mr-r-j.penilaian.nyeriTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.penilaian.nyeriTab')
 
                         </div>
 
@@ -139,7 +139,7 @@
                                 'active': activeTab === '{{ $dataDaftarPoliRJ['penilaian']['statusPediatrikTab'] }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['statusPediatrikTab'] }}'">
-                            @include('livewire.emr-r-j.mr-r-j.penilaian.statusPediatrikTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.penilaian.statusPediatrikTab')
 
                         </div>
 
@@ -148,7 +148,7 @@
                                 'active': activeTab === '{{ $dataDaftarPoliRJ['penilaian']['diagnosisTab'] }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['diagnosisTab'] }}'">
-                            @include('livewire.emr-r-j.mr-r-j.penilaian.diagnosisTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.penilaian.diagnosisTab')
 
                         </div>
 
@@ -158,7 +158,7 @@
                                 '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseTab'] }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseTab'] }}'">
-                            @include('livewire.emr-r-j.mr-r-j.penilaian.skalaMorseTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.penilaian.skalaMorseTab')
 
                         </div>
 
@@ -168,7 +168,7 @@
                                 '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyTab'] }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyTab'] }}'">
-                            @include('livewire.emr-r-j.mr-r-j.penilaian.skalaHumptyDumptyTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.penilaian.skalaHumptyDumptyTab')
 
                         </div>
 
@@ -178,7 +178,7 @@
                                 '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['edmonson']['edmonsonTab'] }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['edmonson']['edmonsonTab'] }}'">
-                            @include('livewire.emr-r-j.mr-r-j.penilaian.edmonsonTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.penilaian.edmonsonTab')
 
                         </div>
 
@@ -188,7 +188,7 @@
                                 '{{ $dataDaftarPoliRJ['penilaian']['dekubitus']['dekubitusTab'] }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['dekubitus']['dekubitusTab'] }}'">
-                            @include('livewire.emr-r-j.mr-r-j.penilaian.dekubitusTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.penilaian.dekubitusTab')
 
                         </div>
 

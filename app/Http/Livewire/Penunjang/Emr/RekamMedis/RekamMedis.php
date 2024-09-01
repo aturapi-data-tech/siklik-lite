@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Emr\RekamMedis;
+namespace App\Http\Livewire\Penunjang\Emr\RekamMedis;
 
 use Illuminate\Support\Facades\DB;
 
@@ -22,9 +22,9 @@ class RekamMedis extends Component
     protected $listeners = [];
 
     // primitive Variable
-    public string $myTitle = 'Data Pasien UGD';
+    public string $myTitle = 'Data Pasien';
     public string $mySnipt = 'Rekam Medis Pasien';
-    public string $myProgram = 'Pasien UGD';
+    public string $myProgram = 'Pasien';
 
 
     //////////////////////////////
@@ -38,7 +38,6 @@ class RekamMedis extends Component
 
 
 
-    public bool $isOpenRekamMedisUGD;
     public bool $isOpenRekamMedisRJ;
 
 
@@ -46,7 +45,7 @@ class RekamMedis extends Component
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
 
-    // Layanan RJ/RI/UGD
+    // Layanan RJ/
     public function openModalLayanan($txnNo = null, $layananStatus = null, $dataDaftarTxn = []): void
     {
 
@@ -56,20 +55,6 @@ class RekamMedis extends Component
             if (isset($this->dataDaftarTxn['regNo'])) {
                 $this->setDataPasien($this->dataDaftarTxn['regNo']);
             }
-        } else if ($layananStatus === 'UGD') {
-            $this->isOpenRekamMedisUGD = true;
-            $this->dataDaftarTxn = $dataDaftarTxn;
-
-            if (isset($this->dataDaftarTxn['regNo'])) {
-                $this->setDataPasien($this->dataDaftarTxn['regNo']);
-            }
-        } else if ($layananStatus === 'RI') {
-            $this->emit('toastr-error', 'Rekam Medis (Rawat Inap) Fitur dalam masa pengembangan');
-            // $this->dataDaftarTxn = $dataDaftarTxn;
-
-            // if (isset($this->dataDaftarTxn['regNo'])) {
-            //     $this->setDataPasien($this->dataDaftarTxn['regNo']);
-            // }
         }
     }
 
@@ -84,7 +69,7 @@ class RekamMedis extends Component
         $meta_data_pasien_json = isset($findData->meta_data_pasien_json) ? $findData->meta_data_pasien_json : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($meta_data_pasien_json == null) {
 
@@ -265,42 +250,15 @@ class RekamMedis extends Component
 
     public function closeModalLayanan(): void
     {
-        $this->isOpenRekamMedisUGD = false;
         $this->isOpenRekamMedisRJ = false;
     }
 
 
-    public function cetakRekamMedisUGD()
-    {
-        $queryIdentitas = DB::table('rsmst_identitases')
-            ->select(
-                'int_name',
-                'int_phone1',
-                'int_phone2',
-                'int_fax',
-                'int_address',
-                'int_city',
-            )
-            ->first();
-        // cetak PDF
-        $data = [
-            'myQueryIdentitas' => $queryIdentitas,
-            'dataPasien' => $this->dataPasien,
-            'dataDaftarTxn' => $this->dataDaftarTxn,
 
-        ];
-        $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-u-g-d', $data)->output();
-        $this->emit('toastr-success', 'Cetak RM IGD');
-
-        return response()->streamDownload(
-            fn () => print($pdfContent),
-            "rmUGD.pdf"
-        );
-    }
 
     public function cetakRekamMedisRJ()
     {
-        $queryIdentitas = DB::table('rsmst_identitases')
+        $queryIdentitas = DB::table('dimst_identitases')
             ->select(
                 'int_name',
                 'int_phone1',
@@ -317,18 +275,18 @@ class RekamMedis extends Component
             'dataDaftarTxn' => $this->dataDaftarTxn,
 
         ];
-        $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-r-j', $data)->output();
+        $pdfContent = PDF::loadView('livewire.penunjang.emr.rekam-medis.cetak-rekam-medis-r-j', $data)->output();
         $this->emit('toastr-success', 'Cetak RM RJ');
 
         return response()->streamDownload(
-            fn () => print($pdfContent),
+            fn() => print($pdfContent),
             "rmRJ.pdf"
         );
     }
 
     public function cetakRekamMedisRJGrid($txnNo = null, $layananStatus = null, $dataDaftarTxn = [])
     {
-        $queryIdentitas = DB::table('rsmst_identitases')
+        $queryIdentitas = DB::table('dimst_identitases')
             ->select(
                 'int_name',
                 'int_phone1',
@@ -353,42 +311,14 @@ class RekamMedis extends Component
                     'dataDaftarTxn' => $this->dataDaftarTxn,
 
                 ];
-                $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-r-j', $data)->output();
+                $pdfContent = PDF::loadView('livewire.penunjang.emr.rekam-medis.cetak-rekam-medis-r-j', $data)->output();
                 $this->emit('toastr-success', 'Cetak RM RJ');
 
 
                 return response()->streamDownload(
-                    fn () => print($pdfContent),
+                    fn() => print($pdfContent),
                     "rmRJ.pdf"
                 );
-            } else if ($layananStatus === 'UGD') {
-                $this->dataDaftarTxn = $dataDaftarTxn;
-
-                if (isset($this->dataDaftarTxn['regNo'])) {
-                    $this->setDataPasien($this->dataDaftarTxn['regNo']);
-                }
-
-                // cetak PDF
-                $data = [
-                    'myQueryIdentitas' => $queryIdentitas,
-                    'dataPasien' => $this->dataPasien,
-                    'dataDaftarTxn' => $this->dataDaftarTxn,
-
-                ];
-                $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-u-g-d', $data)->output();
-                $this->emit('toastr-success', 'Cetak RM IGD');
-
-                return response()->streamDownload(
-                    fn () => print($pdfContent),
-                    "rmUGD.pdf"
-                );
-            } else if ($layananStatus === 'RI') {
-                $this->emit('toastr-error', 'Rekam Medis (Rawat Inap) Fitur dalam masa pengembangan');
-                // $this->dataDaftarTxn = $dataDaftarTxn;
-
-                // if (isset($this->dataDaftarTxn['regNo'])) {
-                //     $this->setDataPasien($this->dataDaftarTxn['regNo']);
-                // }
             }
         } else {
             $this->emit('toastr-error', 'Data Rekam Medis Tidak di Temukan');
@@ -398,7 +328,7 @@ class RekamMedis extends Component
 
     public function cetakRekamMedisRJSuketIstirahatGrid($txnNo = null, $layananStatus = null, $dataDaftarTxn = [])
     {
-        $queryIdentitas = DB::table('rsmst_identitases')
+        $queryIdentitas = DB::table('dimst_identitases')
             ->select(
                 'int_name',
                 'int_phone1',
@@ -423,42 +353,14 @@ class RekamMedis extends Component
                     'dataDaftarTxn' => $this->dataDaftarTxn,
 
                 ];
-                $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-r-j-suket-istirahat', $data)->output();
+                $pdfContent = PDF::loadView('livewire.penunjang.emr.rekam-medis.cetak-rekam-medis-r-j-suket-istirahat', $data)->output();
                 $this->emit('toastr-success', 'Cetak Suket Istirahat');
 
 
                 return response()->streamDownload(
-                    fn () => print($pdfContent),
+                    fn() => print($pdfContent),
                     "rmRJ.pdf"
                 );
-            } else if ($layananStatus === 'UGD') {
-                $this->dataDaftarTxn = $dataDaftarTxn;
-
-                if (isset($this->dataDaftarTxn['regNo'])) {
-                    $this->setDataPasien($this->dataDaftarTxn['regNo']);
-                }
-
-                // cetak PDF
-                $data = [
-                    'myQueryIdentitas' => $queryIdentitas,
-                    'dataPasien' => $this->dataPasien,
-                    'dataDaftarTxn' => $this->dataDaftarTxn,
-
-                ];
-                $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-u-g-d', $data)->output();
-                $this->emit('toastr-success', 'Cetak RM IGD');
-
-                return response()->streamDownload(
-                    fn () => print($pdfContent),
-                    "rmUGD.pdf"
-                );
-            } else if ($layananStatus === 'RI') {
-                $this->emit('toastr-error', 'Rekam Medis (Rawat Inap) Fitur dalam masa pengembangan');
-                // $this->dataDaftarTxn = $dataDaftarTxn;
-
-                // if (isset($this->dataDaftarTxn['regNo'])) {
-                //     $this->setDataPasien($this->dataDaftarTxn['regNo']);
-                // }
             }
         } else {
             $this->emit('toastr-error', 'Data Rekam Medis Tidak di Temukan');
@@ -468,7 +370,7 @@ class RekamMedis extends Component
 
     public function cetakRekamMedisRJSuketSehatGrid($txnNo = null, $layananStatus = null, $dataDaftarTxn = [])
     {
-        $queryIdentitas = DB::table('rsmst_identitases')
+        $queryIdentitas = DB::table('dimst_identitases')
             ->select(
                 'int_name',
                 'int_phone1',
@@ -493,42 +395,14 @@ class RekamMedis extends Component
                     'dataDaftarTxn' => $this->dataDaftarTxn,
 
                 ];
-                $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-r-j-suket-sehat', $data)->output();
+                $pdfContent = PDF::loadView('livewire.penunjang.emr.rekam-medis.cetak-rekam-medis-r-j-suket-sehat', $data)->output();
                 $this->emit('toastr-success', 'Cetak Suket Sehat');
 
 
                 return response()->streamDownload(
-                    fn () => print($pdfContent),
+                    fn() => print($pdfContent),
                     "rmRJ.pdf"
                 );
-            } else if ($layananStatus === 'UGD') {
-                $this->dataDaftarTxn = $dataDaftarTxn;
-
-                if (isset($this->dataDaftarTxn['regNo'])) {
-                    $this->setDataPasien($this->dataDaftarTxn['regNo']);
-                }
-
-                // cetak PDF
-                $data = [
-                    'myQueryIdentitas' => $queryIdentitas,
-                    'dataPasien' => $this->dataPasien,
-                    'dataDaftarTxn' => $this->dataDaftarTxn,
-
-                ];
-                $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-u-g-d', $data)->output();
-                $this->emit('toastr-success', 'Cetak RM IGD');
-
-                return response()->streamDownload(
-                    fn () => print($pdfContent),
-                    "rmUGD.pdf"
-                );
-            } else if ($layananStatus === 'RI') {
-                $this->emit('toastr-error', 'Rekam Medis (Rawat Inap) Fitur dalam masa pengembangan');
-                // $this->dataDaftarTxn = $dataDaftarTxn;
-
-                // if (isset($this->dataDaftarTxn['regNo'])) {
-                //     $this->setDataPasien($this->dataDaftarTxn['regNo']);
-                // }
             }
         } else {
             $this->emit('toastr-error', 'Data Rekam Medis Tidak di Temukan');
@@ -537,9 +411,7 @@ class RekamMedis extends Component
 
 
     // when new form instance
-    public function mount()
-    {
-    }
+    public function mount() {}
 
 
 
@@ -560,8 +432,7 @@ class RekamMedis extends Component
                 'layanan_status',
                 'poli',
                 DB::raw("(CASE WHEN layanan_status='RJ' THEN (select datadaftarpolirj_json from rsview_rjkasir where rj_no=txn_no)
-                                        WHEN layanan_status='UGD' THEN (select datadaftarugd_json from rsview_ugdkasir where rj_no=txn_no)
-                                            ELSE null END) as datadaftar_json")
+                                ELSE null END) as datadaftar_json")
 
             )
             ->where('reg_no', $this->regNoRef)
@@ -570,7 +441,7 @@ class RekamMedis extends Component
             ->orderBy('poli',  'asc');
 
 
-        $queryIdentitas = DB::table('rsmst_identitases')
+        $queryIdentitas = DB::table('dimst_identitases')
             ->select(
                 'int_name',
                 'int_phone1',
@@ -585,7 +456,7 @@ class RekamMedis extends Component
         ///////////////////////////////////////////////
 
         return view(
-            'livewire.emr.rekam-medis.rekam-medis',
+            'livewire.penunjang.emr.rekam-medis.rekam-medis',
             [
                 'myQueryData' => $query->paginate(3),
                 'myQueryIdentitas' => $queryIdentitas

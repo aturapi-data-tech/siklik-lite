@@ -44,7 +44,7 @@
                                 'active': activeTab === '{{ $dataDaftarPoliRJ['suket']['suketSehatTab'] }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['suket']['suketSehatTab'] }}'">
-                            @include('livewire.emr-r-j.mr-r-j.suket.suketSehatTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.suket.suketSehatTab')
 
                         </div>
 
@@ -53,7 +53,7 @@
                                 'active': activeTab === '{{ $dataDaftarPoliRJ['suket']['suketIstirahatTab'] }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['suket']['suketIstirahatTab'] }}'">
-                            @include('livewire.emr-r-j.mr-r-j.suket.suketIstirahatTab')
+                            @include('livewire.r-j.emr-r-j.mr-r-j.suket.suketIstirahatTab')
 
                         </div>
 

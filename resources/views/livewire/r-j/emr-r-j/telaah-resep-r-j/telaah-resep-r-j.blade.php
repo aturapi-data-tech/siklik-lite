@@ -135,11 +135,11 @@
 
 
             @if ($isOpenAdministrasi)
-                @include('livewire.emr-r-j.telaah-resep-r-j.create-administrasi-rj')
+                @include('livewire.r-j.emr-r-j.telaah-resep-r-j.create-administrasi-rj')
             @endif
 
             @if ($isOpenTelaahResep)
-                @include('livewire.emr-r-j.telaah-resep-r-j.create-telaahresep-rj')
+                @include('livewire.r-j.emr-r-j.telaah-resep-r-j.create-telaahresep-rj')
             @endif
 
 
@@ -321,7 +321,7 @@
 
                                 </div>
                                 <div>
-                                    <livewire:cetak.cetak-eresep-r-j :rjNoRef="$myQData->rj_no"
+                                    <livewire:component.cetak.cetak-eresep-r-j :rjNoRef="$myQData->rj_no"
                                         wire:key="cetak.cetak-eresep-r-j-{{ $myQData->rj_no }}">
 
                                 </div>

@@ -23,7 +23,7 @@
 
             </div>
             @if ($isOpenEresepRJ)
-                @include('livewire.emr-r-j.create-emr-r-j-racikan-nonracikan')
+                @include('livewire.r-j.emr-r-j.create-emr-r-j-racikan-nonracikan')
             @endif
         @endrole
 

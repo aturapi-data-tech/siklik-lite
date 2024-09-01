@@ -54,10 +54,10 @@
                     {{-- Display Pasien --}}
                     {{-- :rjNo="" disi dari emit ListeneropenModalEditRj --}}
 
-                    <livewire:emr-r-j.display-pasien.display-pasien :wire:key="$rjNoRef.'display-pasienEresep'"
+                    <livewire:r-j.emr-r-j.display-pasien.display-pasien :wire:key="$rjNoRef.'display-pasienEresep'"
                         :rjNoRef="$rjNoRef">
 
-                        {{-- <livewire:emr-r-j.form-entry-r-j.form-entry-r-j :rjNo="$regNo"
+                        {{-- <livewire:r-j.emr-r-j.form-entry-r-j.form-entry-r-j :rjNo="$regNo"
                             :wire:key="$regNo.'form-entry-r-j'"> --}}
                 </div>
 
@@ -112,7 +112,7 @@
                                     'active': activeTabRacikanNonRacikan === 'NonRacikan'
                                 }"
                                 x-show.transition.in.opacity.duration.600="activeTabRacikanNonRacikan === 'NonRacikan'">
-                                <livewire:emr-r-j.eresep-r-j.eresep-r-j :wire:key="'eresep-r-j'" :rjNoRef="$rjNoRef">
+                                <livewire:r-j.emr-r-j.eresep-r-j.eresep-r-j :wire:key="'eresep-r-j'" :rjNoRef="$rjNoRef">
 
                             </div>
 
@@ -121,7 +121,7 @@
                                     'active': activeTabRacikanNonRacikan === 'Racikan'
                                 }"
                                 x-show.transition.in.opacity.duration.600="activeTabRacikanNonRacikan === 'Racikan'">
-                                <livewire:emr-r-j.eresep-r-j.eresep-r-j-racikan :wire:key="'eresep-r-j-racikan'"
+                                <livewire:r-j.emr-r-j.eresep-r-j.eresep-r-j-racikan :wire:key="'eresep-r-j-racikan'"
                                     :rjNoRef="$rjNoRef">
 
                             </div>
@@ -132,8 +132,8 @@
                         {{-- Telaah Resep / Telaah Obat --}}
                         @role(['Apoteker', 'Admin'])
                             <div class="grid w-full grid-cols-2 gap-8 px-8 mx-2 my-2 mr-2 rounded-lg bg-gray-50">
-                                @include('livewire.emr-r-j.telaah-resep-r-j.radio-telaahresep-rj')
-                                @include('livewire.emr-r-j.telaah-resep-r-j.radio-telaahobat-rj')
+                                @include('livewire.r-j.emr-r-j.telaah-resep-r-j.radio-telaahresep-rj')
+                                @include('livewire.r-j.emr-r-j.telaah-resep-r-j.radio-telaahobat-rj')
                             </div>
                         @endrole
 
@@ -141,7 +141,7 @@
 
                     {{-- Resume --}}
                     <div class="col-span-1">
-                        <livewire:emr.rekam-medis.rekam-medis-display :wire:key="'content-rekamMedisDisplay'"
+                        <livewire:penunjang.emr.rekam-medis.rekam-medis-display :wire:key="'content-rekamMedisDisplay'"
                             :rjNoRefCopyTo="$rjNoRef" :regNoRef="$regNoRef">
                     </div>
 
