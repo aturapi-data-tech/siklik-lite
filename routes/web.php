@@ -17,7 +17,6 @@ use App\Http\Livewire\RJ\EmrRJ\TelaahResepRJ\TelaahResepRJ;
 
 // use App\Http\Livewire\PelayananRJ\PelayananRJ;
 // use App\Http\Livewire\DisplayPelayananRJ\DisplayPelayananRJ;
-// use App\Http\Livewire\EmrRJ\AdministrasiRJ\AdministrasiRJ;
 
 
 
@@ -86,7 +85,6 @@ Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker']], functi
 
 
 
-    // Route::get('EmrRJAdministrasi', AdministrasiRJ::class)->middleware('auth')->name('EmrRJAdministrasi');
 });
 
 
