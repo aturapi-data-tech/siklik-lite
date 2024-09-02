@@ -630,7 +630,7 @@ class TelaahResepRJ extends Component
             ->first();
 
         $rsObat = DB::table('rstxn_rjobats')
-            ->join('dimst_products', 'dimst_products.product_id', 'rstxn_rjobats.product_id')
+            ->join('tkmst_products', 'tkmst_products.product_id', 'rstxn_rjobats.product_id')
             ->select('rstxn_rjobats.product_id as product_id', 'product_name', 'qty', 'price', 'rjobat_dtl')
             ->where('rj_no', $rjNo)
             ->get();
