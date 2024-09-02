@@ -264,6 +264,11 @@ class FormEntryDaftarRJ extends Component
                 ];
         } else {
             // Klaim & Kunjungan
+            // noBooking kosong maka buat
+            if (!$this->FormEntry['noBooking']) {
+                $this->FormEntry['noBooking'] = Carbon::now()->format('YmdHis') . 'KLIKM';
+            }
+
             $this->FormEntry['klaimId'] = $this->jenisKlaim['JenisKlaimId'];
             $this->FormEntry['passStatus'] = $this->FormEntry['passStatus'] ? 'N' : 'O';
 
