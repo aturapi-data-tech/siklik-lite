@@ -115,7 +115,6 @@
                                 @endrole
 
                                 {{--
-
                                 @role(['Perawat', 'Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('pelayananRJ')" :active="request()->routeIs('pelayananRJ')">
                                         {{ __('Pelayanan Rawat Jalan') }}
@@ -123,18 +122,12 @@
                                 @endrole
 
 
-
-
-
-
-
-
-
                                 @role(['Perawat', 'Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('displayPelayananRJ')" :active="request()->routeIs('displayPelayananRJ')">
                                         {{ __('Display Pelayanan RJ') }}
                                     </x-nav-link>
-                                @endrole --}}
+                                @endrole
+                                --}}
 
                             </li>
                         </ul>
