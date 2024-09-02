@@ -47,7 +47,7 @@ class ObatRJ extends Component
     private function findData($rjno): void
     {
         $findData = DB::table('rstxn_rjobats')
-            ->join('immst_products', 'immst_products.product_id', 'rstxn_rjobats.product_id')
+            ->join('tkmst_products', 'tkmst_products.product_id', 'rstxn_rjobats.product_id')
             ->select('rstxn_rjobats.product_id as product_id', 'product_name', 'qty', 'price', 'rjobat_dtl')
             ->where('rj_no', $rjno)
             ->get();
