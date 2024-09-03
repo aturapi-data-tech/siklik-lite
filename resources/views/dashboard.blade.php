@@ -10,11 +10,13 @@
                 <div class="text-white w-full h-[calc(100vh-68px)] flex items-center justify-center min-h-screen p-10 ">
                     <div class="w-max">
                         <h1 class="overflow-hidden text-5xl font-bold ">
-                            Selamat datang di RSI MADINAH
+                            Selamat datang <br> {{ env('SATUSEHAT_ORGANIZATION_NAME'), 'SIKlik' }}
                         </h1>
                         <h3
                             class="pr-5 my-4 overflow-hidden text-2xl font-bold border-r-4 animate-typing whitespace-nowrap border-r-white ">
-                            Berkarya untuk kesembuhan sesama!</h3>
+                            {{ env('RS_ALAMAT'), 'SIKlik' }}
+                        </h3>
+
                     </div>
                 </div>
 
