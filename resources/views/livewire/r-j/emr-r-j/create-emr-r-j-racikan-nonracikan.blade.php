@@ -145,7 +145,7 @@
 
                     <div class="">
 
-                        <div>
+                        {{-- <div>
                             <div wire:loading wire:target="setstatusPRB">
                                 <x-loading />
                             </div>
@@ -169,7 +169,7 @@
                                     Set Status PRB
                                 </x-light-button>
                             @endisset
-                        </div>
+                        </div> --}}
 
                     </div>
                     <div>
