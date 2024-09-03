@@ -496,7 +496,7 @@ class CetakEresepRJ extends Component
                     'dataDaftarPoliRJ' => $this->dataDaftarPoliRJ,
 
                 ];
-                $pdfContent = PDF::loadView('livewire.cetak.cetak-eresep-r-j-print', $data)->output();
+                $pdfContent = PDF::loadView('livewire.component.cetak.cetak-eresep-r-j-print', $data)->output();
                 $this->emit('toastr-success', 'Cetak Eresep RJ');
 
 

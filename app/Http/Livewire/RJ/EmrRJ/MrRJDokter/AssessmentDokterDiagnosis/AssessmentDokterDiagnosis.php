@@ -511,7 +511,7 @@ class AssessmentDokterDiagnosis extends Component
     {
         $this->updateJsonRJ($rjNo, $this->dataDaftarPoliRJ);
 
-        $this->emit('toastr-success', "Diagnosa berhasil disimpan.");
+        // $this->emit('toastr-success', "Diagnosa berhasil disimpan.");
     }
     // insert and update record end////////////////
 

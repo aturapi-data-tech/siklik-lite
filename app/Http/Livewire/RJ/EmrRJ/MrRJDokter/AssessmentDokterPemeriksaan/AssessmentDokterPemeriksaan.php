@@ -917,7 +917,7 @@ class AssessmentDokterPemeriksaan extends Component
     {
         $this->updateJsonRJ($rjNo, $this->dataDaftarPoliRJ);
 
-        $this->emit('toastr-success', "Pemeriksaan berhasil disimpan.");
+        // $this->emit('toastr-success', "Pemeriksaan berhasil disimpan.");
     }
     // insert and update record end////////////////
 

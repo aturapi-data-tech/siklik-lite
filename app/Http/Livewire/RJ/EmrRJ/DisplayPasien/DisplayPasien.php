@@ -135,9 +135,9 @@ class DisplayPasien extends Component
             if (!isset($this->dataDaftarPoliRJ['klaimId'])) {
                 $this->emit('toastr-error', "Data Klaim tidak ditemukan, Reset Data Ke UMUM");
             }
-            if (!isset($this->dataDaftarPoliRJ['kunjunganId'])) {
-                $this->emit('toastr-error', "Data Kunjungan tidak ditemukan, Reset Data Ke FKTP");
-            }
+            // if (!isset($this->dataDaftarPoliRJ['kunjunganId'])) {
+            //     $this->emit('toastr-error', "Data Kunjungan tidak ditemukan, Reset Data Ke FKTP");
+            // }
         } else {
 
             $this->emit('toastr-error', "Data tidak dapat di proses json.");

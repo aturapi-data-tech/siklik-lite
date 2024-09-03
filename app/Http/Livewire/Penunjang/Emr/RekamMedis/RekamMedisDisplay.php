@@ -10,7 +10,7 @@ use Livewire\WithPagination;
 use App\Http\Traits\BPJS\iCareTrait;
 
 
-use Spatie\ArrayToXml\ArrayToXml;
+// use Spatie\ArrayToXml\ArrayToXml;
 use Exception;
 
 
@@ -278,7 +278,7 @@ class RekamMedisDisplay extends Component
             ->where('rj_no', $rjNo)
             ->update([
                 'datadaftarpolirj_json' => json_encode($dataDaftarPoliRJArr, true),
-                'datadaftarpolirj_xml' => ArrayToXml::convert($dataDaftarPoliRJArr),
+                // 'datadaftarpolirj_xml' => ArrayToXml::convert($dataDaftarPoliRJArr),
             ]);
 
         $this->emit('syncronizeAssessmentDokterRJFindData');

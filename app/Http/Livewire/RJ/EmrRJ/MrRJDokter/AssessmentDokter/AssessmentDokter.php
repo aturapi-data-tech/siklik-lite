@@ -32,6 +32,7 @@ class AssessmentDokter extends Component
     public function storeAssessmentDokterRJ()
     {
         $this->emit('storeAssessmentDokterRJ');
+        $this->emit('toastr-success', "Data Pemeriksaan berhasil disimpan.");
     }
 
 

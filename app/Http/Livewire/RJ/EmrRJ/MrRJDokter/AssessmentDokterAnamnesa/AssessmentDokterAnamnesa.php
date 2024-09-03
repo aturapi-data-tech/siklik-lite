@@ -501,7 +501,7 @@ class AssessmentDokterAnamnesa extends Component
     {
         $this->updateJsonRJ($rjNo, $this->dataDaftarPoliRJ);
 
-        $this->emit('toastr-success', "Anamnesa berhasil disimpan.");
+        // $this->emit('toastr-success', "Anamnesa berhasil disimpan.");
     }
     // insert and update record end////////////////
 

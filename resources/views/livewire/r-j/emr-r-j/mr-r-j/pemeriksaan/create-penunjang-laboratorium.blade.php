@@ -49,7 +49,7 @@
                     {{-- Display Pasien --}}
                     {{-- :rjNo="" disi dari emit ListeneropenModalEditRj --}}
 
-                    <livewire:emr-r-j.display-pasien.display-pasien :wire:key="$rjNoRef.'display-pasien'"
+                    <livewire:r-j.emr-r-j.display-pasien.display-pasien :wire:key="$rjNoRef.'display-pasien'"
                         :rjNoRef="$rjNoRef">
 
                         {{-- <livewire:emr-r-j.form-entry-r-j.form-entry-r-j :rjNo="$regNo"

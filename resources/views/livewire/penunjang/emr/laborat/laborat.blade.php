@@ -118,7 +118,7 @@
                         </div>
                     </div>
                     @if ($isOpenRekamMedisLaborat)
-                        @include('livewire.emr.laborat.create-laborat')
+                        @include('livewire.penunjang.emr.laborat.create-laborat')
                     @endif
 
                 </div>

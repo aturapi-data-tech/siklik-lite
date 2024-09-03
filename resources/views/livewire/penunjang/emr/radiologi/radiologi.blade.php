@@ -116,7 +116,7 @@
                         </div>
                     </div>
                     @if ($isOpenRekamMedisRadiologi)
-                        @include('livewire.emr.radiologi.create-radiologi')
+                        @include('livewire.penunjang.emr.radiologi.create-radiologi')
                     @endif
 
                 </div>
