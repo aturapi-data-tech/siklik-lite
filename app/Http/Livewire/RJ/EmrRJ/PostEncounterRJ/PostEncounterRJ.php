@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Livewire\EmrRJ\PostEncounterRJ;
+namespace App\Http\Livewire\RJ\EmrRJ\PostEncounterRJ;
 
 
 use App\Http\Traits\EmrRJ\EmrRJTrait;
 use Carbon\Carbon;
-use Illuminate\Support\Str;
 
 use App\Http\Livewire\SatuSehat\Encounter\Encounter;
 use App\Http\Livewire\SatuSehat\Condition\Condition;
@@ -175,6 +174,6 @@ class PostEncounterRJ extends Component
     }
     public function render()
     {
-        return view('livewire.emr-r-j.post-encounter-r-j.post-encounter-r-j');
+        return view('livewire.r-j.emr-r-j.post-encounter-r-j.post-encounter-r-j');
     }
 }

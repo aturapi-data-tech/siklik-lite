@@ -427,10 +427,10 @@
                                             </div>
                                         </div>
                                         <!-- End Dropdown Action Open menu -->
-                                        {{-- @role(['Admin', 'Mr', 'Perawat'])
-                                            <livewire:emr-r-j.post-encounter-r-j.post-encounter-r-j :rjNoRef="$myQData->rj_no"
+                                        @role(['Admin', 'Mr', 'Perawat'])
+                                            <livewire:r-j.emr-r-j.post-encounter-r-j.post-encounter-r-j :rjNoRef="$myQData->rj_no"
                                                 :wire:key="'post-encounter-r-j-'.$myQData->rj_no">
-                                            @endrole --}}
+                                            @endrole
 
                                 </div>
 

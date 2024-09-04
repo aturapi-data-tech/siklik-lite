@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Traits\BPJS;
+namespace App\Http\Traits\SATUSEHAT;
 
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;

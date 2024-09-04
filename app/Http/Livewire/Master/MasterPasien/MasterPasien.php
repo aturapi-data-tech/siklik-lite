@@ -5,16 +5,13 @@ namespace App\Http\Livewire\Master\MasterPasien;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
-use Spatie\ArrayToXml\ArrayToXml;
+// use Spatie\ArrayToXml\ArrayToXml;
 use Carbon\Carbon;
 
 use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\BPJS\VclaimTrait;
-use App\Http\Traits\BPJS\SatuSehatTrait;
+use App\Http\Traits\SATUSEHAT\SatuSehatTrait;
 
-
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 
 class MasterPasien extends Component
 {
@@ -1481,7 +1478,7 @@ class MasterPasien extends Component
             'prop_id' => $this->dataPasien['pasien']['identitas']['propinsiId'],
             'phone' => $this->dataPasien['pasien']['kontak']['nomerTelponSelulerPasien'],
             'meta_data_pasien_json' => json_encode($this->dataPasien, true),
-            'meta_data_pasien_xml' => ArrayToXml::convert($this->dataPasien)
+            // 'meta_data_pasien_xml' => ArrayToXml::convert($this->dataPasien)
 
         ]);
         $this->emit('toastr-success', "Data " .  $this->dataPasien['pasien']['regName'] . " berhasil disimpan.");
@@ -1523,7 +1520,7 @@ class MasterPasien extends Component
                 'prop_id' => $this->dataPasien['pasien']['identitas']['propinsiId'],
                 'phone' => $this->dataPasien['pasien']['kontak']['nomerTelponSelulerPasien'],
                 'meta_data_pasien_json' => json_encode($this->dataPasien, true),
-                'meta_data_pasien_xml' => ArrayToXml::convert($this->dataPasien)
+                // 'meta_data_pasien_xml' => ArrayToXml::convert($this->dataPasien)
 
             ]);
 
