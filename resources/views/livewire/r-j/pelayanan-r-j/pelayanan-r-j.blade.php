@@ -129,8 +129,6 @@
 
 
 
-
-
                 </div>
 
 
@@ -148,13 +146,6 @@
                                                 <x-sort-link :active=false wire:click.prevent="sortBy('RJp_id')"
                                                     role="button" href="#">
                                                     Pasien / Poli
-                                                </x-sort-link>
-                                            </th>
-
-                                            <th scope="col" class="px-4 py-3 ">
-                                                <x-sort-link :active=false wire:click.prevent="" role="button"
-                                                    href="#">
-                                                    SEP
                                                 </x-sort-link>
                                             </th>
 
@@ -178,7 +169,16 @@
 
                                         @foreach ($RJpasiens as $RJp)
                                             @php
-                                                $statusLayananBgcolor = $RJp->waktu_masuk_poli == null && $RJp->waktu_masuk_apt == null ? 'bg-yellow-100' : ($RJp->waktu_masuk_poli != null && $RJp->waktu_masuk_apt == null ? 'bg-red-100' : ($RJp->waktu_masuk_poli != null && $RJp->waktu_masuk_apt != null ? 'bg-green-100' : ''));
+                                                $statusLayananBgcolor =
+                                                    $RJp->waktu_masuk_poli == null && $RJp->waktu_masuk_apt == null
+                                                        ? 'bg-yellow-100'
+                                                        : ($RJp->waktu_masuk_poli != null &&
+                                                        $RJp->waktu_masuk_apt == null
+                                                            ? 'bg-red-100'
+                                                            : ($RJp->waktu_masuk_poli != null &&
+                                                            $RJp->waktu_masuk_apt != null
+                                                                ? 'bg-green-100'
+                                                                : ''));
                                             @endphp
                                             <tr
                                                 class="border-b group dark:border-gray-700 {{ $statusLayananBgcolor }}">
@@ -216,17 +216,7 @@
                                                     </div>
                                                 </td>
 
-                                                <td
-                                                    class="px-4 py-3 break-all group-hover:bg-gray-100 dark:text-white w-52">
 
-                                                    <div class="mb-2 font-semibold text-primary">
-                                                        {{ $RJp->vno_sep }}
-                                                    </div>
-                                                    <div>
-                                                        {{ '' . $RJp->push_antrian_bpjs_status . $RJp->push_antrian_bpjs_json }}
-                                                    </div>
-
-                                                </td>
 
                                                 <td
                                                     class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
@@ -287,14 +277,18 @@
                                                             <x-loading />
                                                         </div>
 
-                                                        <x-red-button
-                                                            wire:click="$emit('confirm_batal_poli', '{{ addslashes($RJp->rj_no) }}', '{{ addslashes($RJp->reg_name) }}')"
-                                                            wire:loading.remove class="ml-12">
-                                                            Batal Poli
-                                                        </x-red-button>
-                                                        <div wire:loading wire:target="batalPoli">
-                                                            <x-loading />
+                                                        {{-- delete Modal --}}
+                                                        <div x-data="{ deleteConfirmation: false }">
+                                                            <div x-show="deleteConfirmation">
+                                                                @include('livewire.r-j.pelayanan-r-j.delete-modal')
+                                                            </div>
+                                                            <x-red-button @click="deleteConfirmation = true"
+                                                                class="ml-12">
+                                                                Batal Poli
+                                                            </x-red-button>
+
                                                         </div>
+
 
                                                     </div>
                                                     <div>
@@ -381,20 +375,6 @@
         {{-- script end --}}
 
 
-
-
-
-        {{-- Disabling enter key for form --}}
-        <script type="text/javascript">
-            $(document).on("keydown", "form", function(event) {
-                return event.key != "Enter";
-            });
-        </script>
-
-
-
-
-
         {{-- Global Livewire JavaScript Object start --}}
         <script type="text/javascript">
             window.livewire.on('toastr-success', message => toastr.success(message));
@@ -402,78 +382,6 @@
                 toastr.info(message)
             });
             window.livewire.on('toastr-error', message => toastr.error(message));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            // confirmation message remove record
-            window.livewire.on('confirm_batal_poli', (key, name) => {
-
-                let cfn = confirm('Apakah anda ingin membatalkan data ini ' + name + '?');
-                if (cfn) {
-                    console.log(cfn)
-                    window.livewire.emit('confirm_batal_poli_taskId', key, name);
-                }
-            });
-
-
-
-
-
-
-
-
-
-
-
-
-            // confirmation cari_Data_Pasien_Tidak_Ditemukan_Confirmation
-            window.livewire.on('cari_Data_Pasien_Tidak_Ditemukan_Confirmation', (msg) => {
-                let cfn = confirm('Data ' + msg +
-                    ' tidak ditemuka, apakah anda ingin menambahkan menjadi pasien baru ?');
-
-                if (cfn) {
-                    @this.set('callMasterPasien', true);
-                }
-            });
-
-
-
-
-            // confirmation rePush_Data_Antrian_Confirmation
-            window.livewire.on('rePush_Data_Antrian_Confirmation', () => {
-                let cfn = confirm('Apakah anda ingin mengulaingi Proses Kirim data Antrian ?');
-
-                if (cfn) {
-                    // emit ke controller
-                    window.livewire.emit('rePush_Data_Antrian');
-                }
-            });
-
-
-
-
-
-
-
-
-
-
-
-
 
             // press_dropdownButton flowbite
             window.Livewire.on('pressDropdownButton', (key) => {
@@ -515,12 +423,7 @@
 
             );
         </script>
-        <script>
-            // $("#dateRjRef").change(function() {
-            //     const datepickerEl = document.getElementById('dateRjRef');
-            //     console.log(datepickerEl);
-            // });
-        </script>
+
         {{-- Global Livewire JavaScript Object end --}}
     @endpush
 

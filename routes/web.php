@@ -12,11 +12,13 @@ use App\Http\Livewire\RJ\BookingRJ\BookingRJ;
 use App\Http\Livewire\RJ\DaftarRJ\DaftarRJ;
 use App\Http\Livewire\RJ\EmrRJ\EmrRJ;
 use App\Http\Livewire\RJ\EmrRJ\TelaahResepRJ\TelaahResepRJ;
+use App\Http\Livewire\RJ\PelayananRJ\PelayananRJ;
+
+
+// use App\Http\Livewire\RJ\DisplayPelayananRJ\DisplayPelayananRJ;
 
 
 
-// use App\Http\Livewire\PelayananRJ\PelayananRJ;
-// use App\Http\Livewire\DisplayPelayananRJ\DisplayPelayananRJ;
 
 
 
@@ -76,11 +78,11 @@ Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker']], functi
     Route::get('daftarRJ', DaftarRJ::class)->middleware('auth')->name('daftarRJ');
     Route::get('EmrRJ', EmrRJ::class)->middleware('auth')->name('EmrRJ');
     Route::get('TelaahResepRJ', TelaahResepRJ::class)->middleware('auth')->name('TelaahResepRJ');
+    Route::get('pelayananRJ', PelayananRJ::class)->middleware('auth')->name('pelayananRJ');
 
 
 
 
-    // Route::get('pelayananRJ', PelayananRJ::class)->middleware('auth')->name('pelayananRJ');
     // Route::get('displayPelayananRJ', displayPelayananRJ::class)->middleware('auth')->name('displayPelayananRJ');
 
 
