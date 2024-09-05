@@ -302,13 +302,10 @@ class PelayananRJ extends Component
 
 
 
-    // when new form instance
     public function mount()
     {
-
         // set date
         $this->dateRjRef = Carbon::now()->format('d/m/Y');
-
         // set data dokter ref
         $this->optionsdrRjRef();
     }
@@ -380,8 +377,8 @@ class PelayananRJ extends Component
             'livewire.r-j.pelayanan-r-j.pelayanan-r-j',
             [
                 'RJpasiens' => $query->paginate($this->limitPerPage),
-                'myTitle' => 'Antrian Pasien Rawat Jalan',
-                'mySnipt' => 'Rekam Medis Pasien',
+                'myTitle' => 'Pelayanan Rawat Jalan',
+                'mySnipt' => 'Data Pelayanan Pasien',
                 'myProgram' => 'Pasien Rawat Jalan',
                 'myLimitPerPages' => [5, 10, 15, 20, 100],
             ]
