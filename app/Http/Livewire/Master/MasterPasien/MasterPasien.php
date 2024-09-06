@@ -136,8 +136,8 @@ class MasterPasien extends Component
                 "kodepos" => "", //harus diisi
                 "desaId" => "", //harus diisi (Kode data Kemendagri)
                 "kecamatanId" => "", //harus diisi (Kode data Kemendagri)
-                "kotaId" => "3504", //harus diisi (Kode data Kemendagri)
-                "propinsiId" => "35", //harus diisi (Kode data Kemendagri)
+                "kotaId" => "1", //harus diisi (Kode data Kemendagri)
+                "propinsiId" => "1", //harus diisi (Kode data Kemendagri)
                 "desaName" => "", //harus diisi (Kode data Kemendagri)
                 "kecamatanName" => "", //harus diisi (Kode data Kemendagri)
                 "kotaName" => "TULUNGAGUNG", //harus diisi (Kode data Kemendagri)
@@ -155,8 +155,8 @@ class MasterPasien extends Component
                 "kodepos" => "", //harus diisi
                 "desaId" => "", //harus diisi (Kode data Kemendagri)
                 "kecamatanId" => "", //harus diisi (Kode data Kemendagri)
-                "kotaId" => "3504", //harus diisi (Kode data Kemendagri)
-                "propinsiId" => "35", //harus diisi (Kode data Kemendagri)
+                "kotaId" => "1", //harus diisi (Kode data Kemendagri)
+                "propinsiId" => "1", //harus diisi (Kode data Kemendagri)
                 "desaName" => "", //harus diisi (Kode data Kemendagri)
                 "kecamatanName" => "", //harus diisi (Kode data Kemendagri)
                 "kotaName" => "TULUNGAGUNG", //harus diisi (Kode data Kemendagri)
@@ -1300,9 +1300,9 @@ class MasterPasien extends Component
             $this->dataPasien['pasien']['domisil']['desaName'] = '';
             $this->dataPasien['pasien']['domisil']['kecamatanId'] = '';
             $this->dataPasien['pasien']['domisil']['kecamatanName'] = '';
-            $this->dataPasien['pasien']['domisil']['kotaId'] = '3504';
+            $this->dataPasien['pasien']['domisil']['kotaId'] = '1';
             $this->dataPasien['pasien']['domisil']['kotaName'] = 'TULUNGAGUNG';
-            $this->dataPasien['pasien']['domisil']['propinsiId'] = '35';
+            $this->dataPasien['pasien']['domisil']['propinsiId'] = '1';
             $this->dataPasien['pasien']['domisil']['propinsiName'] = 'JAWA TIMUR';
         }
     }
