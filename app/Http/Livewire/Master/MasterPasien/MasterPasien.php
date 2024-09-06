@@ -1323,7 +1323,7 @@ class MasterPasien extends Component
     private function createRegNoPasien()
     {
         $jmlpasien = DB::table('rsmst_pasiens')->count();
-        $this->dataPasien['pasien']['regNo'] = sprintf("%07s", $jmlpasien) . 'Z';
+        $this->dataPasien['pasien']['regNo'] = sprintf("%07s", $jmlpasien) . 'A';
     }
 
     // validate Data Pasien//////////////////////////////////////////////////
