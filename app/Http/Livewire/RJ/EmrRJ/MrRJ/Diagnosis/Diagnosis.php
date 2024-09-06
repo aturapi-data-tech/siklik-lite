@@ -118,7 +118,7 @@ class Diagnosis extends Component
                         ->Where(DB::raw('upper(diag_desc)'), 'like', '%' . strtoupper($search) . '%')
                         ->orWhere(DB::raw('upper(diag_id)'), 'like', '%' . strtoupper($search) . '%')
                         ->orWhere(DB::raw('upper(icdx)'), 'like', '%' . strtoupper($search) . '%')
-                        ->limit(10)
+                        ->limit(100)
                         ->orderBy('diag_id', 'ASC')
                         ->orderBy('diag_desc', 'ASC')
                         ->get(),
