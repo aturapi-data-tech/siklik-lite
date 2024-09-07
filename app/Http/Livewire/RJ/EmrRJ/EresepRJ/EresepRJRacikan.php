@@ -293,8 +293,8 @@ class EresepRJRacikan extends Component
                     'no_antrian',
 
                     'nobooking',
-                    'push_antrian_bpjs_status',
-                    'push_antrian_bpjs_json',
+                    // 'push_antrian_bpjs_status',
+                    // 'push_antrian_bpjs_json',
                     'kd_dr_bpjs',
                     'kd_poli_bpjs',
                     'rj_status',
