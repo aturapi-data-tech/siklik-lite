@@ -464,13 +464,13 @@
                                         @enderror
                                     </div>
                                     <div>
-                                        <x-input-label for="idBpjsidentitas" :value="__('Id BPJS')" :required="__($errors->has('dataPasien.pasien.identitas.idbpjs'))" />
+                                        <x-input-label for="idBpjsidentitas" :value="__('Id BPJS')" :required="__($errors->has('dataPasien.pasien.identitas.idBpjs'))" />
                                         <div class="flex items-center mb-2">
                                             <x-text-input id="idBpjsidentitas" placeholder="Id BPJS [13digit]"
-                                                class="mt-1 ml-2" :errorshas="__($errors->has('dataPasien.pasien.identitas.idbpjs'))" :disabled=$disabledProperty
-                                                wire:model.debounce.500ms="dataPasien.pasien.identitas.idbpjs" />
+                                                class="mt-1 ml-2" :errorshas="__($errors->has('dataPasien.pasien.identitas.idBpjs'))" :disabled=$disabledProperty
+                                                wire:model.debounce.500ms="dataPasien.pasien.identitas.idBpjs" />
                                         </div>
-                                        @error('dataPasien.pasien.identitas.idbpjs')
+                                        @error('dataPasien.pasien.identitas.idBpjs')
                                             <x-input-error :messages=$message />
                                         @enderror
                                     </div>
