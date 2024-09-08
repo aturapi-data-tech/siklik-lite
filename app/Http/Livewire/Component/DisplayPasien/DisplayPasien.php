@@ -38,7 +38,7 @@ class DisplayPasien extends Component
                 $this->displayPasien['pasien']['regDate'] = $findData->reg_date;
                 $this->displayPasien['pasien']['regNo'] = $findData->reg_no;
                 $this->displayPasien['pasien']['regName'] = $findData->reg_name;
-                $this->displayPasien['pasien']['identitas']['idbpjs'] = $findData->nokartu_bpjs;
+                $this->displayPasien['pasien']['identitas']['idBpjs'] = $findData->nokartu_bpjs;
                 $this->displayPasien['pasien']['identitas']['nik'] = $findData->nik_bpjs;
                 $this->displayPasien['pasien']['jenisKelamin']['jenisKelaminId'] = ($findData->sex == 'L') ? 1 : 2;
                 $this->displayPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($findData->sex == 'L') ? 'Laki-laki' : 'Perempuan';
@@ -97,7 +97,7 @@ class DisplayPasien extends Component
                 $this->displayPasien['pasien']['regDate'] = '-';
                 $this->displayPasien['pasien']['regNo'] = '-';
                 $this->displayPasien['pasien']['regName'] = '-';
-                $this->displayPasien['pasien']['identitas']['idbpjs'] = '-';
+                $this->displayPasien['pasien']['identitas']['idBpjs'] = '-';
                 $this->displayPasien['pasien']['identitas']['nik'] = '-';
                 $this->displayPasien['pasien']['jenisKelamin']['jenisKelaminId'] = '-';
                 $this->displayPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = '-';

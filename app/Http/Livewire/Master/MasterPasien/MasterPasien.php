@@ -146,7 +146,7 @@ class MasterPasien extends Component
             ],
             "identitas" => [
                 "nik" => "", //harus diisi
-                "idbpjs" => "",
+                "idBpjs" => "",
                 "patientUuid" => "", //UUID SATUSEHAT
                 "pasport" => "", //untuk WNA / WNI yang memiliki passport
                 "alamat" => "", //harus diisi
@@ -263,7 +263,7 @@ class MasterPasien extends Component
 
             'identitas' => [
                 'nik' => true,
-                'idbpjs' => false,
+                'idBpjs' => false,
                 'pasport' => false,
                 'alamat' => true,
                 'rt' => true,
@@ -1389,7 +1389,7 @@ class MasterPasien extends Component
             'dataPasien.pasien.domisil.propinsiName' => 'bail|required',
 
 
-            'dataPasien.pasien.identitas.idbpjs' => 'digits:13',
+            'dataPasien.pasien.identitas.idBpjs' => 'digits:13',
             'dataPasien.pasien.identitas.pasport' => '',
             'dataPasien.pasien.identitas.alamat' => '',
             'dataPasien.pasien.identitas.rt' => 'bail|required',
@@ -1452,7 +1452,7 @@ class MasterPasien extends Component
             'reg_date' => Carbon::now(),
             'reg_no' => $this->dataPasien['pasien']['regNo'], //primarykey insert when select max
             'reg_name' => strtoupper($this->dataPasien['pasien']['regName']),
-            'nokartu_bpjs' => $this->dataPasien['pasien']['identitas']['idbpjs'],
+            'nokartu_bpjs' => $this->dataPasien['pasien']['identitas']['idBpjs'],
             'nik_bpjs' => $this->dataPasien['pasien']['identitas']['nik'],
             'sex' => $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] == 1 ? 'L' : 'P',
             'birth_date' => DB::raw("to_date('" . $this->dataPasien['pasien']['tglLahir'] . "','dd/mm/yyyy')"),
@@ -1494,7 +1494,7 @@ class MasterPasien extends Component
                 'reg_date' => Carbon::now(),
                 // 'reg_no' => $this->dataPasien['pasien']['regNo'], //primarykey insert when select max
                 'reg_name' => strtoupper($this->dataPasien['pasien']['regName']),
-                'nokartu_bpjs' => $this->dataPasien['pasien']['identitas']['idbpjs'],
+                'nokartu_bpjs' => $this->dataPasien['pasien']['identitas']['idBpjs'],
                 'nik_bpjs' => $this->dataPasien['pasien']['identitas']['nik'],
                 'sex' => $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] == 1 ? 'L' : 'P',
                 'birth_date' => DB::raw("to_date('" . $this->dataPasien['pasien']['tglLahir'] . "','dd/mm/yyyy')"),
@@ -1569,7 +1569,7 @@ class MasterPasien extends Component
                         // set dataPasien
                         $this->dataPasien['pasien']['regDate'] = Carbon::now();
                         $this->dataPasien['pasien']['regName'] = $CaridataVclaim['nama'];
-                        $this->dataPasien['pasien']['identitas']['idbpjs'] = $CaridataVclaim['noKartu'];
+                        $this->dataPasien['pasien']['identitas']['idBpjs'] = $CaridataVclaim['noKartu'];
                         $this->dataPasien['pasien']['identitas']['nik'] = $CaridataVclaim['nik'];
                         $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = ($CaridataVclaim['sex'] == 'L') ? 1 : 2;
                         $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($CaridataVclaim['sex'] == 'L') ? 'Laki-laki' : 'Perempuan';
@@ -1716,7 +1716,7 @@ class MasterPasien extends Component
                 $this->dataPasien['pasien']['regDate'] = $findData->reg_date;
                 $this->dataPasien['pasien']['regNo'] = $findData->reg_no;
                 $this->dataPasien['pasien']['regName'] = $findData->reg_name;
-                $this->dataPasien['pasien']['identitas']['idbpjs'] = $findData->nokartu_bpjs;
+                $this->dataPasien['pasien']['identitas']['idBpjs'] = $findData->nokartu_bpjs;
                 $this->dataPasien['pasien']['identitas']['nik'] = $findData->nik_bpjs;
                 $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = ($findData->sex == 'L') ? 1 : 2;
                 $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($findData->sex == 'L') ? 'Laki-laki' : 'Perempuan';

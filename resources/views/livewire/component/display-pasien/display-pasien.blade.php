@@ -18,7 +18,7 @@
         </div>
 
         <div class="font-normal text-gray-700">
-            {{ $displayPasien['pasien']['identitas']['idBpjs'] }}
+            {{ isset($displayPasien['pasien']['identitas']['idBpjs']) ? $displayPasien['pasien']['identitas']['idBpjs'] : '-' }}
         </div>
 
         <div class="font-normal text-gray-700">
