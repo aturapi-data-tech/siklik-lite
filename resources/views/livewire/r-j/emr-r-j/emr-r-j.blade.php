@@ -430,7 +430,11 @@
                                         @role(['Admin', 'Mr', 'Perawat'])
                                             <livewire:r-j.emr-r-j.post-encounter-r-j.post-encounter-r-j :rjNoRef="$myQData->rj_no"
                                                 :wire:key="'post-encounter-r-j-'.$myQData->rj_no">
-                                            @endrole
+
+                                                <livewire:r-j.emr-r-j.post-satu-data-kesehatan-r-j.post-satu-data-kesehatan-r-j
+                                                    :rjNoRef="$myQData->rj_no"
+                                                    :wire:key="'post-satu-data-kesehatan-r-j-'.$myQData->rj_no">
+                                                @endrole
 
                                 </div>
 

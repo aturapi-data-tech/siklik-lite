@@ -10,7 +10,7 @@ use App\Http\Livewire\SatuSehat\Encounter\Encounter;
 use App\Http\Livewire\SatuSehat\Condition\Condition;
 use App\Http\Livewire\SatuSehat\Bundle\Bundle;
 
-use App\Http\Traits\BPJS\SatuSehatTrait;
+use App\Http\Traits\SATUSEHAT\SatuSehatTrait;
 use App\Http\Traits\customErrorMessagesTrait;
 use Illuminate\Support\Facades\Validator;
 

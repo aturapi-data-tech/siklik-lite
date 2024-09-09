@@ -124,15 +124,65 @@ trait EmrRJTrait
                 ->where('rj_no', '=', $rjno)
                 ->first();
 
+            $dataPasien = DB::table('rsmst_pasiens')
+                ->select(
+                    DB::raw("to_char(reg_date,'dd/mm/yyyy hh24:mi:ss') as reg_date"),
+                    DB::raw("to_char(reg_date,'yyyymmddhh24miss') as reg_date1"),
+                    'reg_no',
+                    'reg_name',
+                    DB::raw("nvl(nokartu_bpjs,'-') as nokartu_bpjs"),
+                    DB::raw("nvl(nik_bpjs,'-') as nik_bpjs"),
+                    'sex',
+                    DB::raw("to_char(birth_date,'dd/mm/yyyy') as birth_date"),
+                    DB::raw("(select trunc( months_between( sysdate, birth_date ) /12 ) from dual) as thn"),
+                    'bln',
+                    'hari',
+                    'birth_place',
+                    'blood',
+                    'marital_status',
+                    'rsmst_religions.rel_id as rel_id',
+                    'rel_desc',
+                    'rsmst_educations.edu_id as edu_id',
+                    'edu_desc',
+                    'rsmst_jobs.job_id as job_id',
+                    'job_name',
+                    'kk',
+                    'nyonya',
+                    'no_kk',
+                    'address',
+                    'rsmst_desas.des_id as des_id',
+                    'des_name',
+                    'rt',
+                    'rw',
+                    'rsmst_kecamatans.kec_id as kec_id',
+                    'kec_name',
+                    'rsmst_kabupatens.kab_id as kab_id',
+                    'kab_name',
+                    'rsmst_propinsis.prop_id as prop_id',
+                    'prop_name',
+                    'phone'
+                )->join('rsmst_religions', 'rsmst_religions.rel_id', 'rsmst_pasiens.rel_id')
+                ->join('rsmst_educations', 'rsmst_educations.edu_id', 'rsmst_pasiens.edu_id')
+                ->join('rsmst_jobs', 'rsmst_jobs.job_id', 'rsmst_pasiens.job_id')
+                ->join('rsmst_desas', 'rsmst_desas.des_id', 'rsmst_pasiens.des_id')
+                ->join('rsmst_kecamatans', 'rsmst_kecamatans.kec_id', 'rsmst_pasiens.kec_id')
+                ->join('rsmst_kabupatens', 'rsmst_kabupatens.kab_id', 'rsmst_pasiens.kab_id')
+                ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_pasiens.prop_id')
+                ->where('reg_no', $dataPasienRJ->reg_no)
+                ->first();
+
             $dataPasienRJ = [
-                "regNo" => $dataPasienRJ->reg_no,
-                "regName" => $dataPasienRJ->reg_name,
+                "regNo" => $dataPasien->reg_no,
+                "regName" => $dataPasien->reg_name,
                 "patientUuid" => $dataPasienRJ->patient_uuid,
                 "drUuid" => $dataPasienRJ->dr_uuid,
                 "drName" => $dataPasienRJ->dr_name,
                 "poliUuid" => $dataPasienRJ->poli_uuid,
                 "poliDesc" => $dataPasienRJ->poli_desc,
-
+                "nik" => $dataPasien->nik_bpjs,
+                "address" => $dataPasien->address,
+                "desa" => $dataPasien->des_name,
+                "kecamatan" => $dataPasien->kec_name,
             ];
 
 
@@ -190,6 +240,10 @@ trait EmrRJTrait
                     "drName" => "",
                     "poliUuid" => "",
                     "poliDesc" => "",
+                    "nik" => "",
+                    "address" => "",
+                    "desa" => "",
+                    "kecamatan" => "",
                 ],
 
                 "errorMessages" => $e->getMessage()
