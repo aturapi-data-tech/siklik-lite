@@ -8,7 +8,6 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 
-use Spatie\ArrayToXml\ArrayToXml;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
 
 
@@ -794,7 +793,7 @@ class AssessmentDokterAnamnesa extends Component
             DB::table('rsmst_pasiens')->where('reg_no', $regNo)
                 ->update([
                     'meta_data_pasien_json' => json_encode($this->dataPasien, true),
-                    'meta_data_pasien_xml' => ArrayToXml::convert($this->dataPasien)
+                    // 'meta_data_pasien_xml' => ArrayToXml::convert($this->dataPasien)
                 ]);
 
             $this->emit('toastr-success', "Data Alergi " . $this->dataPasien['pasien']['regName'] . " berhasil diupdate.");
