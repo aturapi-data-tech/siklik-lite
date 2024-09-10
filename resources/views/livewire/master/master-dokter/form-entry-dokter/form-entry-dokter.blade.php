@@ -43,9 +43,9 @@
         </div>
 
         <div>
-            <x-input-label for="FormEntryDokter.dokterNik" :value="__('Kode Dokter BPJS')" :required="__($errors->has('FormEntryDokter.dokterNik'))" />
+            <x-input-label for="FormEntryDokter.dokterNik" :value="__('Kode Dokter NIK')" :required="__($errors->has('FormEntryDokter.dokterNik'))" />
             <div class="flex items-center mb-2">
-                <x-text-input id="FormEntryDokter.dokterNik" placeholder="Kode Dokter BPJS" class="mt-1 ml-2"
+                <x-text-input id="FormEntryDokter.dokterNik" placeholder="Kode Dokter NIK" class="mt-1 ml-2"
                     :errorshas="__($errors->has('FormEntryDokter.dokterNik'))" :disabled=$disabledProperty wire:model="FormEntryDokter.dokterNik" />
             </div>
             @error('FormEntryDokter.dokterNik')
