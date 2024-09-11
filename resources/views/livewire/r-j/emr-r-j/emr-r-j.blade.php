@@ -109,28 +109,31 @@
 
 
             <div class="flex justify-end w-1/2">
-                <x-dropdown align="right" :width="__('20')">
-                    <x-slot name="trigger">
-                        {{-- Button myLimitPerPage --}}
-                        <x-alternative-button class="inline-flex">
-                            <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                <path clip-rule="evenodd" fill-rule="evenodd"
-                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                            </svg>
-                            Tampil ({{ $limitPerPage }})
-                        </x-alternative-button>
-                    </x-slot>
-                    {{-- Open myLimitPerPagecontent --}}
-                    <x-slot name="content">
+                <livewire:r-j.emr-r-j.post-encounter-r-j.post-encounter-r-j-all :rjDateRef="$myTopBar['refDate']"
+                    :wire:key="'post-encounter-r-j-all'.$myTopBar['refDate']">
 
-                        @foreach ($myLimitPerPages as $myLimitPerPage)
-                            <x-dropdown-link wire:click="$set('limitPerPage', '{{ $myLimitPerPage }}')">
-                                {{ __($myLimitPerPage) }}
-                            </x-dropdown-link>
-                        @endforeach
-                    </x-slot>
-                </x-dropdown>
+                    <x-dropdown align="right" :width="__('20')">
+                        <x-slot name="trigger">
+                            {{-- Button myLimitPerPage --}}
+                            <x-alternative-button class="inline-flex">
+                                <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path clip-rule="evenodd" fill-rule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                </svg>
+                                Tampil ({{ $limitPerPage }})
+                            </x-alternative-button>
+                        </x-slot>
+                        {{-- Open myLimitPerPagecontent --}}
+                        <x-slot name="content">
+
+                            @foreach ($myLimitPerPages as $myLimitPerPage)
+                                <x-dropdown-link wire:click="$set('limitPerPage', '{{ $myLimitPerPage }}')">
+                                    {{ __($myLimitPerPage) }}
+                                </x-dropdown-link>
+                            @endforeach
+                        </x-slot>
+                    </x-dropdown>
             </div>
 
 
@@ -428,13 +431,15 @@
                                         </div>
                                         <!-- End Dropdown Action Open menu -->
                                         @role(['Admin', 'Mr', 'Perawat'])
-                                            <livewire:r-j.emr-r-j.post-encounter-r-j.post-encounter-r-j :rjNoRef="$myQData->rj_no"
-                                                :wire:key="'post-encounter-r-j-'.$myQData->rj_no">
+                                            <div class="grid grid-cols-1 gap-2">
+                                                <livewire:r-j.emr-r-j.post-encounter-r-j.post-encounter-r-j
+                                                    :rjNoRef="$myQData->rj_no" :wire:key="'post-encounter-r-j-'.$myQData->rj_no">
 
-                                                <livewire:r-j.emr-r-j.post-satu-data-kesehatan-r-j.post-satu-data-kesehatan-r-j
-                                                    :rjNoRef="$myQData->rj_no"
-                                                    :wire:key="'post-satu-data-kesehatan-r-j-'.$myQData->rj_no">
-                                                @endrole
+                                                    <livewire:r-j.emr-r-j.post-satu-data-kesehatan-r-j.post-satu-data-kesehatan-r-j
+                                                        :rjNoRef="$myQData->rj_no"
+                                                        :wire:key="'post-satu-data-kesehatan-r-j-'.$myQData->rj_no">
+                                            </div>
+                                        @endrole
 
                                 </div>
 
