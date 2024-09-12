@@ -13,12 +13,14 @@ use App\Http\Livewire\SatuSehat\Bundle\Bundle;
 use App\Http\Traits\SATUSEHAT\SatuSehatTrait;
 use App\Http\Traits\customErrorMessagesTrait;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Traits\MasterPasien\MasterPasienTrait;
+use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 
 class PostEncounterRJ extends Component
 {
-    use EmrRJTrait;
+    use EmrRJTrait, MasterPasienTrait;
 
 
     public $rjNoRef;
@@ -83,6 +85,14 @@ class PostEncounterRJ extends Component
 
 
         ];
+
+        // update ihs pasien
+        if (!$r['patientUuid']) {
+            $UpdatepatientUuid = $this->UpdatepatientUuid($dataPasienRJ['regNo'], $dataPasienRJ['nik']);
+
+            $r['patientUuid'] = $UpdatepatientUuid;
+        }
+
         $rules = [
             'patientUuid' => 'bail|required',
             'drUuid' => 'bail|required',
@@ -167,6 +177,53 @@ class PostEncounterRJ extends Component
         }
     }
 
+
+    private function UpdatepatientUuid(string $regNo = '', string $nik = '')
+    {
+        // validateNIIK
+        $r = ['nik' => $nik, 'regNo' => $regNo];
+        $rules = ['nik' => 'required', 'regNo' => 'required'];
+        $customErrorMessagesTrait = customErrorMessagesTrait::messages();
+        $attribute = ['nik' => 'NIK', 'regNo' => 'No Rekam Medis'];
+        $validator = Validator::make($r, $rules, $customErrorMessagesTrait, $attribute);
+        if ($validator->fails()) {
+            $this->emit('toastr-error', $validator->messages()->all());
+            return;
+        }
+        // validateNIIK
+
+
+        // Proses Validasi///////////////////////////////////////////
+        try {
+
+            $PatientByNIK = SatuSehatTrait::PatientByNIK($nik);
+
+            // Jika uuid tidak ditemukan
+            if (!isset($PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'])) {
+                $this->emit('toastr-error', 'UUID tidak dapat ditemukan.' . $PatientByNIK->getOriginalContent()['metadata']['message']);
+                return;
+            }
+
+            $dataPasien = $this->findDataMasterPasien($regNo);
+            $dataPasien['pasien']['identitas']['patientUuid'] = $PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'];
+
+            //    updateDB
+            DB::table('rsmst_pasiens')->where('reg_no', $regNo)
+                ->update([
+                    'patient_uuid' => isset($this->dataPasien['pasien']['identitas']['patientUuid']) ? $this->dataPasien['pasien']['identitas']['patientUuid'] : '',
+                ]);
+
+            //    updateJson
+            $this->updateJsonMasterPasien($regNo, $dataPasien);
+
+            $this->emit('toastr-success', $PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'] . ' / ' . $PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['name'][0]['text']);
+            return  $PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'];
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // dd($validator->fails());
+            $this->emit('toastr-error', 'Errors "' . $e->getMessage());
+            return;
+        }
+    }
 
     public function mount()
     {
