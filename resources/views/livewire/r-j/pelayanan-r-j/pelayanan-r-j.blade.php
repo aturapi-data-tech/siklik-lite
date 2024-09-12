@@ -278,16 +278,7 @@
                                                         </div>
 
                                                         {{-- delete Modal --}}
-                                                        <div x-data="{ deleteConfirmation: false }">
-                                                            <div x-show="deleteConfirmation">
-                                                                @include('livewire.r-j.pelayanan-r-j.delete-modal')
-                                                            </div>
-                                                            <x-red-button @click="deleteConfirmation = true"
-                                                                class="ml-12">
-                                                                Batal Poli
-                                                            </x-red-button>
-
-                                                        </div>
+                                                        @include('livewire.r-j.pelayanan-r-j.delete-confirmation')
 
 
                                                     </div>
