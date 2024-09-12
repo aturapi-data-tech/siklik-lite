@@ -262,6 +262,8 @@ class FormEntryDaftarRJ extends Component
                     'userLog' => auth()->user()->myuser_name,
                     'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
                 ];
+
+            $this->FormEntry['taskIdPelayanan']['taskId3'] = $this->FormEntry['rjDate'];
         } else {
             // Klaim & Kunjungan
             // noBooking kosong maka buat
@@ -278,6 +280,8 @@ class FormEntryDaftarRJ extends Component
                     'userLog' => auth()->user()->myuser_name,
                     'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
                 ];
+
+            $this->FormEntry['taskIdPelayanan']['taskId3'] = $this->FormEntry['rjDate'];
         }
     }
 

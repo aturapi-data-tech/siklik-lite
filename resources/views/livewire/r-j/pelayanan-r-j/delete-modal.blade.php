@@ -25,10 +25,6 @@
             </p>
             <div class="flex items-center justify-center space-x-4">
 
-                <button @click="deleteConfirmation = false" type="button"
-                    class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
-                    Tidak
-                </button>
                 <button @click="deleteConfirmation = false"
                     wire:click="batalPoli('{{ addslashes($RJp->rj_no) }}','{{ addslashes($RJp->reg_name) }}')"
                     wire:loading.remove
@@ -39,6 +35,12 @@
                 <div wire:loading wire:target="batalPoli">
                     <x-loading />
                 </div>
+
+                <button @click="deleteConfirmation = false" type="button"
+                    class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+                    Tidak
+                </button>
+
 
             </div>
         </div>
