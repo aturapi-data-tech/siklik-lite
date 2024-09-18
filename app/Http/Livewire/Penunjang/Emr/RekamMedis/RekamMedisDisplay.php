@@ -224,6 +224,7 @@ class RekamMedisDisplay extends Component
             if (!isset($to['perencanaan'])) {
                 $this->emit('storeAssessmentDokterRJPerencanaan');
                 $this->emit('syncronizeAssessmentDokterRJFindData');
+                $this->emit('syncronizeAssessmentPerawatRJFindData');
                 $to = $this->cariResepRJ($this->rjNoRefCopyTo);
             }
 
@@ -285,6 +286,7 @@ class RekamMedisDisplay extends Component
             ]);
 
         $this->emit('syncronizeAssessmentDokterRJFindData');
+        $this->emit('syncronizeAssessmentPerawatRJFindData');
         $this->emit('toastr-success', "Data Resep berhasil disimpan.");
     }
 
