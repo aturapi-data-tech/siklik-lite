@@ -172,34 +172,36 @@ class RekamMedisDisplay extends Component
                     // ?\
                     // select nvl(max(rjobat_dtl)+1,1) into :rstxn_rjobatracikans.rjobat_dtl from rstxn_rjobatracikans;
                     foreach ($to['eresepRacikan']  as $toEresepRacikan) {
-                        $lastInserted = DB::table('rstxn_rjobatracikans')
-                            ->select(DB::raw("nvl(max(rjobat_dtl)+1,1) as rjobat_dtl_max"))
-                            ->first();
-                        // insert into table transaksi
-                        DB::table('rstxn_rjobatracikans')
-                            ->insert([
-                                'rjobat_dtl' => $lastInserted->rjobat_dtl_max,
-                                'rj_no' => $this->rjNoRefCopyTo,
-                                // 'product_id' => $toEresepRacikan['productId'],
-                                'product_name' => $toEresepRacikan['productName'],
-                                'sedia' => $toEresepRacikan['sedia'],
-                                'dosis' => isset($toEresepRacikan['dosis']) ? ($toEresepRacikan['dosis'] ? $toEresepRacikan['dosis'] : '') : '',
-                                'qty' => $toEresepRacikan['qty'],
-                                // 'price' => $toEresepRacikan['productPrice'],
-                                // 'rj_carapakai' => $toEresepRacikan['signaX'],
-                                // 'rj_kapsul' => $toEresepRacikan['signaHari'],
-                                'catatan' => $toEresepRacikan['catatan'],
-                                'catatan_khusus' => $toEresepRacikan['catatanKhusus'],
-                                'no_racikan' => $toEresepRacikan['noRacikan'],
+                        if (isset($toEresepRacikan['jenisKeterangan'])) {
+                            $lastInserted = DB::table('rstxn_rjobatracikans')
+                                ->select(DB::raw("nvl(max(rjobat_dtl)+1,1) as rjobat_dtl_max"))
+                                ->first();
+                            // insert into table transaksi
+                            DB::table('rstxn_rjobatracikans')
+                                ->insert([
+                                    'rjobat_dtl' => $lastInserted->rjobat_dtl_max,
+                                    'rj_no' => $this->rjNoRefCopyTo,
+                                    // 'product_id' => $toEresepRacikan['productId'],
+                                    'product_name' => $toEresepRacikan['productName'],
+                                    'sedia' => $toEresepRacikan['sedia'],
+                                    'dosis' => isset($toEresepRacikan['dosis']) ? ($toEresepRacikan['dosis'] ? $toEresepRacikan['dosis'] : '') : '',
+                                    'qty' => $toEresepRacikan['qty'],
+                                    // 'price' => $toEresepRacikan['productPrice'],
+                                    // 'rj_carapakai' => $toEresepRacikan['signaX'],
+                                    // 'rj_kapsul' => $toEresepRacikan['signaHari'],
+                                    'catatan' => $toEresepRacikan['catatan'],
+                                    'catatan_khusus' => $toEresepRacikan['catatanKhusus'],
+                                    'no_racikan' => $toEresepRacikan['noRacikan'],
 
-                                'rj_takar' => 'Tablet',
-                                'exp_date' => DB::raw("to_date('" . $to['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+30"),
-                                'etiket_status' => 1,
-                            ]);
+                                    'rj_takar' => 'Tablet',
+                                    'exp_date' => DB::raw("to_date('" . $to['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+30"),
+                                    'etiket_status' => 1,
+                                ]);
 
-                        // replace rjobatdtl dan rjno ke obat yang baru
-                        $to['eresepRacikan'][$key]['rjObatDtl'] = $lastInserted->rjobat_dtl_max;
-                        $to['eresepRacikan'][$key]['rjNo'] = $this->rjNoRefCopyTo;
+                            // replace rjobatdtl dan rjno ke obat yang baru
+                            $to['eresepRacikan'][$key]['rjObatDtl'] = $lastInserted->rjobat_dtl_max;
+                            $to['eresepRacikan'][$key]['rjNo'] = $this->rjNoRefCopyTo;
+                        }
                     }
                     //
                 } catch (Exception $e) {
@@ -226,25 +228,26 @@ class RekamMedisDisplay extends Component
             }
 
             // terapi
+            $eresep = '';
             if (isset($to['eresep'])) {
-                $eresep = '';
                 foreach ($to['eresep'] as  $value) {
                     $catatanKhusus = ($value['catatanKhusus']) ? ' (' . $value['catatanKhusus'] . ')' : '';
                     $eresep .=  'R/' . ' ' . $value['productName'] . ' | No. ' . $value['qty'] . ' | S ' .  $value['signaX'] . 'dd' . $value['signaHari'] . $catatanKhusus . PHP_EOL;
                 }
-                $to['perencanaan']['terapi']['terapi'] = $eresep;
+                // $to['perencanaan']['terapi']['terapi'] = $eresep;
             }
 
+            $eresepRacikan = '' . PHP_EOL;
             if (isset($to['eresepRacikan'])) {
-                $eresepRacikan = '' . PHP_EOL;
                 foreach ($to['eresepRacikan'] as  $value) {
                     $jmlRacikan = ($value['qty']) ? 'Jml Racikan ' . $value['qty'] . ' | ' . $value['catatan'] . ' | S ' . $value['catatanKhusus'] . PHP_EOL : '';
                     $dosis = isset($value['dosis']) ? ($value['dosis'] ? $value['dosis'] : '') : '';
                     $eresepRacikan .= $value['noRacikan'] . '/ ' . $value['productName'] . ' - ' . $dosis .  PHP_EOL . $jmlRacikan;
                 }
-                $to['perencanaan']['terapi']['terapi'] = $eresepRacikan;
+                // $to['perencanaan']['terapi']['terapi'] = $eresepRacikan;
             }
 
+            $to['perencanaan']['terapi']['terapi'] = $eresep . $eresepRacikan;
 
 
 

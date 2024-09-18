@@ -295,9 +295,16 @@ class Perencanaan extends Component
         if (isset($this->dataDaftarPoliRJ['eresepRacikan'])) {
             // Racikan
             foreach ($this->dataDaftarPoliRJ['eresepRacikan'] as $key => $value) {
-                $jmlRacikan = ($value['qty']) ? 'Jml Racikan ' . $value['qty'] . ' | ' . $value['catatan'] . ' | S ' . $value['catatanKhusus'] . PHP_EOL : '';
-                $dosis = isset($value['dosis']) ? ($value['dosis'] ? $value['dosis'] : '') : '';
-                $eresepRacikan .= $value['noRacikan'] . '/ ' . $value['productName'] . ' - ' . $dosis .  PHP_EOL . $jmlRacikan;
+                if (isset($value['jenisKeterangan'])) {
+                    $catatan = isset($value['catatan']) ? $value['catatan'] : '';
+                    $catatanKhusus = isset($value['catatanKhusus']) ? $value['catatanKhusus'] : '';
+                    $noRacikan = isset($value['noRacikan']) ? $value['noRacikan'] : '';
+                    $productName = isset($value['productName']) ? $value['productName'] : '';
+
+                    $jmlRacikan = ($value['qty']) ? 'Jml Racikan ' . $value['qty'] . ' | ' . $catatan . ' | S ' . $catatanKhusus . PHP_EOL : '';
+                    $dosis = isset($value['dosis']) ? ($value['dosis'] ? $value['dosis'] : '') : '';
+                    $eresepRacikan .= $noRacikan . '/ ' . $productName . ' - ' . $dosis .  PHP_EOL . $jmlRacikan;
+                }
             };
         }
         $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] = $eresep . $eresepRacikan;

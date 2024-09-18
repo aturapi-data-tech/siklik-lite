@@ -319,201 +319,203 @@
                                                     $myPreviousRow = '';
                                                 @endphp
                                                 @foreach ($dataDaftarPoliRJ['eresepRacikan'] as $key => $eresep)
-                                                    @php
-                                                        $myRacikanBorder =
-                                                            $myPreviousRow !== $eresep['noRacikan']
-                                                                ? 'border-t-2 '
-                                                                : '';
-                                                    @endphp
+                                                    @isset($eresep['jenisKeterangan'])
+                                                        @php
+                                                            $myRacikanBorder =
+                                                                $myPreviousRow !== $eresep['noRacikan']
+                                                                    ? 'border-t-2 '
+                                                                    : '';
+                                                        @endphp
 
-                                                    @role(['Dokter', 'Admin'])
-                                                        <tr class="{{ $myRacikanBorder }} group">
+                                                        @role(['Dokter', 'Admin'])
+                                                            <tr class="{{ $myRacikanBorder }} group">
 
-                                                            <td
-                                                                class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                                {{ $eresep['jenisKeterangan'] . '  (' . $eresep['noRacikan'] . ')' }}
-                                                            </td>
-
-
-                                                            <td
-                                                                class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                                {{ $eresep['productName'] }}
-                                                            </td>
-
-                                                            <td
-                                                                class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                                {{-- {{ isset($eresep['dosis']) ? ($eresep['dosis'] ? $eresep['dosis'] : '-') : '-' }} --}}
-
-                                                                <div>
-                                                                    <x-text-input placeholder="dosis" class=""
-                                                                        :disabled=$disabledPropertyRjStatus
-                                                                        x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}dosis"
-                                                                        x-on:keyup.enter="$refs.dataDaftarPoliRJeresepRacikan{{ $key }}qty.focus()"
-                                                                        wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.dosis" />
-
-                                                                </div>
+                                                                <td
+                                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                                    {{ $eresep['jenisKeterangan'] . '  (' . $eresep['noRacikan'] . ')' }}
+                                                                </td>
 
 
+                                                                <td
+                                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                                    {{ $eresep['productName'] }}
+                                                                </td>
 
+                                                                <td
+                                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                                    {{-- {{ isset($eresep['dosis']) ? ($eresep['dosis'] ? $eresep['dosis'] : '-') : '-' }} --}}
 
-                                                            </td>
+                                                                    <div>
+                                                                        <x-text-input placeholder="dosis" class=""
+                                                                            :disabled=$disabledPropertyRjStatus
+                                                                            x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}dosis"
+                                                                            x-on:keyup.enter="$refs.dataDaftarPoliRJeresepRacikan{{ $key }}qty.focus()"
+                                                                            wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.dosis" />
 
-                                                            <td
-                                                                class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                                {{-- {{ $eresep['qty'] }} --}}
-
-                                                                <div>
-                                                                    <x-text-input placeholder="Jml Racikan" class=""
-                                                                        :disabled=$disabledPropertyRjStatus
-                                                                        wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.qty"
-                                                                        x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}qty"
-                                                                        x-on:keyup.enter="$refs.dataDaftarPoliRJeresepRacikan{{ $key }}catatan.focus()" />
-                                                                </div>
-                                                            </td>
-
-                                                            <td
-                                                                class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                                {{-- {{ $eresep['catatan'] }} --}}
-
-                                                                <div>
-                                                                    <x-text-input placeholder="Catatan" class=""
-                                                                        :disabled=$disabledPropertyRjStatus
-                                                                        x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}catatan"
-                                                                        x-on:keyup.enter="$refs.dataDaftarPoliRJeresepRacikan{{ $key }}catatanKhusus.focus()"
-                                                                        wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.catatan" />
-
-
-                                                                </div>
-                                                            </td>
-
-                                                            <td
-                                                                class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                                {{-- {{ $eresep['catatanKhusus'] }} --}}
-                                                                <div>
-                                                                    <x-text-input placeholder="Signa" class=""
-                                                                        :disabled=$disabledPropertyRjStatus
-                                                                        wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.catatanKhusus"
-                                                                        x-on:keyup.enter="$wire.updateProduct('{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['rjObatDtl'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['rjObatDtl'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['dosis'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['dosis'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['qty'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['qty'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['catatan'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['catatan'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['catatanKhusus'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['catatanKhusus'] : null }}')"
-                                                                        x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}catatanKhusus" />
-
-                                                                </div>
-                                                            </td>
-
-
-                                                            <td
-                                                                class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                                @role(['Dokter', 'Admin'])
-                                                                    <x-alternative-button class="inline-flex"
-                                                                        :disabled=$disabledPropertyRjStatus
-                                                                        wire:click.prevent="removeProduct('{{ $eresep['rjObatDtl'] }}')">
-                                                                        <svg class="w-5 h-5 text-gray-800 dark:text-white"
-                                                                            aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                                                            fill="currentColor" viewBox="0 0 18 20">
-                                                                            <path
-                                                                                d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
-                                                                        </svg>
-                                                                    </x-alternative-button>
-                                                                @endrole
-                                                            </td>
-
-                                                        </tr>
-                                                    @endrole
-                                                    {{--  --}}
-                                                    @role(['Apoteker'])
-                                                        <tr class="{{ $myRacikanBorder }} group">
-
-                                                            <td
-                                                                class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                                {{ $eresep['jenisKeterangan'] . '  (' . $eresep['noRacikan'] . ')' }}
-                                                            </td>
-
-
-                                                            <td
-                                                                class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                                {{ $eresep['productName'] }}
-                                                            </td>
-
-                                                            <td
-                                                                class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                                {{-- {{ isset($eresep['dosis']) ? ($eresep['dosis'] ? $eresep['dosis'] : '-') : '-' }} --}}
-
-                                                                <div>
-                                                                    <x-text-input placeholder="dosis" class=""
-                                                                        :disabled=true
-                                                                        x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}dosis"
-                                                                        x-on:keyup.enter="$refs.dataDaftarPoliRJeresepRacikan{{ $key }}qty.focus()"
-                                                                        wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.dosis" />
-
-                                                                </div>
+                                                                    </div>
 
 
 
 
-                                                            </td>
+                                                                </td>
 
-                                                            <td
-                                                                class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                                {{-- {{ $eresep['qty'] }} --}}
+                                                                <td
+                                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                                    {{-- {{ $eresep['qty'] }} --}}
 
-                                                                <div>
-                                                                    <x-text-input placeholder="Jml Racikan" class=""
-                                                                        :disabled=true
-                                                                        wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.qty"
-                                                                        x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}qty"
-                                                                        x-on:keyup.enter="$refs.dataDaftarPoliRJeresepRacikan{{ $key }}catatan.focus()" />
-                                                                </div>
-                                                            </td>
+                                                                    <div>
+                                                                        <x-text-input placeholder="Jml Racikan" class=""
+                                                                            :disabled=$disabledPropertyRjStatus
+                                                                            wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.qty"
+                                                                            x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}qty"
+                                                                            x-on:keyup.enter="$refs.dataDaftarPoliRJeresepRacikan{{ $key }}catatan.focus()" />
+                                                                    </div>
+                                                                </td>
 
-                                                            <td
-                                                                class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                                {{-- {{ $eresep['catatan'] }} --}}
+                                                                <td
+                                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                                    {{-- {{ $eresep['catatan'] }} --}}
 
-                                                                <div>
-                                                                    <x-text-input placeholder="Catatan" class=""
-                                                                        :disabled=true
-                                                                        x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}catatan"
-                                                                        x-on:keyup.enter="$refs.dataDaftarPoliRJeresepRacikan{{ $key }}catatanKhusus.focus()"
-                                                                        wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.catatan" />
-
-
-                                                                </div>
-                                                            </td>
-
-                                                            <td
-                                                                class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                                {{-- {{ $eresep['catatanKhusus'] }} --}}
-                                                                <div>
-                                                                    <x-text-input placeholder="Signa" class=""
-                                                                        :disabled=true
-                                                                        wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.catatanKhusus"
-                                                                        x-on:keyup.enter="$wire.updateProduct('{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['rjObatDtl'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['rjObatDtl'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['dosis'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['dosis'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['qty'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['qty'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['catatan'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['catatan'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['catatanKhusus'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['catatanKhusus'] : null }}')"
-                                                                        x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}catatanKhusus" />
-
-                                                                </div>
-                                                            </td>
+                                                                    <div>
+                                                                        <x-text-input placeholder="Catatan" class=""
+                                                                            :disabled=$disabledPropertyRjStatus
+                                                                            x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}catatan"
+                                                                            x-on:keyup.enter="$refs.dataDaftarPoliRJeresepRacikan{{ $key }}catatanKhusus.focus()"
+                                                                            wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.catatan" />
 
 
-                                                            <td
-                                                                class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                                @role(['Dokter', 'Admin'])
-                                                                    <x-alternative-button class="inline-flex" :disabled=true
-                                                                        wire:click.prevent="removeProduct('{{ $eresep['rjObatDtl'] }}')">
-                                                                        <svg class="w-5 h-5 text-gray-800 dark:text-white"
-                                                                            aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                                                            fill="currentColor" viewBox="0 0 18 20">
-                                                                            <path
-                                                                                d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
-                                                                        </svg>
-                                                                    </x-alternative-button>
-                                                                @endrole
-                                                            </td>
+                                                                    </div>
+                                                                </td>
 
-                                                        </tr>
-                                                    @endrole
-                                                    {{--  --}}
-                                                    @php
-                                                        $myPreviousRow = $eresep['noRacikan'];
-                                                    @endphp
+                                                                <td
+                                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                                    {{-- {{ $eresep['catatanKhusus'] }} --}}
+                                                                    <div>
+                                                                        <x-text-input placeholder="Signa" class=""
+                                                                            :disabled=$disabledPropertyRjStatus
+                                                                            wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.catatanKhusus"
+                                                                            x-on:keyup.enter="$wire.updateProduct('{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['rjObatDtl'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['rjObatDtl'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['dosis'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['dosis'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['qty'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['qty'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['catatan'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['catatan'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['catatanKhusus'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['catatanKhusus'] : null }}')"
+                                                                            x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}catatanKhusus" />
+
+                                                                    </div>
+                                                                </td>
+
+
+                                                                <td
+                                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                                    @role(['Dokter', 'Admin'])
+                                                                        <x-alternative-button class="inline-flex"
+                                                                            :disabled=$disabledPropertyRjStatus
+                                                                            wire:click.prevent="removeProduct('{{ $eresep['rjObatDtl'] }}')">
+                                                                            <svg class="w-5 h-5 text-gray-800 dark:text-white"
+                                                                                aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                                                                fill="currentColor" viewBox="0 0 18 20">
+                                                                                <path
+                                                                                    d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
+                                                                            </svg>
+                                                                        </x-alternative-button>
+                                                                    @endrole
+                                                                </td>
+
+                                                            </tr>
+                                                        @endrole
+                                                        {{--  --}}
+                                                        @role(['Apoteker'])
+                                                            <tr class="{{ $myRacikanBorder }} group">
+
+                                                                <td
+                                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                                    {{ $eresep['jenisKeterangan'] . '  (' . $eresep['noRacikan'] . ')' }}
+                                                                </td>
+
+
+                                                                <td
+                                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                                    {{ $eresep['productName'] }}
+                                                                </td>
+
+                                                                <td
+                                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                                    {{-- {{ isset($eresep['dosis']) ? ($eresep['dosis'] ? $eresep['dosis'] : '-') : '-' }} --}}
+
+                                                                    <div>
+                                                                        <x-text-input placeholder="dosis" class=""
+                                                                            :disabled=true
+                                                                            x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}dosis"
+                                                                            x-on:keyup.enter="$refs.dataDaftarPoliRJeresepRacikan{{ $key }}qty.focus()"
+                                                                            wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.dosis" />
+
+                                                                    </div>
+
+
+
+
+                                                                </td>
+
+                                                                <td
+                                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                                    {{-- {{ $eresep['qty'] }} --}}
+
+                                                                    <div>
+                                                                        <x-text-input placeholder="Jml Racikan" class=""
+                                                                            :disabled=true
+                                                                            wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.qty"
+                                                                            x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}qty"
+                                                                            x-on:keyup.enter="$refs.dataDaftarPoliRJeresepRacikan{{ $key }}catatan.focus()" />
+                                                                    </div>
+                                                                </td>
+
+                                                                <td
+                                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                                    {{-- {{ $eresep['catatan'] }} --}}
+
+                                                                    <div>
+                                                                        <x-text-input placeholder="Catatan" class=""
+                                                                            :disabled=true
+                                                                            x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}catatan"
+                                                                            x-on:keyup.enter="$refs.dataDaftarPoliRJeresepRacikan{{ $key }}catatanKhusus.focus()"
+                                                                            wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.catatan" />
+
+
+                                                                    </div>
+                                                                </td>
+
+                                                                <td
+                                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                                    {{-- {{ $eresep['catatanKhusus'] }} --}}
+                                                                    <div>
+                                                                        <x-text-input placeholder="Signa" class=""
+                                                                            :disabled=true
+                                                                            wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.catatanKhusus"
+                                                                            x-on:keyup.enter="$wire.updateProduct('{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['rjObatDtl'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['rjObatDtl'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['dosis'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['dosis'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['qty'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['qty'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['catatan'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['catatan'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['catatanKhusus'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['catatanKhusus'] : null }}')"
+                                                                            x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}catatanKhusus" />
+
+                                                                    </div>
+                                                                </td>
+
+
+                                                                <td
+                                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                                    @role(['Dokter', 'Admin'])
+                                                                        <x-alternative-button class="inline-flex" :disabled=true
+                                                                            wire:click.prevent="removeProduct('{{ $eresep['rjObatDtl'] }}')">
+                                                                            <svg class="w-5 h-5 text-gray-800 dark:text-white"
+                                                                                aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                                                                fill="currentColor" viewBox="0 0 18 20">
+                                                                                <path
+                                                                                    d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
+                                                                            </svg>
+                                                                        </x-alternative-button>
+                                                                    @endrole
+                                                                </td>
+
+                                                            </tr>
+                                                        @endrole
+                                                        {{--  --}}
+                                                        @php
+                                                            $myPreviousRow = $eresep['noRacikan'];
+                                                        @endphp
+                                                    @endisset
                                                 @endforeach
                                             @endisset
 
