@@ -591,6 +591,14 @@ class Anamnesa extends Component
                 ? $this->dataPasien['pasien']['alergi']
                 : $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergi']);
         // Alergi from master Pasien
+
+        $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitDahulu']['riwayatPenyakitDahulu'] =
+            ($this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitDahulu']['riwayatPenyakitDahulu'])
+            ? $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitDahulu']['riwayatPenyakitDahulu']
+            : (($this->dataPasien['pasien']['riwayatPenyakitDahulu'] != $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitDahulu']['riwayatPenyakitDahulu'])
+                ? $this->dataPasien['pasien']['riwayatPenyakitDahulu']
+                : $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitDahulu']['riwayatPenyakitDahulu']);
+        // Alergi from master Pasien
     }
 
 
@@ -795,6 +803,10 @@ class Anamnesa extends Component
             $this->dataPasien['pasien']['alergi'] = "";
         }
 
+        if (!isset($this->dataPasien['pasien']['riwayatPenyakitDahulu'])) {
+            $this->dataPasien['pasien']['riwayatPenyakitDahulu'] = "";
+        }
+
         // Update data Alergi ke master Pasien
         if (($this->dataPasien['pasien']['alergi']) != $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergi']) {
             $this->dataPasien['pasien']['alergi'] = $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergi'];
@@ -805,7 +817,20 @@ class Anamnesa extends Component
                     // 'meta_data_pasien_xml' => ArrayToXml::convert($this->dataPasien)
                 ]);
 
-            $this->emit('toastr-success', "Data Alergi " . $this->dataPasien['pasien']['regName'] . " berhasil diupdate.");
+            // $this->emit('toastr-success', "Data Alergi " . $this->dataPasien['pasien']['regName'] . " berhasil diupdate.");
+        }
+
+        // Update data riwayatPenyakitDahulu ke master Pasien
+        if (($this->dataPasien['pasien']['riwayatPenyakitDahulu']) != $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitDahulu']['riwayatPenyakitDahulu']) {
+            $this->dataPasien['pasien']['riwayatPenyakitDahulu'] = $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitDahulu']['riwayatPenyakitDahulu'];
+
+            DB::table('rsmst_pasiens')->where('reg_no', $regNo)
+                ->update([
+                    'meta_data_pasien_json' => json_encode($this->dataPasien, true),
+                    // 'meta_data_pasien_xml' => ArrayToXml::convert($this->dataPasien)
+                ]);
+
+            // $this->emit('toastr-success', "Data riwayatPenyakitDahulu " . $this->dataPasien['pasien']['regName'] . " berhasil diupdate.");
         }
     }
 

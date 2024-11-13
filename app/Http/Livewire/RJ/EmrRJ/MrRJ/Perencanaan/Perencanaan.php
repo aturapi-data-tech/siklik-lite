@@ -234,14 +234,29 @@ class Perencanaan extends Component
 
         if (auth()->user()->hasRole('Dokter')) {
             if ($this->dataDaftarPoliRJ['drId'] == $myUserCodeActive) {
+
                 if (isset($this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'])) {
                     if (!$this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa']) {
-                        $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'] = isset($this->dataDaftarPoliRJ['drDesc']) ? ($this->dataDaftarPoliRJ['drDesc'] ? $this->dataDaftarPoliRJ['drDesc'] : 'Dokter pemeriksa') : 'Dokter pemeriksa-';
+                        $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'] = (isset($this->dataDaftarPoliRJ['drDesc']) ?
+                            ($this->dataDaftarPoliRJ['drDesc'] ? $this->dataDaftarPoliRJ['drDesc']
+                                : 'Dokter pemeriksa')
+                            : 'Dokter pemeriksa-');
                     }
                 } else {
+
                     $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedisTab'] = 'Pengkajian Medis';
-                    $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'] = isset($this->dataDaftarPoliRJ['drDesc']) ? ($this->dataDaftarPoliRJ['drDesc'] ? $this->dataDaftarPoliRJ['drDesc'] : 'Dokter pemeriksa') : 'Dokter pemeriksa-';
+                    $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'] = (isset($this->dataDaftarPoliRJ['drDesc']) ?
+                        ($this->dataDaftarPoliRJ['drDesc'] ? $this->dataDaftarPoliRJ['drDesc']
+                            : 'Dokter pemeriksa')
+                        : 'Dokter pemeriksa-');
                 }
+
+                // updateDB
+                $this->dataDaftarPoliRJ['ermStatus'] = 'L';
+                DB::table('rstxn_rjhdrs')
+                    ->where('rj_no', '=', $this->rjNoRef)
+                    ->update(['erm_status' => $this->dataDaftarPoliRJ['ermStatus']]);
+
                 $this->store();
             } else {
                 $this->emit('toastr-error', 'Anda tidak dapat melakukan TTD-E karena Bukan Pasien ' . $myUserNameActive);

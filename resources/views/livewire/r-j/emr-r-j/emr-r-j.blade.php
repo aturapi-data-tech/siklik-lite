@@ -232,6 +232,10 @@
 
                             <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
                                 <div class="">
+                                    <div class="font-normal text-gray-700">
+                                        {{ 'No. Antrian ' }} <span
+                                            class="text-5xl font-semibold text-gray-700">{{ $myQData->no_antrian }}</span>
+                                    </div>
                                     <div class="font-semibold text-primary">
                                         {{ $myQData->reg_no }}
                                     </div>
@@ -261,9 +265,6 @@
                                                         : 'Asuransi Lain')) }}
                                         </x-badge>
 
-                                    </div>
-                                    <div class="font-normal text-gray-900">
-                                        {{ 'Nomer Pelayanan ' . $myQData->no_antrian }}
                                     </div>
                                     <div class="font-normal">
                                         {{ $myQData->vno_sep }}

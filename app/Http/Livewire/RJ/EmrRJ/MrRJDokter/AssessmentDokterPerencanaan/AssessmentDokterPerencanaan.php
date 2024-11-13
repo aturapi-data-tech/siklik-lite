@@ -291,6 +291,13 @@ class AssessmentDokterPerencanaan extends Component
                             : 'Dokter pemeriksa')
                         : 'Dokter pemeriksa-');
                 }
+
+                // updateDB
+                $this->dataDaftarPoliRJ['ermStatus'] = 'L';
+                DB::table('rstxn_rjhdrs')
+                    ->where('rj_no', '=', $this->rjNoRef)
+                    ->update(['erm_status' => $this->dataDaftarPoliRJ['ermStatus']]);
+
                 $this->store();
             } else {
                 $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena Bukan Pasien " . $myUserNameActive);

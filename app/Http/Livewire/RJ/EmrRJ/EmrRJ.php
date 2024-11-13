@@ -438,7 +438,6 @@ class EmrRJ extends Component
                 ->orWhere(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($mySearch) . '%');
         })
             ->orderBy('dr_name',  'asc')
-            ->orderBy('shift',  'asc')
             ->orderBy('no_antrian',  'desc')
             ->orderBy('rj_date1',  'desc');
 
