@@ -497,15 +497,15 @@ class JasaDokterRJ extends Component
     {
         $collection = DB::table('rsmst_accdocproducts')
             ->select(
-                'immst_products.product_id as product_id',
+                'tkmst_products.product_id as product_id',
                 'accdoc_id',
                 'accdprod_qty',
-                'immst_products.product_name as product_name',
-                'immst_products.sales_price as sales_price',
+                'tkmst_products.product_name as product_name',
+                'tkmst_products.sales_price as sales_price',
 
             )
             ->where('accdoc_id', $accdocId)
-            ->join('immst_products', 'immst_products.product_id', 'rsmst_accdocproducts.product_id')
+            ->join('tkmst_products', 'tkmst_products.product_id', 'rsmst_accdocproducts.product_id')
             ->orderBy('accdoc_id')
             ->get();
 
@@ -535,7 +535,7 @@ class JasaDokterRJ extends Component
         ];
 
         $rules = [
-            "productId" => 'bail|required|exists:immst_products ,product_id',
+            "productId" => 'bail|required|exists:tkmst_products ,product_id',
             "productName" => 'bail|required|',
             "signaX" => 'bail|required|numeric|min:1|max:5',
             "signaHari" => 'bail|required|numeric|min:1|max:5',
