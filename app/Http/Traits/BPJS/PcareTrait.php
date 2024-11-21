@@ -104,9 +104,6 @@ trait PcareTrait
             if ($code == 200 || $code == 201) {
                 $decrypt = $this->stringDecrypt($signature['decrypt_key'], $response->json('response'));
                 $data = json_decode($decrypt, true);
-                if ($code === 201) {
-                    dd($data);
-                }
             } else {
 
                 $data = json_decode($response, true);
@@ -148,7 +145,7 @@ trait PcareTrait
         ], $messages);
 
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 201, null, null);
         }
 
 
@@ -168,7 +165,7 @@ trait PcareTrait
             return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
             /////////////////////////////////////////////////////////////////////////////
         } catch (Exception $e) {
-            return $this->sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
         }
     }
 
@@ -183,7 +180,7 @@ trait PcareTrait
         $validator = Validator::make($r, ["r" => ""], $messages);
 
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 201, null, null);
         }
 
 
@@ -203,7 +200,7 @@ trait PcareTrait
             return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
             /////////////////////////////////////////////////////////////////////////////
         } catch (Exception $e) {
-            return $this->sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
         }
     }
 
@@ -224,7 +221,7 @@ trait PcareTrait
         ], $messages);
 
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 201, null, null);
         }
 
 
@@ -244,7 +241,7 @@ trait PcareTrait
             return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
             /////////////////////////////////////////////////////////////////////////////
         } catch (Exception $e) {
-            return $this->sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
         }
     }
 
@@ -259,7 +256,7 @@ trait PcareTrait
         $validator = Validator::make($r, ["r" => ""], $messages);
 
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 201, null, null);
         }
 
 
@@ -279,7 +276,7 @@ trait PcareTrait
             return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
             /////////////////////////////////////////////////////////////////////////////
         } catch (Exception $e) {
-            return $this->sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
         }
     }
 
@@ -295,7 +292,7 @@ trait PcareTrait
         $validator = Validator::make($r, ["r" => ""], $messages);
 
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 201, null, null);
         }
 
 
@@ -315,7 +312,7 @@ trait PcareTrait
             return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
             /////////////////////////////////////////////////////////////////////////////
         } catch (Exception $e) {
-            return $this->sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
         }
     }
 
@@ -330,7 +327,7 @@ trait PcareTrait
         $validator = Validator::make($r, ["r" => ""], $messages);
 
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 201, null, null);
         }
 
 
@@ -350,7 +347,42 @@ trait PcareTrait
             return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
             /////////////////////////////////////////////////////////////////////////////
         } catch (Exception $e) {
-            return $this->sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
+        }
+    }
+
+    private function getStatusPulang($statusInap)
+    {
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+
+        // Masukkan Nilai dari parameter
+        $r = ['statusInap' => $statusInap];
+        // lakukan validasis
+        $validator = Validator::make($r, ["statusInap" => "required|boolean"], $messages);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 201, null, null);
+        }
+
+
+
+        // handler when time out and off line mode
+        try {
+            $myStatusInap = $statusInap ? 'true' : 'false';
+            $url = env('PCARE_URL') . "statuspulang/rawatInap/" . $myStatusInap;
+            $signature = $this->signature();
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->get($url);
+
+
+            // dd($response->transferStats->getTransferTime()); Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
         }
     }
 
@@ -372,7 +404,7 @@ trait PcareTrait
         ], $messages);
 
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 201, null, null);
         }
 
 
@@ -392,7 +424,7 @@ trait PcareTrait
             return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
             /////////////////////////////////////////////////////////////////////////////
         } catch (Exception $e) {
-            return $this->sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
         }
     }
 
@@ -429,7 +461,7 @@ trait PcareTrait
         $validator = Validator::make($r, $rules, $messages);
 
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 400, null, null);
         }
 
 
@@ -450,7 +482,7 @@ trait PcareTrait
             return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
             /////////////////////////////////////////////////////////////////////////////
         } catch (Exception $e) {
-            return $this->sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
         }
     }
 
@@ -476,7 +508,7 @@ trait PcareTrait
         $validator = Validator::make($r, $rules, $messages);
 
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 201, null, null);
         }
 
 
@@ -496,7 +528,7 @@ trait PcareTrait
             return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
             /////////////////////////////////////////////////////////////////////////////
         } catch (Exception $e) {
-            return $this->sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
         }
     }
 
@@ -518,7 +550,7 @@ trait PcareTrait
         $validator = Validator::make($r, $rules, $messages);
 
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 201, null, null);
         }
 
 
@@ -537,7 +569,7 @@ trait PcareTrait
             return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
             /////////////////////////////////////////////////////////////////////////////
         } catch (Exception $e) {
-            return $this->sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
         }
     }
 
@@ -561,7 +593,7 @@ trait PcareTrait
         $validator = Validator::make($r, $rules, $messages);
 
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 201, null, null);
         }
 
 
@@ -580,7 +612,7 @@ trait PcareTrait
             return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
             /////////////////////////////////////////////////////////////////////////////
         } catch (Exception $e) {
-            return $this->sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
         }
     }
 }

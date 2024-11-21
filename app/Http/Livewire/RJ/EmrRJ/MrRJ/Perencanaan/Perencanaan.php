@@ -39,8 +39,15 @@ class Perencanaan extends Component
         'tindakLanjutTab' => 'Tindak Lanjut',
         'tindakLanjut' => [
             'tindakLanjut' => '',
+            "tindakLanjutDesc" => "",
             'keteranganTindakLanjut' => '',
-            'tindakLanjutOptions' => [['tindakLanjut' => 'MRS'], ['tindakLanjut' => 'Kontrol'], ['tindakLanjut' => 'Rujuk'], ['tindakLanjut' => 'Perawatan Selesai'], ['tindakLanjut' => 'Lain-lain']],
+            // 'tindakLanjutOptions' => [
+            //     ['tindakLanjut' => 'MRS'],
+            //     ['tindakLanjut' => 'Kontrol'],
+            //     ['tindakLanjut' => 'Rujuk'],
+            //     ['tindakLanjut' => 'Perawatan Selesai'],
+            //     ['tindakLanjut' => 'Lain-lain']
+            // ],
         ],
 
         'pengkajianMedisTab' => 'Petugas Medis',

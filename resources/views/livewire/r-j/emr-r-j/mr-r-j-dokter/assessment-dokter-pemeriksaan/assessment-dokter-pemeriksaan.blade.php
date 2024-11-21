@@ -238,7 +238,7 @@
                                             Lingkar Perut :
                                         </td>
                                         <td>
-                                            {{ $dataDaftarPoliRJ['pemeriksaan']['nutrisi']['liPerut']
+                                            {{ isset($dataDaftarPoliRJ['pemeriksaan']['nutrisi']['liPerut'])
                                                 ? ($dataDaftarPoliRJ['pemeriksaan']['nutrisi']['liPerut']
                                                     ? $dataDaftarPoliRJ['pemeriksaan']['nutrisi']['liPerut']
                                                     : '-')

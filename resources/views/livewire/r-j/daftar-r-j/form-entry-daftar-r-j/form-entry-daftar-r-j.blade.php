@@ -8,7 +8,7 @@
     {{-- FormEntry --}}
     <div class="grid grid-cols-2 gap-2 mx-2">
         <x-border-form :title="__('Data Pasien')" :align="__('start')" :bgcolor="__('bg-white')" class="mr-0">
-
+            <div>{{ $FormEntry['noUrutBpjs'] ?? 'X' }}</div>
             {{-- Display Pasien Componen --}}
             <div class="grid grid-cols-1">
                 <livewire:component.display-pasien.display-pasien :regNoRef="$FormEntry['regNo']" :checkStatusKlaimPasien="$checkStatusKlaimPasien"

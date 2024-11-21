@@ -247,6 +247,57 @@ class FormEntryRefBpjs extends Component
         }
     }
 
+    public function updateDataStatusPulang(): void
+    {
+        //Parameter 1 : Jika rawat inap maka diisi true, sebaliknya diisi false
+        try {
+
+
+            $getStatusPulang = $this->getStatusPulang(true)
+                ->getOriginalContent()['response']['list'] ?? [];
+
+            $checkDataAlergi =  $this->checkData('Status Pulang RI');
+
+
+
+            if (
+                json_encode($getStatusPulang, true) !== $checkDataAlergi
+                &&
+                $getStatusPulang !== []
+            ) {
+                $this->updateData('Status Pulang RI', $getStatusPulang);
+                $this->emit('toastr-success', 'Data Ref Status Pulang RI BPJS telah diperbarui.');
+            } else {
+                $this->emit('toastr-error', 'Data Ref Status Pulang RI BPJS sekarang sudah akurat dan terbaru');
+            }
+        } catch (\Exception $e) {
+            $this->emit('toastr-error', $e->getMessage());
+        }
+
+        try {
+
+            $getStatusPulang = $this->getStatusPulang(false)
+                ->getOriginalContent()['response']['list'] ?? [];
+
+            $checkDataAlergi =  $this->checkData('Status Pulang RJ');
+
+
+
+            if (
+                json_encode($getStatusPulang, true) !== $checkDataAlergi
+                &&
+                $getStatusPulang !== []
+            ) {
+                $this->updateData('Status Pulang RJ', $getStatusPulang);
+                $this->emit('toastr-success', 'Data Ref Status Pulang RJ BPJS telah diperbarui.');
+            } else {
+                $this->emit('toastr-error', 'Data Ref Status Pulang RJ BPJS sekarang sudah akurat dan terbaru');
+            }
+        } catch (\Exception $e) {
+            $this->emit('toastr-error', $e->getMessage());
+        }
+    }
+
 
 
     private function checkData(string $refData): string

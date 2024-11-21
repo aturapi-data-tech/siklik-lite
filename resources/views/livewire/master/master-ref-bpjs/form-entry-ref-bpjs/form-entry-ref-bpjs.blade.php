@@ -77,6 +77,17 @@
             </x-green-button>
         </div>
 
+        <div class="">
+            <div wire:loading wire:target="updateDataStatusPulang">
+                <x-loading />
+            </div>
+
+            <x-green-button :disabled=$disabledProperty wire:click.prevent="updateDataStatusPulang()" type="button"
+                wire:loading.remove>
+                Update Data StatusPulang
+            </x-green-button>
+        </div>
+
 
 
 

@@ -285,7 +285,7 @@ class FormEntryDaftarRJ extends Component
                     // dd($getPendaftaranbyNomorUrut);
 
                     // check pendaftaran profider -> cari list pasien ->upate antrian
-                    dd('check pendaftaran profider -> cari list pasien ->upate antrian');
+                    // dd('check pendaftaran profider -> cari list pasien ->upate antrian');
                 }
             } else {
                 $this->emit('toastr-error', 'Kode Provider Peserta tidak sesuai. Provider Peserta /' . $kdProvider);
@@ -476,8 +476,6 @@ class FormEntryDaftarRJ extends Component
 
     public function render()
     {
-        $this->emit('toastr-error', 'xxx');
-
         // LOV
         $this->syncLOV();
         // FormEntry
