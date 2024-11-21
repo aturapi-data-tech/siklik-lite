@@ -32,7 +32,9 @@ trait LOVDokterTrait
                 'dr_id',
                 'dr_name',
                 'rsmst_doctors.poli_id as poli_id',
-                'poli_desc'
+                'poli_desc',
+                'kd_poli_bpjs',
+                'kd_dr_bpjs'
             )
             ->join('rsmst_polis', 'rsmst_polis.poli_id', '=', 'rsmst_doctors.poli_id')
             ->where('rsmst_doctors.dr_id', '=', $search)
@@ -42,7 +44,7 @@ trait LOVDokterTrait
         if ($dataDokterLovs) {
 
             // set Dokter sep
-            $this->addDokter($dataDokterLovs->dr_id, $dataDokterLovs->dr_name, $dataDokterLovs->poli_id, $dataDokterLovs->poli_desc);
+            $this->addDokter($dataDokterLovs->dr_id, $dataDokterLovs->dr_name, $dataDokterLovs->poli_id, $dataDokterLovs->poli_desc, $dataDokterLovs->kd_poli_bpjs, $dataDokterLovs->kd_dr_bpjs);
             $this->resetdataDokterLov();
         } else {
 
@@ -56,7 +58,9 @@ trait LOVDokterTrait
                             'dr_id',
                             'dr_name',
                             'rsmst_doctors.poli_id as poli_id',
-                            'poli_desc'
+                            'poli_desc',
+                            'kd_poli_bpjs',
+                            'kd_dr_bpjs'
                         )
                         ->join('rsmst_polis', 'rsmst_polis.poli_id', '=', 'rsmst_doctors.poli_id')
                         // ->where('active_status', '1')
@@ -85,14 +89,16 @@ trait LOVDokterTrait
                 'dr_id',
                 'dr_name',
                 'rsmst_doctors.poli_id as poli_id',
-                'poli_desc'
+                'poli_desc',
+                'kd_poli_bpjs',
+                'kd_dr_bpjs'
             )
             ->join('rsmst_polis', 'rsmst_polis.poli_id', '=', 'rsmst_doctors.poli_id')
             ->where('dr_id', $this->dataDokterLov[$id]['dr_id'])
             ->first();
 
         // set dokter sep
-        $this->addDokter($dataDokterLovs->dr_id, $dataDokterLovs->dr_name, $dataDokterLovs->poli_id, $dataDokterLovs->poli_desc);
+        $this->addDokter($dataDokterLovs->dr_id, $dataDokterLovs->dr_name, $dataDokterLovs->poli_id, $dataDokterLovs->poli_desc, $dataDokterLovs->kd_poli_bpjs, $dataDokterLovs->kd_dr_bpjs);
         $this->resetdataDokterLov();
     }
 
@@ -130,10 +136,11 @@ trait LOVDokterTrait
 
     public function enterMydataDokterLov($id)
     {
+        // dd($this->dataDokterLov);
         // $this->checkRjStatus();
         // jika JK belum siap maka toaster error
         if (isset($this->dataDokterLov[$id]['dr_id'])) {
-            $this->addDokter($this->dataDokterLov[$id]['dr_id'], $this->dataDokterLov[$id]['dr_name'], $this->dataDokterLov[$id]['poli_id'], $this->dataDokterLov[$id]['poli_desc']);
+            $this->addDokter($this->dataDokterLov[$id]['dr_id'], $this->dataDokterLov[$id]['dr_name'], $this->dataDokterLov[$id]['poli_id'], $this->dataDokterLov[$id]['poli_desc'], $this->dataDokterLov[$id]['kd_poli_bpjs'], $this->dataDokterLov[$id]['kd_dr_bpjs']);
             $this->resetdataDokterLov();
         } else {
             $this->emit('toastr-error', "Kode belum tersedia.");
@@ -142,13 +149,15 @@ trait LOVDokterTrait
     }
 
 
-    private function addDokter($DokterId, $DokterDesc, $PoliId, $PoliDesc): void
+    private function addDokter($DokterId, $DokterDesc, $PoliId, $PoliDesc, $kdPoliBpjs, $kdDokterBpjs): void
     {
         $this->collectingMyDokter = [
             'DokterId' => $DokterId,
             'DokterDesc' => $DokterDesc,
             'PoliId' => $PoliId,
             'PoliDesc' => $PoliDesc,
+            'kdPoliBpjs' => $kdPoliBpjs,
+            'kdDokterBpjs' => $kdDokterBpjs
 
         ];
     }

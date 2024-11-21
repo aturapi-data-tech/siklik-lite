@@ -7,6 +7,8 @@ use App\Http\Livewire\Master\MasterPasien\MasterPasien;
 
 use App\Http\Livewire\Master\MasterPoli\MasterPoli;
 use App\Http\Livewire\Master\MasterDokter\MasterDokter;
+use App\Http\Livewire\Master\MasterRefBpjs\MasterRefBpjs;
+
 
 use App\Http\Livewire\RJ\BookingRJ\BookingRJ;
 use App\Http\Livewire\RJ\DaftarRJ\DaftarRJ;
@@ -70,6 +72,9 @@ Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker']], functi
 
     // Master Dokter
     Route::get('MasterDokter', MasterDokter::class)->middleware('auth')->name('MasterDokter');
+
+    // Master Dokter
+    Route::get('MasterRefBpjs', MasterRefBpjs::class)->middleware('auth')->name('MasterRefBpjs');
 
 
 

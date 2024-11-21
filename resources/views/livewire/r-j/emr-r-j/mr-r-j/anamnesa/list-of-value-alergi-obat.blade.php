@@ -1,6 +1,6 @@
-<div x-data @click.outside="$wire.tingkatKesadaranLovStatus = false" class="absolute">
+<div x-data @click.outside="$wire.alergiObatLovStatus = false" class="absolute">
 
-    @if ($tingkatKesadaranLovStatus)
+    @if ($alergiObatLovStatus)
         <!-- Dropdown list Title -->
 
 
@@ -9,21 +9,21 @@
         <div class="z-10 w-full bg-white rounded-lg shadow dark:bg-gray-700">
             <!-- Dropdown list -->
             <ul class="h-auto px-3 pt-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200">
-                @foreach ($tingkatKesadaranLov as $lov)
-                    <li wire:key='tingkatKesadaranLov{{ $lov['tingkatKesadaranId'] }}'>
+                @foreach ($alergiObatLov as $lov)
+                    <li wire:key='alergiObatLov{{ $lov['alergiObatId'] }}'>
                         <x-dropdown-link
-                            wire:click="setMytingkatKesadaranLov('{{ $lov['tingkatKesadaranId'] }}','{{ $lov['tingkatKesadaranDesc'] }}')">
-                            {{ $lov['tingkatKesadaranId'] . ' / ' . $lov['tingkatKesadaranDesc'] }}
+                            wire:click="setMyalergiObatLov('{{ $lov['alergiObatId'] }}','{{ $lov['alergiObatDesc'] }}')">
+                            {{ $lov['alergiObatId'] . ' / ' . $lov['alergiObatDesc'] }}
                         </x-dropdown-link>
                     </li>
                 @endforeach
-                @if (strlen($tingkatKesadaranLovSearch) < 3 && count($tingkatKesadaranLov) == 0)
+                @if (strlen($alergiObatLovSearch) < 3 && count($alergiObatLov) == 0)
                     <li>
                         <div class="w-full p-4 text-sm text-center text-gray-500 dark:text-gray-400">
                             {{ 'Masukkan minimal 3 karakter' }}
                         </div>
                     </li>
-                @elseif(strlen($tingkatKesadaranLovSearch) >= 3 && count($tingkatKesadaranLov) == 0)
+                @elseif(strlen($alergiObatLovSearch) >= 3 && count($alergiObatLov) == 0)
                     <li>
                         <div class="w-full p-4 text-sm text-center text-gray-500 dark:text-gray-400">
                             {{ 'Data Tidak ditemukan' }}

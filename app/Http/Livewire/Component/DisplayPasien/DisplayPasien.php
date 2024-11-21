@@ -12,12 +12,17 @@ class DisplayPasien extends Component
     public $regNoRef;
 
     public array $displayPasien = [];
+    public array $checkStatusKlaimPasien = [];
+    protected $listeners = ['displayPasienUpdated' => 'setCheckStatusKlaimPasien'];
 
     private function findData($regNo): void
     {
         $this->setdisplayPasien($regNo);
     }
-
+    public function setCheckStatusKlaimPasien($value)
+    {
+        $this->checkStatusKlaimPasien = $value;
+    }
     private function setdisplayPasien($value): void
     {
         $findData = DB::table('rsmst_pasiens')
@@ -215,6 +220,7 @@ class DisplayPasien extends Component
 
     public function render()
     {
+
         return view('livewire.component.display-pasien.display-pasien');
     }
 }

@@ -233,6 +233,19 @@
                                             cm
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td class="pr-4 text-end">
+                                            Lingkar Perut :
+                                        </td>
+                                        <td>
+                                            {{ $dataDaftarPoliRJ['pemeriksaan']['nutrisi']['liPerut']
+                                                ? ($dataDaftarPoliRJ['pemeriksaan']['nutrisi']['liPerut']
+                                                    ? $dataDaftarPoliRJ['pemeriksaan']['nutrisi']['liPerut']
+                                                    : '-')
+                                                : '-' }}
+                                            cm
+                                        </td>
+                                    </tr>
 
 
 

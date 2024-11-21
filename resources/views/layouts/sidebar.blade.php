@@ -79,6 +79,12 @@
                                 @endrole
 
                                 @role(['Mr', 'Admin'])
+                                    <x-nav-link class="pl-4" :href="route('MasterRefBpjs')" :active="request()->routeIs('MasterRefBpjs')">
+                                        {{ __('Master Ref BPJS') }}
+                                    </x-nav-link>
+                                @endrole
+
+                                @role(['Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('MasterPasien')" :active="request()->routeIs('MasterPasien')">
                                         {{ __('Pendaftaran Pasien Baru') }}
                                     </x-nav-link>

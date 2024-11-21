@@ -6,15 +6,18 @@ use Illuminate\Support\Facades\DB;
 use Exception;
 use App\Http\Traits\customErrorMessagesTrait;
 
+use App\Http\Traits\LOV\Pcare\LOVGetPoliFKTP\LOVGetPoliFKTPTrait;
 
 use App\Http\Livewire\SatuSehat\Location\Location;
-use App\Http\Traits\BPJS\SatuSehatTrait;
+use App\Http\Traits\SatuSehat\SatuSehatTrait;
 
 
 use Livewire\Component;
 
 class FormEntryPoli extends Component
 {
+    use LOVGetPoliFKTPTrait;
+
     // listener from blade////////////////
     protected $listeners = [];
 
@@ -22,7 +25,7 @@ class FormEntryPoli extends Component
     public string $isOpenMode = 'insert';
 
     public array $FormEntryPoli = [];
-
+    public array $poliFKTP = [];
 
 
 
@@ -87,6 +90,8 @@ class FormEntryPoli extends Component
                 'poliUuid' => null,
             ];
         }
+
+        $this->syncDataPrimer();
     }
 
 
@@ -167,6 +172,14 @@ class FormEntryPoli extends Component
         }
     }
 
+    private function syncDataPrimer(): void
+    {
+        // sync data primer dilakukan ketika update
+        if ($this->isOpenMode == 'update') {
+            $this->addGetPoliFKTP($this->FormEntryPoli['poliIdBPJS'], $this->FormEntryPoli['poliDesc'], true);
+        }
+    }
+
     // validate Data RJ//////////////////////////////////////////////////
     private function validateData(): void
     {
@@ -185,6 +198,17 @@ class FormEntryPoli extends Component
         }
     }
 
+    private function syncDataFormEntry(): void
+    {
+        //  Entry ketika Mont
+        // Pasien Baru Lama di blade wire:model
+        $this->FormEntryPoli['poliIdBPJS'] = $this->poliFKTP['kdPoli'] ?? '';
+    }
+    private function syncLOV(): void
+    {
+        $this->poliFKTP = $this->collectingMyGetPoliFKTP;
+    }
+
     public function mount()
     {
         $this->findData($this->poliId);
@@ -192,6 +216,11 @@ class FormEntryPoli extends Component
 
     public function render()
     {
+        // LOV
+        $this->syncLOV();
+        // FormEntry
+        $this->syncDataFormEntry();
+
         return view('livewire.master.master-poli.form-entry-poli.form-entry-poli');
     }
 }

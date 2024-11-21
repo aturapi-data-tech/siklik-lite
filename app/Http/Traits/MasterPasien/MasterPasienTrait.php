@@ -2,7 +2,6 @@
 
 namespace App\Http\Traits\MasterPasien;
 
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 use Exception;
@@ -27,8 +26,6 @@ trait MasterPasienTrait
             if ($findDataMetaDataPasienJson) {
                 $dataPasien = json_decode($findData->meta_data_pasien_json, true);
             } else {
-
-                $this->emit('toastr-error', "Data tidak dapat di proses json.");
 
                 $dataPasien = [
                     "pasien" => [
@@ -313,7 +310,7 @@ trait MasterPasienTrait
 
             return $dataPasien;
         } catch (Exception $e) {
-            dd($e->getMessage());
+            // dd($e->getMessage());
             return ["errorMessages" => $e->getMessage()];
         }
     }

@@ -1,9 +1,9 @@
-@props(['label' => 'Label'])
+@props(['label' => 'Label', 'value' => '1'])
 
 
 <div class="flex items-center w-auto px-4 bg-white border border-gray-300 rounded-lg dark:border-gray-700">
     {{-- input --}}
-    <input id="{{ $label }}" type="checkbox" {!! $attributes->merge([
+    <input id="{{ $label }}" type="checkbox" value = "{{ $value }}" {!! $attributes->merge([
         'class' =>
             'w-4 h-4 bg-gray-100 border-gray-300 rounded text-secondary focus:ring-secondary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600',
     ]) !!}>

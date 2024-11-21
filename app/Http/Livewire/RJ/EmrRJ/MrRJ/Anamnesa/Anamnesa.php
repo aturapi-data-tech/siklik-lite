@@ -197,7 +197,14 @@ class Anamnesa extends Component
 
         "alergiTab" => "Alergi",
         "alergi" => [
-            "alergi" => ""
+            "alergi" => "",
+            "alergiMakanan" => "00",
+            "alergiMakananDesc" => "Tidak Ada",
+            "alergiObat" => "00",
+            "alergiObatDesc" => "Tidak Ada",
+            "alergiUdara" => "00",
+            "alergiUdaraDesc" => "Tidak Ada",
+
         ],
 
         "rekonsiliasiObatTab" => "Rekonsiliasi Obat",
@@ -871,6 +878,122 @@ class Anamnesa extends Component
         }
     }
 
+
+
+
+
+    // /////////alergiMakanan////////////
+    public $alergiMakananLov = [];
+    public $alergiMakananLovStatus = 0;
+    public $alergiMakananLovSearch = '';
+    public function clickalergiMakananlov()
+    {
+        $this->alergiMakananLovStatus = true;
+        // $this->alergiMakananLov = $this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['alergiMakananOptions'];
+
+        $getAlergiMakanan = json_decode(DB::table('ref_bpjs_table')
+            ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper('Alergi Makanan'))
+            ->first()->ref_json ?? '{}', true);
+
+        $this->alergiMakananLov = collect($getAlergiMakanan)->map(function ($item) {
+            $item['alergiMakananId'] = $item['kdAlergi'];
+            unset($item['kdAlergi']);
+            $item['alergiMakananDesc'] = $item['nmAlergi'];
+            unset($item['nmAlergi']);
+            return $item;
+        })->toArray();
+    }
+
+    // /////////////////////
+    // LOV selected start
+    public function setMyalergiMakananLov($id, $desc)
+    {
+        $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergiMakanan'] = $id;
+        $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergiMakananDesc'] = $desc;
+
+        $this->alergiMakananLovStatus = false;
+        $this->alergiMakananLovSearch = '';
+    }
+    // LOV selected end
+    // /////////////////////
+
+
+
+    // /////////alergiObat////////////
+    public $alergiObatLov = [];
+    public $alergiObatLovStatus = 0;
+    public $alergiObatLovSearch = '';
+    public function clickalergiObatlov()
+    {
+        $this->alergiObatLovStatus = true;
+        // $this->alergiObatLov = $this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['alergiObatOptions'];
+
+        $getAlergiObat = json_decode(DB::table('ref_bpjs_table')
+            ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper('Alergi Obat'))
+            // ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper($this->dataGetAlergiObatLovSearch))
+            ->first()->ref_json, true) ?? [];
+
+        $this->alergiObatLov = collect($getAlergiObat)->map(function ($item) {
+            $item['alergiObatId'] = $item['kdAlergi'];
+            unset($item['kdAlergi']);
+            $item['alergiObatDesc'] = $item['nmAlergi'];
+            unset($item['nmAlergi']);
+            return $item;
+        })->toArray();
+    }
+
+    // /////////////////////
+    // LOV selected start
+    public function setMyalergiObatLov($id, $desc)
+    {
+        $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergiObat'] = $id;
+        $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergiObatDesc'] = $desc;
+
+        $this->alergiObatLovStatus = false;
+        $this->alergiObatLovSearch = '';
+    }
+    // LOV selected end
+    // /////////////////////
+
+    // /////////alergiUdara////////////
+    public $alergiUdaraLov = [];
+    public $alergiUdaraLovStatus = 0;
+    public $alergiUdaraLovSearch = '';
+    public function clickalergiUdaralov()
+    {
+        $this->alergiUdaraLovStatus = true;
+        // $this->alergiUdaraLov = $this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['alergiUdaraOptions'];
+
+        $getAlergiUdara = json_decode(DB::table('ref_bpjs_table')
+            ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper('Alergi Udara'))
+            // ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper($this->dataGetAlergiUdaraLovSearch))
+            ->first()->ref_json, true) ?? [];
+
+        $this->alergiUdaraLov = collect($getAlergiUdara)->map(function ($item) {
+            $item['alergiUdaraId'] = $item['kdAlergi'];
+            unset($item['kdAlergi']);
+            $item['alergiUdaraDesc'] = $item['nmAlergi'];
+            unset($item['nmAlergi']);
+            return $item;
+        })->toArray();
+    }
+
+    // /////////////////////
+    // LOV selected start
+    public function setMyalergiUdaraLov($id, $desc)
+    {
+        $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergiUdara'] = $id;
+        $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergiUdaraDesc'] = $desc;
+
+        $this->alergiUdaraLovStatus = false;
+        $this->alergiUdaraLovSearch = '';
+    }
+    // LOV selected end
+    // /////////////////////
+
+
+
+    // /////////////////////
     // when new form instance
     public function mount()
     {

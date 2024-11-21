@@ -30,6 +30,9 @@
                             <div>
                                 {{ $lov['sex'] . '/ ' . $lov['address'] }}
                             </div>
+                            <div>
+                                {{ 'Noka ' . $lov['nokartu_bpjs'] . '/ Nik ' . $lov['nik_bpjs'] }}
+                            </div>
                         </x-dropdown-link>
                     </li>
                 @endforeach

@@ -11,7 +11,7 @@
 
             {{-- Display Pasien Componen --}}
             <div class="grid grid-cols-1">
-                <livewire:component.display-pasien.display-pasien :regNoRef="$FormEntry['regNo']"
+                <livewire:component.display-pasien.display-pasien :regNoRef="$FormEntry['regNo']" :checkStatusKlaimPasien="$checkStatusKlaimPasien"
                     :wire:key="$FormEntry['regNo'].'display-pasien'">
 
             </div>
@@ -34,7 +34,7 @@
 
 
                 <div class="flex justify-end ">
-                    <x-check-box value='N' :label="__('Pasien Baru')" wire:model="FormEntry.passStatus" />
+                    <x-check-box :label="__('Pasien Baru')" wire:model="FormEntry.passStatus" :value="__($FormEntry['passStatus'])" />
                 </div>
 
                 {{-- LOV Pasien --}}
@@ -83,6 +83,42 @@
 
                     </div>
                     @error('jenisKlaim.JenisKlaimId')
+                        <x-input-error :messages=$message />
+                    @enderror
+                </div>
+
+                <div>
+                    <x-input-label for="refTkp" :value="__('Tkp')" :required="__(true)" />
+                    <div class="grid grid-cols-3 gap-2 ">
+
+                        @foreach ($refTkp['refTkpOptions'] as $sRj)
+                            {{-- @dd($sRj) --}}
+                            <x-radio-button :label="__($sRj['refTkpDesc'])" value="{{ $sRj['refTkpId'] }}"
+                                wire:model="refTkp.refTkpId" />
+                        @endforeach
+
+                    </div>
+                    @error('refTkp.refTkpId')
+                        <x-input-error :messages=$message />
+                    @enderror
+                </div>
+
+                <div>
+                    <x-input-label for="kunjSakit" :value="__('Kunjungan Sakit')" :required="__(true)" />
+                    <div class="grid grid-cols-3 gap-2 ">
+
+                        @foreach ($kunjSakit['kunjSakitOptions'] as $sRj)
+                            {{-- @dd($sRj) --}}
+                            <x-radio-button :label="__($sRj['kunjSakitDesc'])" value="{{ $sRj['kunjSakitId'] }}"
+                                wire:model="kunjSakit.kunjSakitId" />
+                        @endforeach
+
+                        <div
+                            class="text-gray-700 font-sm {{ $kunjSakit['kunjSakitId'] ? 'text-red-500' : 'text-green-500' }}">
+                            {{ $kunjSakit['kunjSakitId'] ? '(Kunjungan Sakit)' : '(Kunjungan Sehat)' }}</div>
+
+                    </div>
+                    @error('kunjSakit.kunjSakitId')
                         <x-input-error :messages=$message />
                     @enderror
                 </div>
@@ -150,15 +186,29 @@
 
     <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 ">
         <div class="">
-
-            <x-light-button wire:click="closeModal()" type="button">Keluar</x-light-button>
-
-
-
+            <div wire:loading wire:target="closeModal">
+                <x-loading />
+            </div>
+            <x-light-button wire:click="closeModal()" type="button" wire:loading.remove>Keluar</x-light-button>
         </div>
 
+        @if ($jenisKlaim['JenisKlaimId'] === 'JM')
+            <div class="">
+                <div wire:loading wire:target="cekStatusPasienBPJS">
+                    <x-loading />
+                </div>
+                <x-yellow-button wire:click="cekStatusPasienBPJS()" type="button" wire:loading.remove>
+                    Cek Status Pasien BPJS
+                </x-yellow-button>
+            </div>
+        @endif
+
         <div class="">
-            <x-green-button :disabled=$disabledProperty wire:click.prevent="store()" type="button">Simpan
+            <div wire:loading wire:target="store">
+                <x-loading />
+            </div>
+            <x-green-button :disabled=$disabledProperty wire:click.prevent="store()" type="button" wire:loading.remove>
+                Simpan
             </x-green-button>
         </div>
     </div>

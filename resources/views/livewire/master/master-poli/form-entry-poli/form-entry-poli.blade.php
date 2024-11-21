@@ -32,14 +32,28 @@
         </div>
 
         <div>
-            <x-input-label for="FormEntryPoli.poliIdBPJS" :value="__('Kode Poli BPJS')" :required="__($errors->has('FormEntryPoli.poliIdBPJS'))" />
-            <div class="flex items-center mb-2">
-                <x-text-input id="FormEntryPoli.poliIdBPJS" placeholder="Kode Poli BPJS" class="mt-1 ml-2"
-                    :errorshas="__($errors->has('FormEntryPoli.poliIdBPJS'))" :disabled=$disabledProperty wire:model="FormEntryPoli.poliIdBPJS" />
-            </div>
-            @error('FormEntryPoli.poliIdBPJS')
-                <x-input-error :messages=$message />
-            @enderror
+            @if ($poliFKTP)
+                <x-input-label for="FormEntryPoli.poliIdBPJS" :value="__('Kode Poli BPJS')" :required="__($errors->has('FormEntryPoli.poliIdBPJS'))"
+                    wire:click="$set('collectingMyGetPoliFKTP',[])" />
+                <div class="flex items-center mb-2">
+                    <x-text-input id="FormEntryPoli.poliIdBPJS" placeholder="Kode Poli BPJS" class="mt-1 ml-2"
+                        :errorshas="__($errors->has('FormEntryPoli.poliIdBPJS'))" :disabled=true wire:model="FormEntryPoli.poliIdBPJS" />
+                </div>
+            @else
+                {{-- LOV poliFktp --}}
+                <div class="mb-2">
+                    <div class="mb-2">
+                        @include('livewire.component.l-o-v.p-care.list-of-value-poli-f-k-t-p.list-of-value-poli-f-k-t-p')
+                    </div>
+
+                    <div class="mb-2">
+                        @error('FormEntryPoli.poliIdBPJS')
+                            <x-input-error :messages=$message />
+                        @enderror
+                    </div>
+                </div>
+            @endif
+
         </div>
 
         <div>

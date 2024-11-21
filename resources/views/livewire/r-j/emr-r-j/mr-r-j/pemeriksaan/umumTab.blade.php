@@ -19,10 +19,27 @@
                 :required="__(false)" />
 
             <div class="mt-1">
+
+                {{-- @if ($kesadaran)
+                    <x-input-label for="FormEntryPoli.poliIdBPJS" :value="__('Tingat Kesadaran')" :required="__($errors->has('FormEntryPoli.poliIdBPJS'))"
+                        wire:click="$set('collectingMyGetPoliFKTP',[])" />
+                    <div class="flex items-center mb-2">
+                        <x-text-input id="FormEntryPoli.poliIdBPJS" placeholder="Tingat Kesadaran" class="mt-1 ml-2"
+                            :errorshas="__($errors->has('FormEntryPoli.poliIdBPJS'))" :disabled=true wire:model="FormEntryPoli.poliIdBPJS" />
+                    </div>
+                @else
+                <div class="mb-2">
+                    <div class="mb-2">
+                        @include('livewire.component.l-o-v.p-care.list-of-value-kesadaran.list-of-value-kesadaran')
+                    </div>
+                </div>
+                @endif --}}
+
+
                 <div class="flex ">
                     <x-text-input placeholder="Tingkat Kesadaran" class="sm:rounded-none sm:rounded-l-lg"
                         :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.tingkatKesadaran'))" :disabled=true
-                        value="{{ $dataDaftarPoliRJ['pemeriksaan']['tandaVital']['tingkatKesadaran'] }}" />
+                        value="{{ $dataDaftarPoliRJ['pemeriksaan']['tandaVital']['tingkatKesadaran'] ?? '' }}{{ ' / ' }}{{ $dataDaftarPoliRJ['pemeriksaan']['tandaVital']['tingkatKesadaranDesc'] ?? '' }}" />
 
 
 
@@ -257,7 +274,7 @@
 
         </div>
 
-        <div class="grid grid-cols-2 gap-2 pt-2">
+        <div class="grid grid-cols-3 gap-2 pt-2">
             <div class="mb-2 ">
                 <x-input-label for="dataDaftarPoliRJ.pemeriksaan.nutrisi.lk" :value="__('Lingkar Kepala')" :required="__(false)" />
                 <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.nutrisi.lk" placeholder="Lingkar Kepala"
@@ -274,6 +291,17 @@
                     class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.nutrisi.lila'))" :disabled=$disabledPropertyRjStatus
                     wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.nutrisi.lila" :mou_label="__('Cm')" />
                 @error('dataDaftarPoliRJ.pemeriksaan.nutrisi.lila')
+                    <x-input-error :messages=$message />
+                @enderror
+            </div>
+
+            <div class="mb-2 ">
+                <x-input-label for="dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut" :value="__('Lingkar Perut')"
+                    :required="__(false)" />
+                <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut" placeholder="Lingkar Perut"
+                    class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut'))" :disabled=$disabledPropertyRjStatus
+                    wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut" :mou_label="__('Cm')" />
+                @error('dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut')
                     <x-input-error :messages=$message />
                 @enderror
             </div>

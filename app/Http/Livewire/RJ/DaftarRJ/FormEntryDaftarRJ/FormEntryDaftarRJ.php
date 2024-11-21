@@ -6,11 +6,13 @@ use Illuminate\Support\Facades\DB;
 use Exception;
 use App\Http\Traits\customErrorMessagesTrait;
 use Carbon\Carbon;
+use App\Http\Traits\BPJS\PcareTrait;
 
 
 // use App\Http\Livewire\SatuSehat\Location\Location;
 // use App\Http\Traits\BPJS\SatuSehatTrait;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
+use App\Http\Traits\MasterPasien\MasterPasienTrait;
 
 use App\Http\Traits\LOV\LOVDokter\LOVDokterTrait;
 use App\Http\Traits\LOV\LOVPasien\LOVPasienTrait;
@@ -19,7 +21,7 @@ use Livewire\Component;
 
 class FormEntryDaftarRJ extends Component
 {
-    use EmrRJTrait, LOVDokterTrait, LOVPasienTrait;
+    use EmrRJTrait, LOVDokterTrait, LOVPasienTrait, MasterPasienTrait, PcareTrait;
     // listener from blade////////////////
     protected $listeners = [];
 
@@ -28,6 +30,9 @@ class FormEntryDaftarRJ extends Component
     public string $isOpenMode = 'insert';
 
     public array $FormEntry = [];
+    public array $displayPasien = [];
+    public array $checkStatusKlaimPasien = [];
+
 
     public array $jenisKlaim = [
         'JenisKlaimId' => 'UM',
@@ -38,6 +43,26 @@ class FormEntryDaftarRJ extends Component
             ['JenisKlaimId' => 'JML', 'JenisKlaimDesc' => 'Asuransi Lain'],
         ]
     ];
+
+    public array $kunjSakit = [
+        'kunjSakitId' => '1',
+        'kunjSakitDesc' => 'Ya',
+        'kunjSakitOptions' => [
+            ['kunjSakitId' => '1', 'kunjSakitDesc' => 'Ya'],
+            ['kunjSakitId' => '0', 'kunjSakitDesc' => 'Tidak'],
+        ]
+    ]; // true false
+
+    public array $refTkp = [
+        'refTkpId' => '10',
+        'refTkpDesc' => 'RJTP',
+        'refTkpOptions' => [
+            ['refTkpId' => '10', 'refTkpDesc' => 'RJTP'],
+            ['refTkpId' => '20', 'refTkpDesc' => 'RITP'],
+            ['refTkpId' => '50', 'refTkpDesc' => 'Promotif'],
+
+        ]
+    ]; // true false
 
 
     // LOV Nested
@@ -73,6 +98,9 @@ class FormEntryDaftarRJ extends Component
         'FormEntry.rjStatus' => 'bail|required|in:A,L,F,I',
         'FormEntry.txnStatus' => 'bail|required|in:A,L,F,H',
         'FormEntry.ermStatus' => 'bail|required|in:A,L,F',
+        'FormEntry.kunjSakit' => 'bail|required|in:1,0',
+        'FormEntry.kdTkp' => 'bail|required|in:10,20,50',
+
     ];
 
     protected $validationAttributes = [
@@ -99,6 +127,9 @@ class FormEntryDaftarRJ extends Component
         'FormEntry.rjStatus' => 'Status RJ',
         'FormEntry.txnStatus' => 'Status Transaksi',
         'FormEntry.ermStatus' => 'Status Rekam Medis',
+        'FormEntry.kunjSakit' => 'Kunjungan Sakit',
+        'FormEntry.kdTkp' => 'Tkp',
+
     ];
 
     protected $messages = [];
@@ -114,6 +145,12 @@ class FormEntryDaftarRJ extends Component
         $this->emit('CloseModal');
     }
 
+
+    public function cekStatusPasienBPJS(): void
+    {
+        $this->checkJnsKlaimPasien($this->FormEntry['klaimId'], $this->FormEntry['regNo']);
+    }
+
     private function findData($id): void
     {
         try {
@@ -124,6 +161,8 @@ class FormEntryDaftarRJ extends Component
                 $this->emit('CloseModal');
                 // return;
             }
+
+
             $this->FormEntry  = $findData['dataDaftarRJ'];
             $this->syncDataPrimer();
             $this->rjStatusRef = $this->checkRJStatus($id);
@@ -192,6 +231,7 @@ class FormEntryDaftarRJ extends Component
         // validate
         $this->setDataPrimer();
         $this->validateData();
+        $this->checkJnsKlaimPasien($this->FormEntry['klaimId'], $this->FormEntry['regNo']);
 
         // Jika mode data //insert
         if ($this->isOpenMode == 'insert') {
@@ -202,8 +242,78 @@ class FormEntryDaftarRJ extends Component
             $this->update($this->rjNoRef);
         }
 
+        $this->addPedaftaranBPJS($this->FormEntry['klaimId'],);
         $this->updateJsonRJ($this->FormEntry['rjNo'], $this->FormEntry);
+        // ///////////////////////////
+
+
         // $this->closeModal();
+    }
+
+    private function addPedaftaranBPJS($statusPasien): void
+    {
+        if ($statusPasien == 'JM') {
+            $kdProvider = $this->checkStatusKlaimPasien['metadata']['code'] === 200 ?
+                $this->checkStatusKlaimPasien['response']['kdProviderPst']['kdProvider']
+                : '';
+            if ($kdProvider === env('PCARE_PROVIDER')) {
+                $displayPasien  = $this->findDataMasterPasien($this->FormEntry['regNo']);
+                $dataPedaftaran = [
+                    "kdProviderPeserta" => env('PCARE_PROVIDER'),
+                    "tglDaftar" => Carbon::createFromFormat('d/m/Y H:i:s', $this->FormEntry['rjDate'])->format('d-m-Y'),
+                    "noKartu" => $displayPasien['pasien']['identitas']['idBpjs'] ?? '',
+                    "kdPoli" => $this->FormEntry['kdpolibpjs'],
+                    "keluhan" => 'null',
+                    "kunjSakit" => !empty($this->FormEntry['kunjSakit']) ? true : false,
+                    "sistole" => 0,
+                    "diastole" => 0,
+                    "beratBadan" => 0,
+                    "tinggiBadan" => 0,
+                    "respRate" => 0,
+                    "lingkarPerut" => 0,
+                    "heartRate" => 0,
+                    "rujukBalik" => 0,
+                    "kdTkp" => $this->FormEntry['kdTkp']
+                ];
+                $addPedaftaran = $this->addPedaftaran($dataPedaftaran)->getOriginalContent();
+                if ($addPedaftaran['metadata']['code'] === 201) {
+                    $this->FormEntry['noUrutBpjs'] = $addPedaftaran['response']['message'];
+                } else {
+                    // $getPendaftaranProvider = $this->getPendaftaranProvider(Carbon::createFromFormat('d/m/Y H:i:s', $this->FormEntry['rjDate'])->format('d-m-Y'), 1, 15)->getOriginalContent();
+                    // dd($getPendaftaranProvider);
+                    // $getPendaftaranbyNomorUrut = $this->getPendaftaranbyNomorUrut('A01', Carbon::createFromFormat('d/m/Y H:i:s', $this->FormEntry['rjDate'])->format('d-m-Y'))->getOriginalContent();
+                    // dd($getPendaftaranbyNomorUrut);
+
+                    // check pendaftaran profider -> cari list pasien ->upate antrian
+                    dd('check pendaftaran profider -> cari list pasien ->upate antrian');
+                }
+            } else {
+                $this->emit('toastr-error', 'Kode Provider Peserta tidak sesuai. Provider Peserta /' . $kdProvider);
+            }
+        }
+    }
+
+    private function checkJnsKlaimPasien($statusPasien = 'UM', $regNo = ''): void
+    {
+        if ($statusPasien == 'JM') {
+            $displayPasien  = $this->findDataMasterPasien($regNo);
+
+            $noka = $displayPasien['pasien']['identitas']['idBpjs'] ?? '';
+            $nik = $displayPasien['pasien']['identitas']['nik'] ?? '';
+
+            if ($noka && $noka != '-') {
+                $getpeserta = $this->getPesertabyJenisKartu('noka', $noka);
+            } else if ($nik && $nik != '-') {
+                $getpeserta = $this->getPesertabyJenisKartu('nik', $nik);
+            }
+            $this->checkStatusKlaimPasien = $getpeserta->getOriginalContent();
+            $this->emit('displayPasienUpdated', $this->checkStatusKlaimPasien);
+            return;
+        }
+        $this->checkStatusKlaimPasien = [];
+        $this->emit('displayPasienUpdated', $this->checkStatusKlaimPasien);
+
+        return;
     }
 
     private function setDataPrimer(): void
@@ -218,7 +328,9 @@ class FormEntryDaftarRJ extends Component
 
 
             // Klaim & Kunjungan
-            $this->FormEntry['klaimId'] = $this->jenisKlaim['JenisKlaimId'];
+            $this->FormEntry['klaimId'] = $this->jenisKlaim['JenisKlaimId'] ?? 'UM';
+            $this->FormEntry['kunjSakit'] = $this->kunjSakit['kunjSakitId'] ?? '1';
+            $this->FormEntry['kdTkp'] =  $this->refTkp['refTkpId'] ?? '10';
             // noBooking
             if (!$this->FormEntry['noBooking']) {
                 $this->FormEntry['noBooking'] = Carbon::now()->format('YmdHis') . 'KLIKM';
@@ -252,7 +364,7 @@ class FormEntryDaftarRJ extends Component
             }
 
             // Convert Pasien Baru Lama
-            $this->FormEntry['passStatus'] = $this->FormEntry['passStatus'] ? 'N' : 'O';
+            $this->FormEntry['passStatus'] = $this->FormEntry['passStatus'] == 'N' ? 'N' : 'O';
             $this->FormEntry['txnStatus'] = $this->FormEntry['txnStatus'] ? $this->FormEntry['txnStatus'] : 'A';
             $this->FormEntry['rjStatus'] = $this->FormEntry['rjStatus'] ? $this->FormEntry['rjStatus'] : 'A';
             $this->FormEntry['ermStatus'] = $this->FormEntry['ermStatus'] ? $this->FormEntry['ermStatus'] : 'A';
@@ -290,9 +402,11 @@ class FormEntryDaftarRJ extends Component
         // sync data primer dilakukan ketika update
         if ($this->isOpenMode == 'update') {
 
-            $this->jenisKlaim['JenisKlaimId'] = $this->FormEntry['klaimId'];
+            $this->jenisKlaim['JenisKlaimId'] = $this->FormEntry['klaimId'] ?? 'UM';
+            $this->kunjSakit['kunjSakitId'] = $this->FormEntry['kunjSakit'] ?? '1';
+            $this->refTkp['refTkpId'] = $this->FormEntry['kdTkp'] ?? '10';
 
-            $this->addDokter($this->FormEntry['drId'], $this->FormEntry['drDesc'], $this->FormEntry['poliId'], $this->FormEntry['poliDesc']);
+            $this->addDokter($this->FormEntry['drId'], $this->FormEntry['drDesc'], $this->FormEntry['poliId'], $this->FormEntry['poliDesc'], $this->FormEntry['kdpolibpjs'], $this->FormEntry['kddrbpjs']);
 
 
             $findDataPasien = DB::table('rsmst_pasiens')
@@ -332,12 +446,17 @@ class FormEntryDaftarRJ extends Component
     {
         // RJ Date Entry ketika Mont
         // Pasien Baru Lama di blade wire:model
-        $this->FormEntry['passStatus'] = isset($this->FormEntry['passStatus']) ? ($this->FormEntry['passStatus'] ? true : false) : false;
+        $this->FormEntry['passStatus'] = isset($this->FormEntry['passStatus']) ? ($this->FormEntry['passStatus'] == 'N' ? 'N' : '') : '';
         $this->FormEntry['regNo'] = isset($this->pasien['regNo']) ? $this->pasien['regNo'] : '';
         $this->FormEntry['drId'] = isset($this->dokter['DokterId']) ? $this->dokter['DokterId'] : '';
         $this->FormEntry['drDesc'] = isset($this->dokter['DokterDesc']) ? $this->dokter['DokterDesc'] : '';
         $this->FormEntry['poliId'] = isset($this->dokter['PoliId']) ? $this->dokter['PoliId'] : '';
         $this->FormEntry['poliDesc'] = isset($this->dokter['PoliDesc']) ? $this->dokter['PoliDesc'] : '';
+        $this->FormEntry['klaimId'] = $this->jenisKlaim['JenisKlaimId'] ?? 'UM';
+        $this->FormEntry['kunjSakit'] = $this->kunjSakit['kunjSakitId'] ?? '1';
+        $this->FormEntry['kdTkp'] =  $this->refTkp['refTkpId'] ?? '10';
+        $this->FormEntry['kdpolibpjs'] =  $this->dokter['kdPoliBpjs'] ?? '';
+        $this->FormEntry['kddrbpjs'] =  $this->dokter['kdDokterBpjs'] ?? '';
     }
 
     private function syncLOV(): void
@@ -357,6 +476,8 @@ class FormEntryDaftarRJ extends Component
 
     public function render()
     {
+        $this->emit('toastr-error', 'xxx');
+
         // LOV
         $this->syncLOV();
         // FormEntry

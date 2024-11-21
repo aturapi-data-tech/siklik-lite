@@ -885,6 +885,19 @@
                                                             cm
                                                         </td>
                                                     </tr>
+                                                    <tr>
+                                                        <td class="pr-4 text-end">
+                                                            Lingkar Perut :
+                                                        </td>
+                                                        <td>
+                                                            {{ isset($dataDaftarTxn['pemeriksaan']['nutrisi']['liPerut'])
+                                                                ? ($dataDaftarTxn['pemeriksaan']['nutrisi']['liPerut']
+                                                                    ? $dataDaftarTxn['pemeriksaan']['nutrisi']['liPerut']
+                                                                    : '-')
+                                                                : '-' }}
+                                                            cm
+                                                        </td>
+                                                    </tr>
 
 
 

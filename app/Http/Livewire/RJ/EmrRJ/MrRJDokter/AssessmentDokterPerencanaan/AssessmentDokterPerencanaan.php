@@ -397,6 +397,40 @@ class AssessmentDokterPerencanaan extends Component
     }
     // /////////////////////////////////////////
 
+    // /////////prognosa////////////
+    public $prognosaLov = [];
+    public $prognosaLovStatus = 0;
+    public $prognosaLovSearch = '';
+    public function clickprognosalov()
+    {
+        $this->prognosaLovStatus = true;
+        // $this->prognosaLov = $this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['prognosaOptions'];
+
+        $getprognosa = json_decode(DB::table('ref_bpjs_table')
+            ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper('Prognosa'))
+            ->first()->ref_json ?? '{}', true);
+
+        $this->prognosaLov = collect($getprognosa)->map(function ($item) {
+            $item['prognosaId'] = $item['kdPrognosa'];
+            unset($item['kdPrognosa']);
+            $item['prognosaDesc'] = $item['nmPrognosa'];
+            unset($item['nmPrognosa']);
+            return $item;
+        })->toArray();
+    }
+
+    // /////////////////////
+    // LOV selected start
+    public function setMyprognosaLov($id, $desc)
+    {
+        $this->dataDaftarPoliRJ['perencanaan']['prognosa']['prognosa'] = $id;
+        $this->dataDaftarPoliRJ['perencanaan']['prognosa']['prognosaDesc'] = $desc;
+
+        $this->prognosaLovStatus = false;
+        $this->prognosaLovSearch = '';
+    }
+    // LOV selected end
+    // /////////////////////
 
 
 

@@ -115,7 +115,8 @@ class AssessmentDokterPemeriksaan extends Component
             "tb" => "", //number
             "imt" => "", //number
             "lk" => "", //number
-            "lila" => "" //number
+            "lila" => "", //number
+            "liPerut" => "" //number
         ],
         "fungsional" => [
             "alatBantu" => "",
@@ -516,6 +517,8 @@ class AssessmentDokterPemeriksaan extends Component
         'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt' => 'required|numeric',
         'dataDaftarPoliRJ.pemeriksaan.nutrisi.lk' => 'numeric',
         'dataDaftarPoliRJ.pemeriksaan.nutrisi.lila' => 'numeric',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut' => 'numeric',
+
 
     ];
 

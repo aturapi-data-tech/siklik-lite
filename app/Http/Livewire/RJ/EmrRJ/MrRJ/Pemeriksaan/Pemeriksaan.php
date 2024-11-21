@@ -7,16 +7,17 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 // use Spatie\ArrayToXml\ArrayToXml;
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
-
+use App\Http\Traits\LOV\Pcare\LOVGetKesadaran\LOVGetKesadaranTrait;
 
 class Pemeriksaan extends Component
 {
-    use WithPagination, WithFileUploads, EmrRJTrait;
+    use WithPagination, WithFileUploads, EmrRJTrait, LOVGetKesadaranTrait;
 
     // listener from blade////////////////
     protected $listeners = [
@@ -31,21 +32,21 @@ class Pemeriksaan extends Component
 
     // dataDaftarPoliRJ RJ
     public array $dataDaftarPoliRJ = [];
-
+    public array $kesadaran = [];
     // data pemeriksaan=>[]
     public array $pemeriksaan = [
         "umumTab" => "Umum",
         "tandaVital" => [
             "keadaanUmum" => "",
             "tingkatKesadaran" => "",
-            "tingkatKesadaranOptions" => [
-                ["tingkatKesadaran" => "Sadar Baik / Alert"],
-                ["tingkatKesadaran" => "Berespon Dengan Kata-Kata / Voice"],
-                ["tingkatKesadaran" => "Hanya Beresponse Jika Dirangsang Nyeri / Pain"],
-                ["tingkatKesadaran" => "Pasien Tidak Sadar / Unresponsive"],
-                ["tingkatKesadaran" => "Gelisah Atau Bingung"],
-                ["tingkatKesadaran" => "Acute Confusional States"],
-            ],
+            // "tingkatKesadaranOptions" => [
+            //     ["tingkatKesadaran" => "Sadar Baik / Alert"],
+            //     ["tingkatKesadaran" => "Berespon Dengan Kata-Kata / Voice"],
+            //     ["tingkatKesadaran" => "Hanya Beresponse Jika Dirangsang Nyeri / Pain"],
+            //     ["tingkatKesadaran" => "Pasien Tidak Sadar / Unresponsive"],
+            //     ["tingkatKesadaran" => "Gelisah Atau Bingung"],
+            //     ["tingkatKesadaran" => "Acute Confusional States"],
+            // ],
             // jalan nafas
             // "jalanNafas" => [
             //     "jalanNafas" => "",
@@ -113,7 +114,9 @@ class Pemeriksaan extends Component
             "tb" => "", //number
             "imt" => "", //number
             "lk" => "", //number
-            "lila" => "" //number
+            "lila" => "", //number
+            "liPerut" => "" //number
+
         ],
         "fungsional" => [
             "alatBantu" => "",
@@ -515,7 +518,7 @@ class Pemeriksaan extends Component
         'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt' => 'required|numeric',
         'dataDaftarPoliRJ.pemeriksaan.nutrisi.lk' => 'numeric',
         'dataDaftarPoliRJ.pemeriksaan.nutrisi.lila' => 'numeric',
-
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut' => 'numeric',
     ];
 
     ////////////////////////////////////////////////
@@ -818,49 +821,34 @@ class Pemeriksaan extends Component
     public function clicktingkatKesadaranlov()
     {
         $this->tingkatKesadaranLovStatus = true;
-        $this->tingkatKesadaranLov = $this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['tingkatKesadaranOptions'];
+        // $this->tingkatKesadaranLov = $this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['tingkatKesadaranOptions'];
+
+        $getKesadaran = json_decode(DB::table('ref_bpjs_table')
+            ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper('Kesadaran'))
+            // ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper($this->dataGetKesadaranLovSearch))
+            ->first()->ref_json, true) ?? [];
+
+        $this->tingkatKesadaranLov = collect($getKesadaran)->map(function ($item) {
+            $item['tingkatKesadaranId'] = $item['kdSadar'];
+            unset($item['kdSadar']);
+            $item['tingkatKesadaranDesc'] = $item['nmSadar'];
+            unset($item['nmSadar']);
+            return $item;
+        })->toArray();
     }
-    public function updatedtingkatKesadaranlovsearch()
-    {
-        // Variable Search
-        $search = $this->tingkatKesadaranLovSearch;
 
-        // check LOV by id
-        $tingkatKesadaran = collect($this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['tingkatKesadaranOptions'])
-            ->where('tingkatKesadaran', '=', $search)
-            ->first();
-
-        if ($tingkatKesadaran) {
-            $this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['tingkatKesadaranOptions'] = $tingkatKesadaran['tingkatKesadaran'];
-
-            $this->tingkatKesadaranLovStatus = false;
-            $this->tingkatKesadaranLovSearch = '';
-        } else {
-            // if there is no id found and check (min 3 char on search)
-            if (strlen($search) < 3) {
-                $this->tingkatKesadaranLov = $this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['tingkatKesadaranOptions'];
-            } else {
-                $this->tingkatKesadaranLov = collect($this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['tingkatKesadaranOptions'])
-                    ->filter(function ($item) use ($search) {
-                        return false !== stristr($item['tingkatKesadaran'], $search);
-                    });
-            }
-            $this->tingkatKesadaranLovStatus = true;
-            $this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['tingkatKesadaran'] = '';
-        }
-    }
     // /////////////////////
     // LOV selected start
-    public function setMytingkatKesadaranLov($id)
+    public function setMytingkatKesadaranLov($id, $desc)
     {
         $this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['tingkatKesadaran'] = $id;
+        $this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['tingkatKesadaranDesc'] = $desc;
+
         $this->tingkatKesadaranLovStatus = false;
         $this->tingkatKesadaranLovSearch = '';
     }
     // LOV selected end
     // /////////////////////
-
-
 
 
     // ////////////////

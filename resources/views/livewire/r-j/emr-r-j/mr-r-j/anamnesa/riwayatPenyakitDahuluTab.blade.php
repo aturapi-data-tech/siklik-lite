@@ -35,6 +35,74 @@
             @enderror
         </div>
 
+        <div>
+            <x-input-label for="dataDaftarPoliRJ.anamnesa.alergi.alergiMakanan" :value="__('Alergi Makanan')" :required="__(true)"
+                class="pt-2" />
+            <div class="flex ">
+                <x-text-input placeholder="Alergi Makanan" class="sm:rounded-none sm:rounded-l-lg" :errorshas="__($errors->has('dataDaftarPoliRJ.anamnesa.alergi.alergiMakanan'))"
+                    :disabled=true
+                    value="{{ $dataDaftarPoliRJ['anamnesa']['alergi']['alergiMakanan'] ?? '' }}{{ ' / ' }}{{ $dataDaftarPoliRJ['anamnesa']['alergi']['alergiMakananDesc'] ?? '' }}" />
+
+                <x-green-button :disabled=$disabledPropertyRjStatus
+                    class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                    wire:click.prevent="clickalergiMakananlov()">
+                    <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path clip-rule="evenodd" fill-rule="evenodd"
+                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                    </svg>
+                </x-green-button>
+            </div>
+            {{-- LOV alergi-makanan --}}
+            @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.list-of-value-alergi-makanan')
+        </div>
+
+        <div>
+            <x-input-label for="dataDaftarPoliRJ.anamnesa.alergi.alergiObat" :value="__('Alergi Obat')" :required="__(true)"
+                class="pt-2" />
+            <div class="flex ">
+                <x-text-input placeholder="Alergi Obat" class="sm:rounded-none sm:rounded-l-lg" :errorshas="__($errors->has('dataDaftarPoliRJ.anamnesa.alergi.alergiObat'))"
+                    :disabled=true
+                    value="{{ $dataDaftarPoliRJ['anamnesa']['alergi']['alergiObat'] ?? '' }}{{ ' / ' }}{{ $dataDaftarPoliRJ['anamnesa']['alergi']['alergiObatDesc'] ?? '' }}" />
+
+                <x-green-button :disabled=$disabledPropertyRjStatus
+                    class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                    wire:click.prevent="clickalergiObatlov()">
+                    <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path clip-rule="evenodd" fill-rule="evenodd"
+                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                    </svg>
+                </x-green-button>
+            </div>
+            {{-- LOV alergi-Obat --}}
+            @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.list-of-value-alergi-obat')
+        </div>
+
+        <div>
+            <x-input-label for="dataDaftarPoliRJ.anamnesa.alergi.alergiUdara" :value="__('Alergi Udara')" :required="__(true)"
+                class="pt-2" />
+            <div class="flex ">
+                <x-text-input placeholder="Alergi Udara" class="sm:rounded-none sm:rounded-l-lg" :errorshas="__($errors->has('dataDaftarPoliRJ.anamnesa.alergi.alergiUdara'))"
+                    :disabled=true
+                    value="{{ $dataDaftarPoliRJ['anamnesa']['alergi']['alergiUdara'] ?? '' }}{{ ' / ' }}{{ $dataDaftarPoliRJ['anamnesa']['alergi']['alergiUdaraDesc'] ?? '' }}" />
+
+                <x-green-button :disabled=$disabledPropertyRjStatus
+                    class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                    wire:click.prevent="clickalergiUdaralov()">
+                    <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path clip-rule="evenodd" fill-rule="evenodd"
+                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                    </svg>
+                </x-green-button>
+            </div>
+            {{-- LOV alergi-udara --}}
+            @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.list-of-value-alergi-udara')
+        </div>
+
+
+
 
         {{-- <div class="pt-2">
             <x-input-label for="dataDaftarPoliRJ.anamnesa.obat.obat" :value="__('Rekonsiliasi Obat')" :required="__(false)"
