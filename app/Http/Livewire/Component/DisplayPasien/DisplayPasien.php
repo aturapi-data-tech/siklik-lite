@@ -13,7 +13,10 @@ class DisplayPasien extends Component
 
     public array $displayPasien = [];
     public array $checkStatusKlaimPasien = [];
-    protected $listeners = ['displayPasienUpdated' => 'setCheckStatusKlaimPasien'];
+    protected $listeners = [
+        'displayPasienUpdated' => 'setCheckStatusKlaimPasien',
+        'syncronizeDataDisplayPasien' => 'mount'
+    ];
 
     private function findData($regNo): void
     {

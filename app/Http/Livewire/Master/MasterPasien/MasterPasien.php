@@ -2015,7 +2015,9 @@ class MasterPasien extends Component
                 $myQuery->where(function ($myQuery) use ($myMS) {
                     $myQuery
                         ->where(DB::raw('upper(reg_no)'), 'like', '%' . strtoupper($myMS) . '%')
-                        ->orWhere(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($myMS) . '%');
+                        ->orWhere(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($myMS) . '%')
+                        ->orWhere(DB::raw('upper(nokartu_bpjs)'), 'like', '%' . strtoupper($myMS) . '%')
+                        ->orWhere(DB::raw('upper(nik_bpjs)'), 'like', '%' . strtoupper($myMS) . '%');
                 });
             }
             // key 1  mencari alamat

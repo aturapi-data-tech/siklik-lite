@@ -235,6 +235,7 @@
                                     <div class="font-normal text-gray-700">
                                         {{ 'No. Antrian ' }} <span
                                             class="text-5xl font-semibold text-gray-700">{{ $myQData->no_antrian }}</span>
+                                        <span>{{ $datadaftar_json['noUrutBpjs'] ?? '' }}</span>
                                     </div>
                                     <div class="font-semibold text-primary">
                                         {{ $myQData->reg_no }}

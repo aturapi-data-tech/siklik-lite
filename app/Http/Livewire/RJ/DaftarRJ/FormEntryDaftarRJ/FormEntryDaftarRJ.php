@@ -295,27 +295,56 @@ class FormEntryDaftarRJ extends Component
 
     private function checkJnsKlaimPasien($statusPasien = 'UM', $regNo = ''): void
     {
+        // cek jika pasien BPJS
         if ($statusPasien == 'JM') {
+            // cari display master pasien
             $displayPasien  = $this->findDataMasterPasien($regNo);
 
             $noka = $displayPasien['pasien']['identitas']['idBpjs'] ?? '';
             $nik = $displayPasien['pasien']['identitas']['nik'] ?? '';
 
             if ($noka && $noka != '-') {
+                // getBpjs peserta by noka
                 $getpeserta = $this->getPesertabyJenisKartu('noka', $noka);
             } else if ($nik && $nik != '-') {
+                // getBpjs peserta by nik jika noka kosong
                 $getpeserta = $this->getPesertabyJenisKartu('nik', $nik);
             }
             $this->checkStatusKlaimPasien = $getpeserta->getOriginalContent();
+            // lakukan update jika data nik dan noka tidak sama dengan data bpjs
+            // $this->updateNikNokaMasterPasien($regNo, $displayPasien, $nik, $noka, $this->checkStatusKlaimPasien['response']['noKTP'] ?? '', $this->checkStatusKlaimPasien['response']['noKartu'] ?? '');
+
             $this->emit('displayPasienUpdated', $this->checkStatusKlaimPasien);
             return;
         }
+
+
         $this->checkStatusKlaimPasien = [];
         $this->emit('displayPasienUpdated', $this->checkStatusKlaimPasien);
 
         return;
     }
-
+    private function updateNikNokaMasterPasien($regNo, array $displayPasienArry, string $nikDataRs = '', string $nokaDataRs = '', string $nikDataBpjs = '', string $nokaDataBpjs = ''): void
+    {
+        if ($nikDataBpjs && $nokaDataBpjs) {
+            if ($nikDataRs != $nikDataBpjs || $nokaDataRs != $nokaDataBpjs) {
+                // update DB
+                DB::table('rsmst_pasiens')->where('reg_no', $regNo)
+                    ->update([
+                        'nokartu_bpjs' => $nokaDataBpjs,
+                        'nik_bpjs' => $nikDataBpjs,
+                    ]);
+                // update Json
+                $displayPasienArry['pasien']['identitas']['idBpjs'] = $nokaDataBpjs;
+                $displayPasienArry['pasien']['identitas']['nik'] = $nikDataBpjs;
+                $this->updateJsonMasterPasien($regNo, $displayPasienArry);
+                $this->emit('toastr-error', 'Ada perbedaan data pasien di RS dan data pasien di BPJS, data pasien akan diupdate');
+                $this->emit('toastr-success', "Update data pasien dari NIK " . $nikDataRs . " ke NIK " . $nikDataBpjs . " berhasil diupdate.");
+                $this->emit('toastr-success', "Update data pasien dari Noka " . $nokaDataRs . " ke Noka " . $nokaDataBpjs . " berhasil diupdate.");
+                $this->emit('syncronizeDataDisplayPasien');
+            }
+        }
+    }
     private function setDataPrimer(): void
     {
         // set data primer dilakukan ketika insert
