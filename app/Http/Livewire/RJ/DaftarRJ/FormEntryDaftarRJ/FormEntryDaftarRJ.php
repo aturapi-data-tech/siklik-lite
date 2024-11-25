@@ -309,7 +309,10 @@ class FormEntryDaftarRJ extends Component
             } else if ($nik && $nik != '-') {
                 // getBpjs peserta by nik jika noka kosong
                 $getpeserta = $this->getPesertabyJenisKartu('nik', $nik);
+            } else {
+                $this->emit('toastr-error', 'Noka dan NIK kosong');
             }
+
             $this->checkStatusKlaimPasien = $getpeserta->getOriginalContent() ?? [];
             // lakukan update jika data nik dan noka tidak sama dengan data bpjs
             $this->updateNikNokaMasterPasien($regNo, $displayPasien, $nik, $noka, $this->checkStatusKlaimPasien['response']['noKTP'] ?? '', $this->checkStatusKlaimPasien['response']['noKartu'] ?? '');
