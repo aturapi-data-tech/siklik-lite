@@ -310,9 +310,9 @@ class FormEntryDaftarRJ extends Component
                 // getBpjs peserta by nik jika noka kosong
                 $getpeserta = $this->getPesertabyJenisKartu('nik', $nik);
             }
-            $this->checkStatusKlaimPasien = $getpeserta->getOriginalContent();
+            $this->checkStatusKlaimPasien = $getpeserta->getOriginalContent() ?? [];
             // lakukan update jika data nik dan noka tidak sama dengan data bpjs
-            // $this->updateNikNokaMasterPasien($regNo, $displayPasien, $nik, $noka, $this->checkStatusKlaimPasien['response']['noKTP'] ?? '', $this->checkStatusKlaimPasien['response']['noKartu'] ?? '');
+            $this->updateNikNokaMasterPasien($regNo, $displayPasien, $nik, $noka, $this->checkStatusKlaimPasien['response']['noKTP'] ?? '', $this->checkStatusKlaimPasien['response']['noKartu'] ?? '');
 
             $this->emit('displayPasienUpdated', $this->checkStatusKlaimPasien);
             return;
