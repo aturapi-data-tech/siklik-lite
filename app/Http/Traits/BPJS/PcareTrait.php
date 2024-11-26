@@ -28,7 +28,7 @@ trait PcareTrait
         // Insert webLogStatus
         DB::table('web_log_status')->insert([
             'code' =>  $code,
-            'date_ref' => Carbon::now(),
+            'date_ref' => Carbon::now(env('APP_TIMEZONE')),
             'response' => json_encode($response, true),
             'http_req' => $url,
             'requestTransferTime' => $requestTransferTime
@@ -50,7 +50,7 @@ trait PcareTrait
         // Insert webLogStatus
         DB::table('web_log_status')->insert([
             'code' =>  $code,
-            'date_ref' => Carbon::now(),
+            'date_ref' => Carbon::now(env('APP_TIMEZONE')),
             'response' => json_encode($response, true),
             'http_req' => $url,
             'requestTransferTime' => $requestTransferTime
@@ -386,6 +386,87 @@ trait PcareTrait
         }
     }
 
+    private function getProviderRayonisasi($start, $end)
+    {
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+
+        // Masukkan Nilai dari parameter
+        $r = [
+            'start' => $start,
+            'end' => $end,
+        ];
+        // lakukan validasis
+        $validator = Validator::make($r, [
+            "start" => "required|numeric",
+            "end" => "required|numeric",
+        ], $messages);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 201, null, null);
+        }
+
+
+
+        // handler when time out and off line mode
+        try {
+
+            $url = env('PCARE_URL') . "provider/" . $start . "/" . $end;
+            $signature = $this->signature();
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->get($url);
+
+
+            // dd($response->transferStats->getTransferTime()); Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
+        }
+    }
+
+    private function getSarana()
+    {
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+
+        // Masukkan Nilai dari parameter
+        $r = [
+            'r' => '',
+        ];
+        // lakukan validasis
+        $validator = Validator::make($r, [
+            "r" => "",
+        ], $messages);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 201, null, null);
+        }
+
+
+
+        // handler when time out and off line mode
+        try {
+
+            $url = env('PCARE_URL') . "spesialis/sarana";
+            $signature = $this->signature();
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->get($url);
+
+
+            // dd($response->transferStats->getTransferTime()); Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
+        }
+    }
+
+
     // Get Peserta
     private function getPesertabyJenisKartu($jenisKartu, $nikNoka)
     {
@@ -608,6 +689,161 @@ trait PcareTrait
                 ->get($url);
 
 
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
+        }
+    }
+
+    private function addKunjungan(array $data = [])
+    {
+        //parameter 1: 01:Makanan, 02:Udara, 03:Obat
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+
+        // Masukkan Nilai dari parameter
+        $r = $data;
+        $rules = [
+            "noKunjungan" => "",
+            "noKartu" => "",
+            "tglDaftar" => "",
+            "kdPoli" => "",
+            "keluhan" => "",
+            "kdSadar" => "",
+            "sistole" => "",
+            "diastole" => "",
+            "beratBadan" => "",
+            "tinggiBadan" => "",
+            "respRate" => "",
+            "heartRate" => "",
+            "lingkarPerut" => "",
+            "kdStatusPulang" => "",
+            "tglPulang" => "",
+            "kdDokter" => "",
+            "kdDiag1" => "",
+            "kdDiag2" => "",
+            "kdDiag3" => "",
+            "kdPoliRujukInternal" => "",
+
+            "rujukLanjut.tglEstRujuk" => "",
+            "rujukLanjut.kdppk" => "",
+            "rujukLanjut.subSpesialis" => "",
+
+            "rujukLanjut.khusus" => "",
+            "rujukLanjut.khusus.kdKhusus" => "",
+            "rujukLanjut.khusus.kdSubSpesialis1" => "",
+            "rujukLanjut.khusus.catatan" => "",
+
+            "kdTacc" => "",
+            "alasanTacc" => "",
+            "anamnesa" => "",
+            "alergiMakan" => "",
+            "alergiUdara" => "",
+            "alergiObat" => "",
+            "kdPrognosa" => "",
+            "terapiObat" => "",
+            "terapiNonObat" => "",
+            "bmhp" => "",
+            "suhu" => ""
+        ];
+        // lakukan validasis
+        $validator = Validator::make($r, $rules, $messages);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 400, null, null);
+        }
+
+        // handler when time out and off line mode
+        try {
+
+
+            $url = env('PCARE_URL') . "kunjungan";
+            $signature = $this->signature();
+            $signature['Content-Type'] = 'text/plain';
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->post($url, $r);
+
+            // dd($response->getBody()->getContents()); //Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
+        }
+    }
+
+    private function editKunjungan(array $data = [])
+    {
+        //parameter 1: 01:Makanan, 02:Udara, 03:Obat
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+
+        // Masukkan Nilai dari parameter
+        $r = $data;
+        $rules = [
+            "noKunjungan" => "",
+            "noKartu" => "",
+            "tglDaftar" => "",
+            "kdPoli" => "",
+            "keluhan" => "",
+            "kdSadar" => "",
+            "sistole" => "",
+            "diastole" => "",
+            "beratBadan" => "",
+            "tinggiBadan" => "",
+            "respRate" => "",
+            "heartRate" => "",
+            "lingkarPerut" => "",
+            "kdStatusPulang" => "",
+            "tglPulang" => "",
+            "kdDokter" => "",
+            "kdDiag1" => "",
+            "kdDiag2" => "",
+            "kdDiag3" => "",
+            "kdPoliRujukInternal" => "",
+
+            "rujukLanjut.tglEstRujuk" => "",
+            "rujukLanjut.kdppk" => "",
+            "rujukLanjut.subSpesialis" => "",
+
+            "rujukLanjut.khusus" => "",
+            "rujukLanjut.khusus.kdKhusus" => "",
+            "rujukLanjut.khusus.kdSubSpesialis1" => "",
+            "rujukLanjut.khusus.catatan" => "",
+
+            "kdTacc" => "",
+            "alasanTacc" => "",
+            "anamnesa" => "",
+            "alergiMakan" => "",
+            "alergiUdara" => "",
+            "alergiObat" => "",
+            "kdPrognosa" => "",
+            "terapiObat" => "",
+            "terapiNonObat" => "",
+            "bmhp" => "",
+            "suhu" => ""
+        ];
+        // lakukan validasis
+        $validator = Validator::make($r, $rules, $messages);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 400, null, null);
+        }
+
+        // handler when time out and off line mode
+        try {
+
+            $url = env('PCARE_URL') . "kunjungan";
+            $signature = $this->signature();
+            $signature['Content-Type'] = 'text/plain';
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->put($url, $r);
+
+            // dd($response->getBody()->getContents()); //Get Transfertime request
             // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
             return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
             /////////////////////////////////////////////////////////////////////////////

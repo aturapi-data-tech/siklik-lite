@@ -59,7 +59,7 @@ trait AntrianTrait
         // Insert webLogStatus
         DB::table('web_log_status')->insert([
             'code' =>  $code,
-            'date_ref' => Carbon::now(),
+            'date_ref' => Carbon::now(env('APP_TIMEZONE')),
             'response' => json_encode($response, true),
             'http_req' => $url,
             'requestTransferTime' => $requestTransferTime
@@ -81,7 +81,7 @@ trait AntrianTrait
         // Insert webLogStatus
         DB::table('web_log_status')->insert([
             'code' =>  $code,
-            'date_ref' => Carbon::now(),
+            'date_ref' => Carbon::now(env('APP_TIMEZONE')),
             'response' => json_encode($response, true),
             'http_req' => $url,
             'requestTransferTime' => $requestTransferTime
@@ -837,7 +837,7 @@ trait AntrianTrait
                         ];
                     } else {
                         $user = $token->tokenable;
-                        if (Carbon::now() >  $token->created_at->addMinute($tokenexpired)) {
+                        if (Carbon::now(env('APP_TIMEZONE')) >  $token->created_at->addMinute($tokenexpired)) {
                             $token->delete();
                             $response = [
                                 "metadata" => [
@@ -1071,7 +1071,7 @@ trait AntrianTrait
             return self::sendError("Tanggal periksa sudah terlewat", null, 400);
         }
         // check tanggal hanya 7 hari
-        if (Carbon::parse($request->tanggalperiksa) >  Carbon::now()->addDay(6)) {
+        if (Carbon::parse($request->tanggalperiksa) >  Carbon::now(env('APP_TIMEZONE'))->addDay(6)) {
             // error, msgError,Code,url,ReqtrfTime
             return self::sendError("Antrian hanya dapat dibuat untuk 7 hari ke kedepan", null, 400);
         }
@@ -1334,7 +1334,7 @@ trait AntrianTrait
             // error, msgError,Code,url,ReqtrfTime
             return self::sendError("Tanggal periksa sudah terlewat", null, 400);
         }
-        if (Carbon::parse($request->tanggalperiksa) >  Carbon::now()->addDay(6)) {
+        if (Carbon::parse($request->tanggalperiksa) >  Carbon::now(env('APP_TIMEZONE'))->addDay(6)) {
             // error, msgError,Code,url,ReqtrfTime
             return self::sendError("Antrian hanya dapat dibuat untuk 7 hari ke kedepan", null, 400);
         }
@@ -1545,7 +1545,7 @@ trait AntrianTrait
                 // error, msgError,Code,url,ReqtrfTime
                 return self::sendError("Tanggal periksa bukan hari ini.", null, 400);
             }
-            $now = Carbon::now();
+            $now = Carbon::now(env('APP_TIMEZONE'));
             $unit = UnitDB::firstWhere('KDPOLI', $antrian->kodepoli);
             $tarifkarcis = TarifLayananDetailDB::firstWhere('KODE_TARIF_DETAIL', $unit->kode_tarif_karcis);
             $tarifadm = TarifLayananDetailDB::firstWhere('KODE_TARIF_DETAIL', $unit->kode_tarif_adm);
@@ -1832,7 +1832,7 @@ trait AntrianTrait
                     $kunjungan = KunjunganDB::where('no_rm', $antrian->norm)->where('counter', $counter)->first();
                     // get transaksi sebelumnya
                     // $trx_lama = TransaksiDB::where('unit', $unit->kode_unit)
-                    //     ->whereBetween('tgl', [Carbon::now()->startOfDay(), [Carbon::now()->endOfDay()]])
+                    //     ->whereBetween('tgl', [Carbon::now(env('APP_TIMEZONE'))->startOfDay(), [Carbon::now(env('APP_TIMEZONE'))->endOfDay()]])
                     //     ->count();
                     // get kode layanan
                     // $kodelayanan = $unit->prefix_unit . $now->format('y') . $now->format('m') . $now->format('d')  . str_pad($trx_lama + 1, 6, '0', STR_PAD_LEFT);
@@ -2263,7 +2263,7 @@ trait AntrianTrait
     {
         Carbon::setLocale('id');
         date_default_timezone_set('Asia/Jakarta');
-        $now = Carbon::now();
+        $now = Carbon::now(env('APP_TIMEZONE'));
         $connector = new WindowsPrintConnector(env('PRINTER_CHECKIN'));
         $printer = new Printer($connector);
         $printer->setEmphasis(true);
@@ -2324,7 +2324,7 @@ trait AntrianTrait
     {
         Carbon::setLocale('id');
         date_default_timezone_set('Asia/Jakarta');
-        $now = Carbon::now();
+        $now = Carbon::now(env('APP_TIMEZONE'));
         $for_sep = ['POLIKLINIK', 'FARMASI', 'ARSIP'];
         // $for_sep = ['PERCOBAAN'];
         foreach ($for_sep as  $value) {

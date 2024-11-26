@@ -389,7 +389,7 @@ class AssessmentDokterPerencanaan extends Component
         $this->dataDaftarPoliRJ['statusPRB']['penanggungJawab'] = [
             'statusPRB' => $statusPRB,
             'userLog' => auth()->user()->myuser_name,
-            'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
+            'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
             'userLogCode' => auth()->user()->myuser_code
         ];
 

@@ -80,36 +80,7 @@ class FormEntryRefBpjs extends Component
         }
     }
 
-    public function updateDataSpesialis(): void
-    {
-        try {
 
-            $getSpesialis = $this->getSpesialis()
-                ->getOriginalContent()['response']['list'] ?? [];
-
-
-            $checkDataSpesialis =  $this->checkData('Spesialis');
-
-
-
-            if (
-                json_encode($getSpesialis, true) !== $checkDataSpesialis
-                &&
-                $getSpesialis !== []
-            ) {
-                $this->updateData('Spesialis', $getSpesialis);
-                $this->emit('toastr-success', 'Data Ref Spesialis BPJS telah diperbarui.');
-            } else {
-                $this->emit('toastr-error', 'Data Ref Spesialis BPJS sekarang sudah akurat dan terbaru');
-            }
-
-
-            return;
-        } catch (\Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
-            return;
-        }
-    }
 
     public function updateDataAlergi(): void
     {
@@ -256,12 +227,12 @@ class FormEntryRefBpjs extends Component
             $getStatusPulang = $this->getStatusPulang(true)
                 ->getOriginalContent()['response']['list'] ?? [];
 
-            $checkDataAlergi =  $this->checkData('Status Pulang RI');
+            $checkDataStatusPulang =  $this->checkData('Status Pulang RI');
 
 
 
             if (
-                json_encode($getStatusPulang, true) !== $checkDataAlergi
+                json_encode($getStatusPulang, true) !== $checkDataStatusPulang
                 &&
                 $getStatusPulang !== []
             ) {
@@ -298,6 +269,97 @@ class FormEntryRefBpjs extends Component
         }
     }
 
+
+    public function updateDataProvider(): void
+    {
+        //Parameter 1 : Row data awal yang akan ditampilkan
+
+        // Parameter 2 : Limit jumlah data yang akan ditampilkan
+        try {
+
+
+            $getProviderRayonisasi = $this->getProviderRayonisasi(1, 99)
+                ->getOriginalContent()['response']['list'] ?? [];
+
+            $checkDataProviderRayonisasi =  $this->checkData('Provider');
+
+
+
+            if (
+                json_encode($getProviderRayonisasi, true) !== $checkDataProviderRayonisasi
+                &&
+                $getProviderRayonisasi !== []
+            ) {
+                $this->updateData('Provider', $getProviderRayonisasi);
+                $this->emit('toastr-success', 'Data Ref Provider BPJS telah diperbarui.');
+            } else {
+                $this->emit('toastr-error', 'Data Ref Provider BPJS sekarang sudah akurat dan terbaru');
+            }
+        } catch (\Exception $e) {
+            $this->emit('toastr-error', $e->getMessage());
+        }
+    }
+
+    public function updateDataSarana(): void
+    {
+        //Parameter 1 : Row data awal yang akan ditampilkan
+
+        // Parameter 2 : Limit jumlah data yang akan ditampilkan
+        try {
+
+
+            $getSarana = $this->getSarana()
+                ->getOriginalContent()['response']['list'] ?? [];
+
+            $checkDataSarana =  $this->checkData('Sarana');
+
+
+
+            if (
+                json_encode($getSarana, true) !== $checkDataSarana
+                &&
+                $getSarana !== []
+            ) {
+                $this->updateData('Sarana', $getSarana);
+                $this->emit('toastr-success', 'Data Ref Sarana BPJS telah diperbarui.');
+            } else {
+                $this->emit('toastr-error', 'Data Ref Sarana BPJS sekarang sudah akurat dan terbaru');
+            }
+        } catch (\Exception $e) {
+            $this->emit('toastr-error', $e->getMessage());
+        }
+    }
+
+    public function updateDataSpesialis(): void
+    {
+        try {
+
+            $getSpesialis = $this->getSpesialis()
+                ->getOriginalContent()['response']['list'] ?? [];
+
+
+            $checkDataSpesialis =  $this->checkData('Spesialis');
+
+
+
+            if (
+                json_encode($getSpesialis, true) !== $checkDataSpesialis
+                &&
+                $getSpesialis !== []
+            ) {
+                $this->updateData('Spesialis', $getSpesialis);
+                $this->emit('toastr-success', 'Data Ref Spesialis BPJS telah diperbarui.');
+            } else {
+                $this->emit('toastr-error', 'Data Ref Spesialis BPJS sekarang sudah akurat dan terbaru');
+            }
+
+
+            return;
+        } catch (\Exception $e) {
+            $this->emit('toastr-error', $e->getMessage());
+            return;
+        }
+    }
 
 
     private function checkData(string $refData): string

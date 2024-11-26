@@ -23,7 +23,7 @@ class FormEntryDaftarRJ extends Component
 {
     use EmrRJTrait, LOVDokterTrait, LOVPasienTrait, MasterPasienTrait, PcareTrait;
     // listener from blade////////////////
-    protected $listeners = [];
+    protected $listeners =  [];
 
     public string $rjNoRef;
     public bool $rjStatusRef = false;
@@ -228,6 +228,7 @@ class FormEntryDaftarRJ extends Component
 
     public function store(): void
     {
+
         // validate
         $this->setDataPrimer();
         $this->validateData();
@@ -256,11 +257,16 @@ class FormEntryDaftarRJ extends Component
             $kdProvider = $this->checkStatusKlaimPasien['metadata']['code'] === 200 ?
                 $this->checkStatusKlaimPasien['response']['kdProviderPst']['kdProvider']
                 : '';
-            if ($kdProvider === env('PCARE_PROVIDER')) {
+
+            if ($kdProvider !== env('PCARE_PROVIDER')) {
+                $this->emit('toastr-error', 'Kode Provider Peserta dari faskes lain /' . $kdProvider);
+            }
+
+            try {
                 $displayPasien  = $this->findDataMasterPasien($this->FormEntry['regNo']);
                 $dataPedaftaran = [
-                    "kdProviderPeserta" => env('PCARE_PROVIDER'),
-                    "tglDaftar" => Carbon::createFromFormat('d/m/Y H:i:s', $this->FormEntry['rjDate'])->format('d-m-Y'),
+                    "kdProviderPeserta" => $kdProvider,
+                    "tglDaftar" => Carbon::createFromFormat('d/m/Y H:i:s', $this->FormEntry['rjDate'], env('APP_TIMEZONE'))->format('d-m-Y'),
                     "noKartu" => $displayPasien['pasien']['identitas']['idBpjs'] ?? '',
                     "kdPoli" => $this->FormEntry['kdpolibpjs'],
                     "keluhan" => 'null',
@@ -276,19 +282,15 @@ class FormEntryDaftarRJ extends Component
                     "kdTkp" => $this->FormEntry['kdTkp']
                 ];
                 $addPedaftaran = $this->addPedaftaran($dataPedaftaran)->getOriginalContent();
-                if ($addPedaftaran['metadata']['code'] === 201) {
-                    $this->FormEntry['noUrutBpjs'] = $addPedaftaran['response']['message'];
-                } else {
-                    // $getPendaftaranProvider = $this->getPendaftaranProvider(Carbon::createFromFormat('d/m/Y H:i:s', $this->FormEntry['rjDate'])->format('d-m-Y'), 1, 15)->getOriginalContent();
-                    // dd($getPendaftaranProvider);
-                    // $getPendaftaranbyNomorUrut = $this->getPendaftaranbyNomorUrut('A01', Carbon::createFromFormat('d/m/Y H:i:s', $this->FormEntry['rjDate'])->format('d-m-Y'))->getOriginalContent();
-                    // dd($getPendaftaranbyNomorUrut);
+            } catch (\Exception $e) {
+                $this->emit('toastr-error', $e->getMessage());
+                return;
+            }
 
-                    // check pendaftaran profider -> cari list pasien ->upate antrian
-                    // dd('check pendaftaran profider -> cari list pasien ->upate antrian');
-                }
+            if ($addPedaftaran['metadata']['code'] === 201) {
+                $this->FormEntry['noUrutBpjs'] = $addPedaftaran['response']['message'];
             } else {
-                $this->emit('toastr-error', 'Kode Provider Peserta tidak sesuai. Provider Peserta /' . $kdProvider);
+                $this->emit('toastr-error', $addPedaftaran['metadata']['message']);
             }
         }
     }
@@ -365,26 +367,22 @@ class FormEntryDaftarRJ extends Component
             $this->FormEntry['kdTkp'] =  $this->refTkp['refTkpId'] ?? '10';
             // noBooking
             if (!$this->FormEntry['noBooking']) {
-                $this->FormEntry['noBooking'] = Carbon::now()->format('YmdHis') . 'KLIKM';
+                $this->FormEntry['noBooking'] = Carbon::now(env('APP_TIMEZONE'))->format('YmdHis') . 'KLIKM';
             }
 
 
-            // noUrutAntrian (count all kecuali KRonis) if KR 999
-            $sql = "select count(*) no_antrian
-                    from rstxn_rjhdrs
-                    where dr_id=:drId
-                    and to_char(rj_date,'ddmmyyyy')=:tgl
-                    and klaim_id!='KR'";
 
 
             // Antrian ketika data antrian kosong
             if (!$this->FormEntry['noAntrian']) {
                 // proses antrian
                 if ($this->FormEntry['klaimId'] != 'KR') {
-                    $noUrutAntrian = DB::scalar($sql, [
-                        "tgl" => Carbon::createFromFormat('d/m/Y H:i:s', $this->FormEntry['rjDate'])->format('dmY'),
-                        "drId" => $this->FormEntry['drId']
-                    ]);
+                    // noUrutAntrian (count all kecuali KRonis) if KR 999
+                    $noUrutAntrian = DB::table('rstxn_rjhdrs')
+                        ->where('dr_id', '=', $this->FormEntry['drId'])
+                        ->where(DB::row("to_char(rj_date, 'ddmmyyyy')"), '=', Carbon::createFromFormat('d/m/Y H:i:s', $this->FormEntry['rjDate'], env('APP_TIMEZONE'))->format('dmY'))
+                        ->where('klaim_id', '!=', 'KR')
+                        ->count();
 
                     $noAntrian = $noUrutAntrian + 1;
                 } else {
@@ -404,7 +402,7 @@ class FormEntryDaftarRJ extends Component
                 [
                     'userLogDesc' => 'Form Entry Daftar RJ (Insert Data)',
                     'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
+                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
                 ];
 
             $this->FormEntry['taskIdPelayanan']['taskId3'] = $this->FormEntry['rjDate'];
@@ -412,7 +410,7 @@ class FormEntryDaftarRJ extends Component
             // Klaim & Kunjungan
             // noBooking kosong maka buat
             if (!$this->FormEntry['noBooking']) {
-                $this->FormEntry['noBooking'] = Carbon::now()->format('YmdHis') . 'KLIKM';
+                $this->FormEntry['noBooking'] = Carbon::now(env('APP_TIMEZONE'))->format('YmdHis') . 'KLIKM';
             }
 
             $this->FormEntry['klaimId'] = $this->jenisKlaim['JenisKlaimId'];
@@ -422,7 +420,7 @@ class FormEntryDaftarRJ extends Component
                 [
                     'userLogDesc' => 'Form Entry Daftar RJ (Update Data)',
                     'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
+                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
                 ];
 
             $this->FormEntry['taskIdPelayanan']['taskId3'] = $this->FormEntry['rjDate'];
@@ -471,7 +469,7 @@ class FormEntryDaftarRJ extends Component
 
     private function setCurrentDate(): void
     {
-        $this->FormEntry['rjDate'] = Carbon::now()->format('d/m/Y H:i:s');
+        $this->FormEntry['rjDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
     }
 
     private function syncDataFormEntry(): void

@@ -48,7 +48,7 @@
                 </x-green-button>
             </div>
             {{-- LOV prognosa --}}
-            @include('livewire.r-j.emr-r-j.mr-r-j.perencanaan.list-of-value-prognosa')
+            @include('livewire.component.l-o-v.p-care.list-of-value-prognosa.list-of-value-prognosa')
         </div>
 
 

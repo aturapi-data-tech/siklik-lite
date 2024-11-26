@@ -518,7 +518,7 @@ class Pemeriksaan extends Component
         'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt' => 'required|numeric',
         'dataDaftarPoliRJ.pemeriksaan.nutrisi.lk' => 'numeric',
         'dataDaftarPoliRJ.pemeriksaan.nutrisi.lila' => 'numeric',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut' => 'numeric',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut' => 'required|numeric',
     ];
 
     ////////////////////////////////////////////////
@@ -607,14 +607,14 @@ class Pemeriksaan extends Component
 
             // array Hdr
             $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labHdrNo'] =  $checkupNo;
-            $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labHdrDate'] = Carbon::now()->format('d/m/Y H:i:s');
+            $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labHdrDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
 
             // insert Hdr
             DB::table('lbtxn_checkuphdrs')->insert([
                 'reg_no' => $this->dataDaftarPoliRJ['regNo'],
                 'dr_id' => $this->dataDaftarPoliRJ['drId'],
-                'checkup_date' => DB::raw("to_date('" . Carbon::now()->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
+                'checkup_date' => DB::raw("to_date('" . Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
                 'status_rjri' => 'RJ',
                 'checkup_status' => 'P',
                 'ref_no' => $this->dataDaftarPoliRJ['rjNo'],
@@ -759,14 +759,14 @@ class Pemeriksaan extends Component
 
             // array Hdr
             $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radHdrNo'] =  $this->dataDaftarPoliRJ['rjNo'];
-            $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radHdrDate'] = Carbon::now()->format('d/m/Y H:i:s');
+            $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radHdrDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
 
             // insert Hdr (Radiologi tidak di insert header / ikut txn rj)
             // DB::table('lbtxn_checkuphdrs')->insert([
             //     'reg_no' => $this->dataDaftarPoliRJ['regNo'],
             //     'dr_id' => $this->dataDaftarPoliRJ['drId'],
-            //     'checkup_date' => DB::raw("to_date('" . Carbon::now()->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
+            //     'checkup_date' => DB::raw("to_date('" . Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
             //     'status_rjri' => 'RJ',
             //     'checkup_status' => 'P',
             //     'ref_no' => $this->dataDaftarPoliRJ['rjNo'],
@@ -796,7 +796,7 @@ class Pemeriksaan extends Component
                     'rj_no' => $this->dataDaftarPoliRJ['rjNo'],
                     'rad_price' => $radDtl['rad_price'],
                     'dr_radiologi' => 'dr. M.A. Budi Purwito, Sp.Rad.',
-                    'waktu_entry' => DB::raw("to_date('" . Carbon::now()->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
+                    'waktu_entry' => DB::raw("to_date('" . Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
                 ]);
 
 
@@ -868,7 +868,7 @@ class Pemeriksaan extends Component
         $birthDate = DB::scalar($sql, [
             "regNo" => $this->dataDaftarPoliRJ['regNo'],
         ]);
-        $cekUsia = Carbon::createFromFormat('Y-m-d H:i:s', $birthDate)->diff(Carbon::now())->format('%y');
+        $cekUsia = Carbon::createFromFormat('Y-m-d H:i:s', $birthDate)->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y');
 
         if ($cekUsia > 13) {
             $this->rules['dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik'] = 'required|numeric';
@@ -973,10 +973,10 @@ class Pemeriksaan extends Component
         $this->dataDaftarPoliRJ['pemeriksaan']['uploadHasilPenunjang'][] = [
             'file' => $uploadHasilPenunjangfile,
             'desc' => $this->descPDF,
-            'tglUpload' => Carbon::now()->format('d/m/Y H:i:s'),
+            'tglUpload' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
             'penanggungJawab' => [
                 'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
+                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
                 'userLogCode' => auth()->user()->myuser_code
             ]
         ];

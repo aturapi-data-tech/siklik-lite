@@ -212,12 +212,12 @@ class TelaahResepRJ extends Component
     private function settermyTopBarShiftandmyTopBarrefDate(): void
     {
         // dd/mm/yyyy hh24:mi:ss
-        $this->myTopBar['refDate'] = Carbon::now()->format('d/m/Y');
-        // dd(Carbon::now()->format('H:i:s'));
+        $this->myTopBar['refDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y');
+        // dd(Carbon::now(env('APP_TIMEZONE'))->format('H:i:s'));
 
         // shift
         $findShift = DB::table('rstxn_shiftctls')->select('shift')
-            ->whereRaw("'" . Carbon::now()->format('H:i:s') . "' between
+            ->whereRaw("'" . Carbon::now(env('APP_TIMEZONE'))->format('H:i:s') . "' between
              shift_start and shift_end")
             ->first();
         $this->myTopBar['refShiftId'] = isset($findShift->shift) && $findShift->shift ? $findShift->shift : 3;
@@ -460,7 +460,7 @@ class TelaahResepRJ extends Component
             if (isset($this->dataDaftarPoliRJ['telaahResep']['penanggungJawab']) == false) {
                 $this->dataDaftarPoliRJ['telaahResep']['penanggungJawab'] = [
                     'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
+                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
                     'userLogCode' => auth()->user()->myuser_code
                 ];
 
@@ -487,7 +487,7 @@ class TelaahResepRJ extends Component
             if (isset($this->dataDaftarPoliRJ['telaahObat']['penanggungJawab']) == false) {
                 $this->dataDaftarPoliRJ['telaahObat']['penanggungJawab'] = [
                     'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
+                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
                     'userLogCode' => auth()->user()->myuser_code
                 ];
 

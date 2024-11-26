@@ -1449,7 +1449,7 @@ class MasterPasien extends Component
     private function insertDataPasien(): void
     {
         DB::table('rsmst_pasiens')->insert([
-            'reg_date' => Carbon::now(),
+            'reg_date' => Carbon::now(env('APP_TIMEZONE')),
             'reg_no' => $this->dataPasien['pasien']['regNo'], //primarykey insert when select max
             'reg_name' => strtoupper($this->dataPasien['pasien']['regName']),
             'nokartu_bpjs' => $this->dataPasien['pasien']['identitas']['idBpjs'],
@@ -1491,7 +1491,7 @@ class MasterPasien extends Component
     {
         DB::table('rsmst_pasiens')->where('reg_no', $regNo)
             ->update([
-                'reg_date' => Carbon::now(),
+                'reg_date' => Carbon::now(env('APP_TIMEZONE')),
                 // 'reg_no' => $this->dataPasien['pasien']['regNo'], //primarykey insert when select max
                 'reg_name' => strtoupper($this->dataPasien['pasien']['regName']),
                 'nokartu_bpjs' => $this->dataPasien['pasien']['identitas']['idBpjs'],
@@ -1559,7 +1559,7 @@ class MasterPasien extends Component
                     // resert variable dataPasien otomatis (insert mode) cek data dari bpjs server
                     $this->reset('dataPasien');
 
-                    $CaridataVclaim = VclaimTrait::peserta_nik($this->dataPasienBPJSSearch, Carbon::now()
+                    $CaridataVclaim = VclaimTrait::peserta_nik($this->dataPasienBPJSSearch, Carbon::now(env('APP_TIMEZONE'))
                         ->format('Y-m-d'))
                         ->getOriginalContent();
 
@@ -1567,14 +1567,14 @@ class MasterPasien extends Component
                         $CaridataVclaim = $CaridataVclaim['response']['peserta'];
 
                         // set dataPasien
-                        $this->dataPasien['pasien']['regDate'] = Carbon::now();
+                        $this->dataPasien['pasien']['regDate'] = Carbon::now(env('APP_TIMEZONE'));
                         $this->dataPasien['pasien']['regName'] = $CaridataVclaim['nama'];
                         $this->dataPasien['pasien']['identitas']['idBpjs'] = $CaridataVclaim['noKartu'];
                         $this->dataPasien['pasien']['identitas']['nik'] = $CaridataVclaim['nik'];
                         $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = ($CaridataVclaim['sex'] == 'L') ? 1 : 2;
                         $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($CaridataVclaim['sex'] == 'L') ? 'Laki-laki' : 'Perempuan';
 
-                        $this->dataPasien['pasien']['tglLahir'] = Carbon::createFromFormat('Y-m-d', $CaridataVclaim['tglLahir'])->format('d/m/Y');
+                        $this->dataPasien['pasien']['tglLahir'] = Carbon::createFromFormat('Y-m-d', $CaridataVclaim['tglLahir'], env('APP_TIMEZONE'))->format('d/m/Y');
 
                         $this->emit('toastr-success', $CaridataVclaim['nama'] . ' ' . $CaridataVclaim['nik']);
                     } else {
@@ -1812,7 +1812,7 @@ class MasterPasien extends Component
         $mybirthDate = date('d/m/Y', strtotime($birthDate));
 
         $birthDate = new \DateTime($mybirthDate);
-        $today = Carbon::now();
+        $today = Carbon::now(env('APP_TIMEZONE'));
 
         if ($birthDate > $today) {
             $this->dataPasien['pasien']['thn'] = 0;
@@ -1831,7 +1831,7 @@ class MasterPasien extends Component
     private function hitungBirthdatePasien($thn): void
     {
         if ($this->dataPasien['pasien']['tglLahir'] == null) {
-            $this->dataPasien['pasien']['tglLahir'] = Carbon::now()->subYears($thn)->format('d/m/Y');
+            $this->dataPasien['pasien']['tglLahir'] = Carbon::now(env('APP_TIMEZONE'))->subYears($thn)->format('d/m/Y');
         }
     }
     /////////////////////////////////////

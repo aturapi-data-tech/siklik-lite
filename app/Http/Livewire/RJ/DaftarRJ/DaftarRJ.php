@@ -58,6 +58,17 @@ class DaftarRJ extends Component
             ]
         ]
     ];
+
+    // dr
+    public function setdrRjRef($id, $name): void
+    {
+        // $this->emit('toastr-error', $id);
+
+        $this->drRjRef['drId'] = $id;
+        $this->drRjRef['drName'] = $name;
+        $this->resetPage();
+        $this->resetValidation();
+    }
     /////////////////////
     // TopBar Parameters
     /////////////////////
@@ -165,7 +176,7 @@ class DaftarRJ extends Component
                 'dr_id',
                 'dr_name',
             )
-            ->where('shift', '=', $this->shiftRjRef['shiftId'])
+            // ->where('shift', '=', $this->shiftRjRef['shiftId'])
             ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->dateRjRef)
             ->groupBy('dr_id')
             ->groupBy('dr_name')
@@ -181,13 +192,13 @@ class DaftarRJ extends Component
 
     private function setCurrentDate(): void
     {
-        $this->dateRjRef = Carbon::now()->format('d/m/Y');
+        $this->dateRjRef = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y');
     }
 
     private function setCurrentShift(): void
     {
         $findShift = DB::table('rstxn_shiftctls')->select('shift')
-            ->whereRaw("'" . Carbon::now()->format('H:i:s') . "' between shift_start and shift_end")
+            ->whereRaw("'" . Carbon::now(env('APP_TIMEZONE'))->format('H:i:s') . "' between shift_start and shift_end")
             ->first();
         $this->shiftRjRef['shiftId'] = isset($findShift->shift) && $findShift->shift ? $findShift->shift : 1;
         $this->shiftRjRef['shiftDesc'] = isset($findShift->shift) && $findShift->shift ? $findShift->shift : 1;
@@ -270,18 +281,7 @@ class DaftarRJ extends Component
         // end Query
         ///////////////////////////////////////////////
 
-        $query->where(function ($q) use ($mySearch) {
-            $q->Where(DB::raw('upper(poli_id)'), 'like', '%' . strtoupper($mySearch) . '%')
-                ->orWhere(DB::raw('upper(poli_desc)'), 'like', '%' . strtoupper($mySearch) . '%')
-                ->orWhere(DB::raw('upper(kd_poli_bpjs)'), 'like', '%' . strtoupper($mySearch) . '%')
-                ->orWhere(DB::raw('upper(poli_uuid)'), 'like', '%' . strtoupper($mySearch) . '%');
-        })
-            ->orderBy('poli_desc',  'asc');
 
-
-        ////////////////////////////////////////////////
-        // end Query
-        ///////////////////////////////////////////////
 
         return view('livewire.r-j.daftar-r-j.daftar-r-j', ['myQueryData' => $query->paginate($this->limitPerPage)]);
     }

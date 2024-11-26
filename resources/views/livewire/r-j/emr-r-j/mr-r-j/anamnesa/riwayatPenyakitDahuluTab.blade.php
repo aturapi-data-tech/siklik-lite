@@ -54,7 +54,7 @@
                 </x-green-button>
             </div>
             {{-- LOV alergi-makanan --}}
-            @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.list-of-value-alergi-makanan')
+            @include('livewire.component.l-o-v.p-care.list-of-value-alergi-makanan.list-of-value-alergi-makanan')
         </div>
 
         <div>
@@ -76,7 +76,7 @@
                 </x-green-button>
             </div>
             {{-- LOV alergi-Obat --}}
-            @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.list-of-value-alergi-obat')
+            @include('livewire.component.l-o-v.p-care.list-of-value-alergi-obat.list-of-value-alergi-obat')
         </div>
 
         <div>
@@ -98,7 +98,7 @@
                 </x-green-button>
             </div>
             {{-- LOV alergi-udara --}}
-            @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.list-of-value-alergi-udara')
+            @include('livewire.component.l-o-v.p-care.list-of-value-alergi-udara.list-of-value-alergi-udara')
         </div>
 
 

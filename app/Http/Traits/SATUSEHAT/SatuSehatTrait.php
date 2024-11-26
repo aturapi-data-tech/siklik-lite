@@ -25,7 +25,7 @@ trait SatuSehatTrait
         // Insert webLogStatus
         DB::table('web_log_status')->insert([
             'code' =>  $code,
-            'date_ref' => Carbon::now(),
+            'date_ref' => Carbon::now(env('APP_TIMEZONE')),
             'response' => json_encode($response, true),
             'http_req' => $url,
             'requestTransferTime' => $requestTransferTime
@@ -48,7 +48,7 @@ trait SatuSehatTrait
         // Insert webLogStatus
         DB::table('web_log_status')->insert([
             'code' =>  $code,
-            'date_ref' => Carbon::now(),
+            'date_ref' => Carbon::now(env('APP_TIMEZONE')),
             'response' => json_encode($response, true),
             'http_req' => $url,
             'requestTransferTime' => $requestTransferTime

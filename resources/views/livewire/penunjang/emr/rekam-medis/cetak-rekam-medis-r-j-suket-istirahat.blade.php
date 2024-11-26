@@ -170,9 +170,15 @@
                                 </div>
                                 @inject('carbon', 'Carbon\Carbon')
                                 @php
-                                    $tglRj = isset($dataDaftarTxn['rjDate']) ? $carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['rjDate']) : $carbon::now()->format('d/m/Y H:i:s');
+                                    $tglRj = isset($dataDaftarTxn['rjDate'])
+                                        ? $carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['rjDate'])
+                                        : $carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
-                                    $suketIstirahatHari = isset($dataDaftarTxn['suket']['suketIstirahat']['suketIstirahatHari']) ? $dataDaftarTxn['suket']['suketIstirahat']['suketIstirahatHari'] : 3;
+                                    $suketIstirahatHari = isset(
+                                        $dataDaftarTxn['suket']['suketIstirahat']['suketIstirahatHari'],
+                                    )
+                                        ? $dataDaftarTxn['suket']['suketIstirahat']['suketIstirahatHari']
+                                        : 3;
 
                                     $tglRjAwal = $tglRj->format('d/m/Y');
                                     $tglRjAkhir = $tglRj->addDays($suketIstirahatHari)->format('d/m/Y');

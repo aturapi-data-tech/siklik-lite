@@ -214,6 +214,16 @@ class FormEntryPoli extends Component
         $this->findData($this->poliId);
     }
 
+    /*************  ✨ Codeium Command ⭐  *************/
+    /**
+     * The render method will be called when the component is rendered or after a props value has changed.
+     * It will also be called when the Livewire component is mounted.
+     *
+     * This method will sync the LOV and FormEntry data before rendering the view.
+     *
+     * @return \Illuminate\Contracts\View\View
+     */
+    /******  2731f88d-0049-4769-8780-c801c36723f9  *******/
     public function render()
     {
         // LOV

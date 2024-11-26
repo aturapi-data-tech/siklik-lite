@@ -74,7 +74,7 @@ class PostSatuDataKesehatanRJ extends Component
         foreach ($dataDaftarPoliRJ['diagnosis'] as $diag) {
 
             $r = [
-                "tanggal" => Carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarPoliRJ['rjDate'])->format('d-m-Y'),
+                "tanggal" => Carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarPoliRJ['rjDate'], env('APP_TIMEZONE'))->format('d-m-Y'),
 
                 "nik" => $dataPasienRJ['nik'],
                 "nama" => $dataPasienRJ['regName'],

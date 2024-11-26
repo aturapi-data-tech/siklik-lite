@@ -209,6 +209,42 @@ class FormEntryDokter extends Component
         }
     }
 
+
+    // /////////dokter////////////
+    public $dokterLov = [];
+    public $dokterLovStatus = 0;
+    public $dokterLovSearch = '';
+    public function clickdokterlov()
+    {
+        $this->dokterLovStatus = true;
+
+        $getdokter = json_decode(DB::table('ref_bpjs_table')
+            ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper('Dokter'))
+            ->first()->ref_json ?? '{}', true);
+
+        $this->dokterLov = collect($getdokter)->map(function ($item) {
+            $item['dokterId'] = $item['kdDokter'];
+            unset($item['kdDokter']);
+            $item['dokterDesc'] = $item['nmDokter'];
+            unset($item['nmDokter']);
+            return $item;
+        })->toArray();
+    }
+
+    // /////////////////////
+    // LOV selected start
+    public function setMydokterLov($id, $desc)
+    {
+        $this->FormEntryDokter['dokterIdBPJS'] = $id;
+        // $this->FormEntryDokter['dokterName'] = $desc;
+
+        $this->dokterLovStatus = false;
+        $this->dokterLovSearch = '';
+    }
+    // LOV selected end
+    // /////////////////////
+
+
     public function mount()
     {
         $this->findData($this->dokterId);

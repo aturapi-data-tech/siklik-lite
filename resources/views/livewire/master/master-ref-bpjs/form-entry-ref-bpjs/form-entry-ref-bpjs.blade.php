@@ -89,12 +89,27 @@
         </div>
 
 
+        <div class="">
+            <div wire:loading wire:target="updateDataProvider">
+                <x-loading />
+            </div>
 
+            <x-green-button :disabled=$disabledProperty wire:click.prevent="updateDataProvider()" type="button"
+                wire:loading.remove>
+                Update Data Provider
+            </x-green-button>
+        </div>
 
+        <div class="">
+            <div wire:loading wire:target="updateDataSarana">
+                <x-loading />
+            </div>
 
-
-
-
+            <x-green-button :disabled=$disabledProperty wire:click.prevent="updateDataSarana()" type="button"
+                wire:loading.remove>
+                Update Data Sarana
+            </x-green-button>
+        </div>
 
 
 

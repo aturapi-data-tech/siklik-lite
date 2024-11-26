@@ -43,6 +43,27 @@
         </div>
 
         <div>
+            <x-input-label for="FormEntryDokter.dokterIdBPJS" :value="__('id BPJS')" :required="__(true)" class="pt-2" />
+            <div class="flex ">
+                <x-text-input placeholder="id BPJS" class="sm:rounded-none sm:rounded-l-lg" :errorshas="__($errors->has('FormEntryDokter.dokterIdBPJS'))"
+                    :disabled=true
+                    value="{{ $FormEntryDokter['dokterIdBPJS'] ?? '' }}{{ ' / ' }}{{ $FormEntryDokter['dokterIdBPJS'] ?? '' }}" />
+
+                <x-green-button :disabled=$disabledProperty
+                    class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                    wire:click.prevent="clickdokterlov()">
+                    <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path clip-rule="evenodd" fill-rule="evenodd"
+                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                    </svg>
+                </x-green-button>
+            </div>
+            {{-- LOV dokter --}}
+            @include('livewire.component.l-o-v.p-care.list-of-value-dokter.list-of-value-dokter')
+        </div>
+
+        <div>
             <x-input-label for="FormEntryDokter.dokterNik" :value="__('Kode Dokter NIK')" :required="__($errors->has('FormEntryDokter.dokterNik'))" />
             <div class="flex items-center mb-2">
                 <x-text-input id="FormEntryDokter.dokterNik" placeholder="Kode Dokter NIK" class="mt-1 ml-2"

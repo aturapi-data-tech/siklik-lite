@@ -186,7 +186,7 @@ class PelayananRJ extends Component
         $dataDaftarPoliRJ  = $findDataRJ['dataDaftarRJ'];
 
         if (!$dataDaftarPoliRJ['taskIdPelayanan']['taskId4']) {
-            $waktuMasukPoli = Carbon::now()->format('d/m/Y H:i:s');
+            $waktuMasukPoli = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
             $dataDaftarPoliRJ['taskIdPelayanan']['taskId4'] = $waktuMasukPoli;
             // update DB
 
@@ -200,7 +200,7 @@ class PelayananRJ extends Component
                 [
                     'userLogDesc' => 'Masuk Poli',
                     'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
+                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
                 ];
 
             $this->updateJsonRJ($rjNo, $dataDaftarPoliRJ);
@@ -222,7 +222,7 @@ class PelayananRJ extends Component
 
             // isi taskId5
             if (!$dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
-                $waktuKeluarPoli = Carbon::now()->format('d/m/Y H:i:s');
+                $waktuKeluarPoli = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
                 $dataDaftarPoliRJ['taskIdPelayanan']['taskId5'] = $waktuKeluarPoli;
 
                 // update DB
@@ -236,7 +236,7 @@ class PelayananRJ extends Component
                     [
                         'userLogDesc' => 'Keluar Poli',
                         'userLog' => auth()->user()->myuser_name,
-                        'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
+                        'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
                     ];
 
                 $this->updateJsonRJ($rjNo, $dataDaftarPoliRJ);
@@ -261,7 +261,7 @@ class PelayananRJ extends Component
 
             // isi taskId99 Pembatalan
             if (!$dataDaftarPoliRJ['taskIdPelayanan']['taskId99']) {
-                $waktuBatalPoli = Carbon::now()->format('d/m/Y H:i:s');
+                $waktuBatalPoli = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
                 $dataDaftarPoliRJ['taskIdPelayanan']['taskId99'] = $waktuBatalPoli;
 
                 // update DB
@@ -275,7 +275,7 @@ class PelayananRJ extends Component
                     [
                         'userLogDesc' => 'Batal Poli',
                         'userLog' => auth()->user()->myuser_name,
-                        'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
+                        'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
                     ];
 
 
@@ -305,7 +305,7 @@ class PelayananRJ extends Component
     public function mount()
     {
         // set date
-        $this->dateRjRef = Carbon::now()->format('d/m/Y');
+        $this->dateRjRef = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y');
         // set data dokter ref
         $this->optionsdrRjRef();
     }

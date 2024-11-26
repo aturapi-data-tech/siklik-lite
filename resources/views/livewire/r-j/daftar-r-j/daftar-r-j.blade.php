@@ -104,10 +104,9 @@
             </div>
 
             {{-- shift --}}
-            <div class="mt-2 ml-0">
+            {{-- <div class="mt-2 ml-0">
                 <x-dropdown align="right" :width="__('20')" class="">
                     <x-slot name="trigger">
-                        {{-- Button shift --}}
                         <x-alternative-button class="inline-flex">
                             <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
                                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -117,7 +116,6 @@
                             <span>{{ 'Shift' . $shiftRjRef['shiftDesc'] }}</span>
                         </x-alternative-button>
                     </x-slot>
-                    {{-- Open shiftcontent --}}
                     <x-slot name="content">
 
                         @foreach ($shiftRjRef['shiftOptions'] as $shift)
@@ -127,7 +125,7 @@
                         @endforeach
                     </x-slot>
                 </x-dropdown>
-            </div>
+            </div> --}}
 
             {{-- Dokter --}}
             <div class="mt-2 ml-0">

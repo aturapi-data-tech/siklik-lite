@@ -90,9 +90,9 @@ class SetupHfisBpjs extends Component
         $rjNo = 1;
         $encounter->addRegistrationId($rjNo); // unique string free text (increments / UUID)
 
-        $encounter->setArrived(Carbon::now()->subMinutes(15)->toDateTimeString());
-        $encounter->setInProgress(Carbon::now()->subMinutes(5)->toDateTimeString(), Carbon::now()->toDateTimeString());
-        $encounter->setFinished(Carbon::now()->toDateTimeString());
+        $encounter->setArrived(Carbon::now(env('APP_TIMEZONE'))->subMinutes(15)->toDateTimeString());
+        $encounter->setInProgress(Carbon::now(env('APP_TIMEZONE'))->subMinutes(5)->toDateTimeString(), Carbon::now(env('APP_TIMEZONE'))->toDateTimeString());
+        $encounter->setFinished(Carbon::now(env('APP_TIMEZONE'))->toDateTimeString());
 
         $encounter->addRegistrationId('123456789'); // unique string free text (increments / UUID)
         $encounter->setConsultationMethod('RAJAL'); // RAJAL, IGD, RANAP, HOMECARE, TELEKONSULTASI
@@ -423,7 +423,7 @@ class SetupHfisBpjs extends Component
     // when new form instance
     public function mount()
     {
-        $this->dateRef = Carbon::now()->format('d/m/Y');
+        $this->dateRef = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y');
         $this->jadwal_dokter = [];
     }
 

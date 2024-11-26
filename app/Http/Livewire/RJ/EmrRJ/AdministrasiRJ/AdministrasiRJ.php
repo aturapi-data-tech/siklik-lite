@@ -121,7 +121,7 @@ class AdministrasiRJ extends Component
         if (isset($dataDaftarPoliRJ['AdministrasiRj']) == false) {
             $dataDaftarPoliRJ['AdministrasiRj'] = [
                 'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
+                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
             ];
 
             DB::table('rstxn_rjhdrs')

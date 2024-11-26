@@ -304,7 +304,7 @@ class JasaMedisRJ extends Component
                 'rjpactDtl' => $lastInserted->pact_dtl_max,
                 'rjNo' => $this->rjNoRef,
                 'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
+                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
             ];
 
             $this->paketLainLainJasaMedis($this->collectingMyJasaMedis['JasaMedisId'], $this->rjNoRef, $lastInserted->pact_dtl_max);

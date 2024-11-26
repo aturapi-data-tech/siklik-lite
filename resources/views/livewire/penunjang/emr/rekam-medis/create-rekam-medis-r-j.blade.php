@@ -1332,7 +1332,7 @@
                                         {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['jamDatang'])
                                             ? ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['jamDatang']
                                                 ? $carbon
-                                                    ::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['jamDatang'])->format('H:i:s')
+                                                    ::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['jamDatang'],env('APP_TIMEZONE'))->format('H:i:s')
                                                 : '-')
                                             : '-' }}
                                         /
@@ -1342,7 +1342,7 @@
                                         {{ isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])
                                             ? ($dataDaftarTxn['perencanaan']['pengkajianMedis']['waktuPemeriksaan']
                                                 ? $carbon
-                                                    ::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])->format('H:i:s')
+                                                    ::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['perencanaan']['pengkajianMedis']['waktuPemeriksaan'],env('APP_TIMEZONE'))->format('H:i:s')
                                                 : '-')
                                             : '-' }}
                                         /
@@ -1352,7 +1352,7 @@
                                         {{ isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'])
                                             ? ($dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan']
                                                 ? $carbon
-                                                    ::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'])->format('H:i:s')
+                                                    ::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'],env('APP_TIMEZONE'))->format('H:i:s')
                                                 : '-')
                                             : '-' }}
                                         <br>

@@ -42,12 +42,20 @@
                                         @click="activeTab ='{{ $dataDaftarPoliRJ['perencanaan']['terapiTab'] }}'">{{ $dataDaftarPoliRJ['perencanaan']['terapiTab'] }}</label>
                                 </li>
 
-                                <li class="mr-2">
+                                {{-- <li class="mr-2">
                                     <label
                                         class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
                                         :class="activeTab === '{{ 'Kontrol' }}' ?
                                             'text-primary border-primary bg-gray-100' : ''"
                                         @click="activeTab ='{{ 'Kontrol' }}'">{{ 'Kontrol' }}</label>
+                                </li> --}}
+
+                                <li class="mr-2">
+                                    <label
+                                        class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                                        :class="activeTab === '{{ 'Kunjungan' }}' ?
+                                            'text-primary border-primary bg-gray-100' : ''"
+                                        @click="activeTab ='{{ 'Kunjungan' }}'">{{ 'Kunjungan' }}</label>
                                 </li>
 
 
@@ -83,7 +91,7 @@
 
                         </div>
 
-                        <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
+                        {{-- <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
                             :class="{
                                 'active': activeTab === '{{ 'Kontrol' }}'
                             }"
@@ -92,11 +100,22 @@
 
                             <div id="TransaksiRawatJalanskdp" class="px-4">
 
-                                {{-- <livewire:emr-r-j.mr-r-j.skdp-r-j.skdp-r-j :wire:key="'content-skdpRj'"
-                                    :rjNoRef="$rjNoRef"> --}}
+                                <livewire:emr-r-j.mr-r-j.skdp-r-j.skdp-r-j :wire:key="'content-skdpRj'"
+                                    :rjNoRef="$rjNoRef">
 
                             </div>
 
+
+                        </div> --}}
+
+                        <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
+                            :class="{
+                                'active': activeTab === '{{ 'Kunjungan' }}'
+                            }"
+                            x-show.transition.in.opacity.duration.600="activeTab === '{{ 'Kunjungan' }}'">
+
+                            <livewire:pcare.r-j.kunjungan.form-entry-kunjungan :wire:key="'form-entry-kunjungan'"
+                                :rjNoRef="$rjNoRef">
 
                         </div>
 

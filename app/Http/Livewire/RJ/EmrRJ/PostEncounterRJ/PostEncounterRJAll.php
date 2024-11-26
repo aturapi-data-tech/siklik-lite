@@ -169,8 +169,8 @@ class PostEncounterRJAll extends Component
                     $condition->addCategory('Diagnosis'); // Diagnosis, Keluhan. Default : Diagnosis
                     $condition->addCode($diag['icdX'], $diag['diagDesc']); // Kode ICD10
                     $condition->setSubject($dataPasienRJ['patientUuid'], $dataPasienRJ['regName']); // ID SATUSEHAT Pasien dan Nama SATUSEHAT
-                    $condition->setOnsetDateTime(Carbon::now()->toDateTimeString()); // timestamp onset. Timestamp sekarang
-                    $condition->setRecordedDate(Carbon::now()->toDateTimeString()); // timestamp recorded. Timestamp sekarang
+                    $condition->setOnsetDateTime(Carbon::now(env('APP_TIMEZONE'))->toDateTimeString()); // timestamp onset. Timestamp sekarang
+                    $condition->setRecordedDate(Carbon::now(env('APP_TIMEZONE'))->toDateTimeString()); // timestamp recorded. Timestamp sekarang
                     $condition->json();
                     $bundle->addCondition($condition);
                 }

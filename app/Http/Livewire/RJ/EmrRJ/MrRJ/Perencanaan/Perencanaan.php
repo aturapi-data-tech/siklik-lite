@@ -353,7 +353,7 @@ class Perencanaan extends Component
         $this->dataDaftarPoliRJ['statusPRB']['penanggungJawab'] = [
             'statusPRB' => $statusPRB,
             'userLog' => auth()->user()->myuser_name,
-            'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
+            'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
             'userLogCode' => auth()->user()->myuser_code
         ];
 
@@ -396,7 +396,29 @@ class Perencanaan extends Component
     }
     // LOV selected end
     // /////////////////////
+    private function setstatusPulangRJ(): void
+    {
+        $getstatusPulangRJ = json_decode(DB::table('ref_bpjs_table')
+            ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper('Status Pulang RJ'))
+            ->first()->ref_json, true) ?? [];
 
+        if (!isset($this->dataDaftarPoliRJ['perencanaan']['tindakLanjut']['tindakLanjutOptions'])) {
+            $this->dataDaftarPoliRJ['perencanaan']['tindakLanjut']['tindakLanjutOptions'] = collect($getstatusPulangRJ)->map(function ($item) {
+                $item['tindakLanjut'] = $item['kdStatusPulang'];
+                unset($item['kdStatusPulang']);
+                $item['tindakLanjutDesc'] = $item['nmStatusPulang'];
+                unset($item['nmStatusPulang']);
+                return $item;
+            })->values()->toArray();
+        }
+    }
+
+    private function syncDataFormEntry(): void
+    {
+        //  Entry ketika Mont
+        // Pasien Baru Lama di blade wire:model
+        $this->setstatusPulangRJ();
+    }
 
     // when new form instance
     public function mount()
@@ -407,6 +429,9 @@ class Perencanaan extends Component
     // select data start////////////////
     public function render()
     {
+        // FormEntry
+        $this->syncDataFormEntry();
+
         return view('livewire.r-j.emr-r-j.mr-r-j.perencanaan.perencanaan', [
             // 'RJpasiens' => $query->paginate($this->limitPerPage),
             'myTitle' => 'Perencanaan',

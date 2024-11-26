@@ -170,7 +170,9 @@
                                 </div>
                                 @inject('carbon', 'Carbon\Carbon')
                                 @php
-                                    $tglRj = isset($dataDaftarTxn['rjDate']) ? $carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['rjDate']) : $carbon::now()->format('d/m/Y H:i:s');
+                                    $tglRj = isset($dataDaftarTxn['rjDate'])
+                                        ? $carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['rjDate'])
+                                        : $carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
                                     $tglRjAwal = $tglRj->format('d/m/Y');
                                     $tglRjAkhir = $tglRj->addDays(3)->format('d/m/Y');
