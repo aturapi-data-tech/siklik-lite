@@ -176,6 +176,14 @@ class FormEntryKunjungan extends Component
 
     private function syncDataPrimer(): void
     {
+        if (isset($this->FormEntry['dataKunjungan'])) {
+            // edit kunjungan
+            $noKunjungan = collect($this->FormEntry['dataKunjungan'])
+                ->where('field', '=', 'noKunjungan')
+                ->first()['message'] ?? null;
+
+            $this->FormEntry['addKunjungan']['noKunjungan'] = $noKunjungan;
+        }
         // sync data primer dilakukan ketika update
         if (isset($this->FormEntry['addKunjungan']) == false) {
 
@@ -184,7 +192,10 @@ class FormEntryKunjungan extends Component
             // default array
 
             $this->FormEntry['addKunjungan']['noKartu'] = $this->displayPasien['pasien']['identitas']['idBpjs'] ?? '';
+            // entry no kunjungan
             $this->FormEntry['addKunjungan']['noKunjungan'] =  null; //$this->FormEntry['noUrutBpjs'] ?? '';
+
+
             $this->FormEntry['addKunjungan']['kdPoli'] = $this->FormEntry['kdpolibpjs'] ?? '';
 
             $this->FormEntry['addKunjungan']['tglDaftar'] = Carbon::createFromFormat('d/m/Y H:i:s', $this->FormEntry['rjDate'], env('APP_TIMEZONE'))->format('d-m-Y') ?? '';
@@ -244,28 +255,6 @@ class FormEntryKunjungan extends Component
             $this->FormEntry['addKunjungan']['nonSpesialis'] = $this->FormEntry['addKunjungan']['nonSpesialis'] ?? false;
             // cari tau status nonSpesialis true/false untuk menggunakan TACC atau tidak
             $this->getDiagnosaBpjs();
-
-
-
-            // kecelakanan lalu lintas KKL
-            // if Y
-            // tgl kejadian
-            // propinsi / kab /kec
-
-
-            //tenaga medis
-            // pelayanan non kapitasi
-            // status pulang
-        } else {
-
-            if (isset($this->FormEntry['dataKunjungan'])) {
-                // edit kunjungan
-                $noKunjungan = collect($this->FormEntry['dataKunjungan'])
-                    ->where('field', '=', 'noKunjungan')
-                    ->first()['message'] ?? null;
-
-                $this->FormEntry['addKunjungan']['noKunjungan'] = $noKunjungan;
-            }
         }
     }
 
@@ -835,7 +824,12 @@ class FormEntryKunjungan extends Component
     }
     // LOV selected end
     // /////////////////////
-
+    public function clicktglEstRujuk()
+    {
+        if (!$this->FormEntry['addKunjungan']['rujukLanjut']['tglEstRujuk']) {
+            $this->FormEntry['addKunjungan']['rujukLanjut']['tglEstRujuk'] = Carbon::now(env('APP_TIMEZONE'))->addDays(3)->format('d-m-Y');
+        }
+    }
 
 
     private function synJsonRJ(): void

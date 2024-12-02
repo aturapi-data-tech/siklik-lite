@@ -74,19 +74,21 @@
         </div>
 
         <div class="flex justify-between">
-            <div class="flex justify-end px-4">
-                <div wire:loading wire:target="deleteKunjunganBpjs">
-                    <x-loading />
-                </div>
+            @if (isset($FormEntry['dataKunjungan']))
+                <div class="flex justify-end px-4">
+                    <div wire:loading wire:target="deleteKunjunganBpjs">
+                        <x-loading />
+                    </div>
 
-                <x-red-button wire:click="deleteKunjunganBpjs()" type="button" wire:loading.remove>
-                    Delete Pcare
-                </x-red-button>
+                    <x-red-button wire:click="deleteKunjunganBpjs()" type="button" wire:loading.remove>
+                        Delete Pcare
+                    </x-red-button>
 
-                {{-- <x-red-button wire:click="getDiagnosaBpjs()" type="button" wire:loading.remove>
+                    {{-- <x-red-button wire:click="getDiagnosaBpjs()" type="button" wire:loading.remove>
                 GetDiagnosa
             </x-red-button> --}}
-            </div>
+                </div>
+            @endif
 
             @if (!isset($FormEntry['dataKunjungan']))
                 <div class="flex justify-end px-4">
@@ -134,12 +136,11 @@
         </div>
 
         <x-border-form title="Kunjungan" align="start" bordercolor="border-gray-300" bgcolor="bg-white">
-
             <div class="grid grid-cols-4 gap-2 p-2 my-1 border border-gray-300 rounded-lg">
                 <div class="flex">
-                    <x-input-label for="FormEntry.addKunjungan.noKunjugan" :value="__('No Kunjungan')" :required="__($errors->has('FormEntry.addKunjungan.noKunjugan'))" />
+                    <x-input-label for="FormEntry.addKunjungan.noKunjungan" :value="__('No Kunjungan')" :required="__($errors->has('FormEntry.addKunjungan.noKunjungan'))" />
                     <p class="ml-2 font-normal text-primary">
-                        {{ $FormEntry['addKunjungan']['noKunjugan'] ?? '' }}
+                        {{ $FormEntry['addKunjungan']['noKunjungan'] ?? '-' }}
                     </p>
                 </div>
 
@@ -410,15 +411,24 @@
                     <div>
                         <x-input-label for="FormEntry.addKunjungan.rujukLanjut.tglEstRujuk" :value="__('tglEstRujuk')"
                             :required="__($errors->has('FormEntry.addKunjungan.rujukLanjut.tglEstRujuk'))" />
-                        <div class="flex items-center mb-2">
-                            <x-text-input id="FormEntry.addKunjungan.rujukLanjut.tglEstRujuk"
-                                placeholder="[dd-mm-yyyy]" class="ml-2" :errorshas="__($errors->has('FormEntry.addKunjungan.rujukLanjut.tglEstRujuk'))"
-                                :disabled=$disabledPropertyId
+                        <div class="flex ">
+                            <x-text-input placeholder="[dd-mm-yyyy]" class="sm:rounded-none sm:rounded-l-lg"
+                                :errorshas="__($errors->has('FormEntry.addKunjungan.rujukLanjut.tglEstRujuk'))" :disabled=$disabledProperty
                                 wire:model="FormEntry.addKunjungan.rujukLanjut.tglEstRujuk" />
+
+                            <x-green-button :disabled=$disabledProperty
+                                class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                wire:click.prevent="clicktglEstRujuk()">
+                                <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path clip-rule="evenodd" fill-rule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                </svg>
+                            </x-green-button>
+                            @error('FormEntry.addKunjungan.rujukLanjut.tglEstRujuk')
+                                <x-input-error :messages=$message />
+                            @enderror
                         </div>
-                        @error('FormEntry.addKunjungan.rujukLanjut.tglEstRujuk')
-                            <x-input-error :messages=$message />
-                        @enderror
                     </div>
 
                     <div>
