@@ -138,13 +138,12 @@
                             </div>
 
                             {{-- ICD 9 CM --}}
-                            <div>
-                                {{-- LOV Diagnosa --}}
+                            {{-- <div>
                                 @include('livewire.r-j.emr-r-j.mr-r-j.diagnosis.list-of-value-caridataProcedureICD9Cm')
-                            </div>
+                            </div> --}}
 
                             <!-- Table -->
-                            <div class="flex flex-col my-2">
+                            {{-- <div class="flex flex-col my-2">
                                 <div class="overflow-x-auto rounded-lg">
                                     <div class="inline-block min-w-full align-middle">
                                         <div class="overflow-hidden shadow sm:rounded-lg">
@@ -178,13 +177,7 @@
                                                             </x-sort-link>
                                                         </th>
 
-                                                        {{-- <th scope="col" class="px-4 py-3">
 
-                                                                <x-sort-link :active=false wire:click.prevent="" role="button"
-                                                                    href="#">
-                                                                    Kategori
-                                                                </x-sort-link>
-                                                            </th> --}}
 
                                                         <th scope="col" class="w-8 px-4 py-3 text-center">
                                                             Action
@@ -212,10 +205,7 @@
                                                                     {{ $procedure['ketProcedure'] }}
                                                                 </td>
 
-                                                                {{-- <td
-                                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                                    {{ $procedure['kategoriprocedurenosa'] }}
-                                                                </td> --}}
+
 
                                                                 <td
                                                                     class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
@@ -254,7 +244,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
 
                         </div>
 

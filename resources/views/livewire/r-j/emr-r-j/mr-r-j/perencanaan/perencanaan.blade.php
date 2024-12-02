@@ -129,7 +129,7 @@
 
 
                 <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6"
-                    x-show.transition.in.opacity.duration.600="activeTab !== '{{ 'Kontrol' }}'">
+                    x-show.transition.in.opacity.duration.600="activeTab !== '{{ 'Kunjungan' }}'">
 
                     <div class="">
                         {{-- null --}}

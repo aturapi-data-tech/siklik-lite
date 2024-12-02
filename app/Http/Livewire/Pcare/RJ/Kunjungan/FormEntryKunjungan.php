@@ -51,6 +51,7 @@ class FormEntryKunjungan extends Component
         "tglPulang" => "",
         "kdDokter" => "",
         "kdDiag1" => "",
+        "nonSpesialis" => "",
         "kdDiag2" => "",
         "kdDiag3" => "",
         "kdPoliRujukInternal" => "",
@@ -90,53 +91,53 @@ class FormEntryKunjungan extends Component
 
     // rules///////////////////
     protected $rules = [
-        "FormEntry.pcare.addKunjungan.noKunjungan" => "",
-        "FormEntry.pcare.addKunjungan.noKartu" => "",
-        "FormEntry.pcare.addKunjungan.tglDaftar" => "",
-        "FormEntry.pcare.addKunjungan.kdPoli" => "",
-        "FormEntry.pcare.addKunjungan.keluhan" => "",
-        "FormEntry.pcare.addKunjungan.kdSadar" => "",
-        "FormEntry.pcare.addKunjungan.sistole" => "",
-        "FormEntry.pcare.addKunjungan.diastole" => "",
-        "FormEntry.pcare.addKunjungan.beratBadan" => "",
-        "FormEntry.pcare.addKunjungan.tinggiBadan" => "",
-        "FormEntry.pcare.addKunjungan.respRate" => "",
-        "FormEntry.pcare.addKunjungan.heartRate" => "",
-        "FormEntry.pcare.addKunjungan.lingkarPerut" => "",
-        "FormEntry.pcare.addKunjungan.kdStatusPulang" => "",
-        "FormEntry.pcare.addKunjungan.tglPulang" => "",
-        "FormEntry.pcare.addKunjungan.kdDokter" => "",
-        "FormEntry.pcare.addKunjungan.kdDiag1" => "",
-        "FormEntry.pcare.addKunjungan.kdDiag2" => "",
-        "FormEntry.pcare.addKunjungan.kdDiag3" => "",
-        "FormEntry.pcare.addKunjungan.kdPoliRujukInternal" => "",
+        "FormEntry.addKunjungan.noKunjungan" => "",
+        "FormEntry.addKunjungan.noKartu" => "",
+        "FormEntry.addKunjungan.tglDaftar" => "",
+        "FormEntry.addKunjungan.kdPoli" => "",
+        "FormEntry.addKunjungan.keluhan" => "",
+        "FormEntry.addKunjungan.kdSadar" => "",
+        "FormEntry.addKunjungan.sistole" => "",
+        "FormEntry.addKunjungan.diastole" => "",
+        "FormEntry.addKunjungan.beratBadan" => "",
+        "FormEntry.addKunjungan.tinggiBadan" => "",
+        "FormEntry.addKunjungan.respRate" => "",
+        "FormEntry.addKunjungan.heartRate" => "",
+        "FormEntry.addKunjungan.lingkarPerut" => "",
+        "FormEntry.addKunjungan.kdStatusPulang" => "",
+        "FormEntry.addKunjungan.tglPulang" => "",
+        "FormEntry.addKunjungan.kdDokter" => "",
+        "FormEntry.addKunjungan.kdDiag1" => "",
+        "FormEntry.addKunjungan.kdDiag2" => "",
+        "FormEntry.addKunjungan.kdDiag3" => "",
+        "FormEntry.addKunjungan.kdPoliRujukInternal" => "",
 
-        "FormEntry.pcare.addKunjungan.rujukLanjut.tglEstRujuk" => "",
-        "FormEntry.pcare.addKunjungan.rujukLanjut.kdppk" => "",
-        "FormEntry.pcare.addKunjungan.rujukLanjut.subSpesialis" => "",
+        "FormEntry.addKunjungan.rujukLanjut.tglEstRujuk" => "",
+        "FormEntry.addKunjungan.rujukLanjut.kdppk" => "",
+        "FormEntry.addKunjungan.rujukLanjut.subSpesialis" => "",
 
-        "FormEntry.pcare.addKunjungan.rujukLanjut.khusus" => "",
-        "FormEntry.pcare.addKunjungan.rujukLanjut.khusus.kdKhusus" => "",
-        "FormEntry.pcare.addKunjungan.rujukLanjut.khusus.kdSubSpesialis1" => "",
-        "FormEntry.pcare.addKunjungan.rujukLanjut.khusus.catatan" => "",
+        "FormEntry.addKunjungan.rujukLanjut.khusus" => "",
+        "FormEntry.addKunjungan.rujukLanjut.khusus.kdKhusus" => "",
+        "FormEntry.addKunjungan.rujukLanjut.khusus.kdSubSpesialis1" => "",
+        "FormEntry.addKunjungan.rujukLanjut.khusus.catatan" => "",
 
-        "FormEntry.pcare.addKunjungan.kdTacc" => "",
-        "FormEntry.pcare.addKunjungan.alasanTacc" => "",
-        "FormEntry.pcare.addKunjungan.anamnesa" => "",
-        "FormEntry.pcare.addKunjungan.alergiMakan" => "",
-        "FormEntry.pcare.addKunjungan.alergiUdara" => "",
-        "FormEntry.pcare.addKunjungan.alergiObat" => "",
-        "FormEntry.pcare.addKunjungan.kdPrognosa" => "",
-        "FormEntry.pcare.addKunjungan.terapiObat" => "",
-        "FormEntry.pcare.addKunjungan.terapiNonObat" => "",
-        "FormEntry.pcare.addKunjungan.bmhp" => "",
-        "FormEntry.pcare.addKunjungan.suhu" => ""
+        "FormEntry.addKunjungan.kdTacc" => "",
+        "FormEntry.addKunjungan.alasanTacc" => "",
+        "FormEntry.addKunjungan.anamnesa" => "",
+        "FormEntry.addKunjungan.alergiMakan" => "",
+        "FormEntry.addKunjungan.alergiUdara" => "",
+        "FormEntry.addKunjungan.alergiObat" => "",
+        "FormEntry.addKunjungan.kdPrognosa" => "",
+        "FormEntry.addKunjungan.terapiObat" => "",
+        "FormEntry.addKunjungan.terapiNonObat" => "",
+        "FormEntry.addKunjungan.bmhp" => "",
+        "FormEntry.addKunjungan.suhu" => ""
     ];
 
     protected $messages = [];
 
     protected $validationAttributes = [
-        // 'FormEntry.pcare.poliId' => 'Kode Poliklinik',
+        // 'FormEntry.poliId' => 'Kode Poliklinik',
     ];
     // rules///////////////////
 
@@ -175,11 +176,15 @@ class FormEntryKunjungan extends Component
 
     private function syncDataPrimer(): void
     {
-
         // sync data primer dilakukan ketika update
-        if (isset($this->FormEntry['dataKunjungan']) == false) {
+        if (isset($this->FormEntry['addKunjungan']) == false) {
+
+            // default array
+            $this->FormEntry['addKunjungan'] = $this->addKunjungan;
+            // default array
+
             $this->FormEntry['addKunjungan']['noKartu'] = $this->displayPasien['pasien']['identitas']['idBpjs'] ?? '';
-            $this->FormEntry['addKunjungan']['noKunjugan'] =  null; //$this->FormEntry['noUrutBpjs'] ?? '';
+            $this->FormEntry['addKunjungan']['noKunjungan'] =  null; //$this->FormEntry['noUrutBpjs'] ?? '';
             $this->FormEntry['addKunjungan']['kdPoli'] = $this->FormEntry['kdpolibpjs'] ?? '';
 
             $this->FormEntry['addKunjungan']['tglDaftar'] = Carbon::createFromFormat('d/m/Y H:i:s', $this->FormEntry['rjDate'], env('APP_TIMEZONE'))->format('d-m-Y') ?? '';
@@ -224,25 +229,21 @@ class FormEntryKunjungan extends Component
             $this->FormEntry['addKunjungan']['kdDokter'] = $this->FormEntry['kddrbpjs'] ?? '';
 
 
-            if ($this->FormEntry['addKunjungan']['kdStatusPulang'] === '3') {
-                $this->FormEntry['addKunjungan']['rujukLanjut']['tglEstRujuk'] = null;
-                $this->FormEntry['addKunjungan']['rujukLanjut']['kdppk'] = null;
-                $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis1'] = null;
-                $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis'] = null;
-                $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSarana'] = null;
-            } else if ($this->FormEntry['addKunjungan']['kdStatusPulang'] === '4') {
-                $this->FormEntry['addKunjungan']['rujukLanjut']['tglEstRujuk'] = $this->FormEntry['rjDate'] ?? '';
-                $this->FormEntry['addKunjungan']['rujukLanjut']['kdppk'] = null;
-                $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis1'] = null;
-                $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis'] = null;
-                $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSarana'] = null;
-            }
+            $this->FormEntry['addKunjungan']['rujukLanjut']['tglEstRujuk'] = $this->FormEntry['addKunjungan']['rujukLanjut']['tglEstRujuk'] ?? Carbon::createFromFormat('d/m/Y H:i:s', $this->FormEntry['rjDate'], env('APP_TIMEZONE'))->format('d-m-Y') ?? '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['kdppk'] = $this->FormEntry['addKunjungan']['rujukLanjut']['kdppk'] ?? null;
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis1'] = $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis1'] ?? null;
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis'] = $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis'] ?? null;
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSarana'] = $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSarana'] ?? null;
+
+
+
 
             $this->FormEntry['addKunjungan']['kdTacc'] = '-1';
             $this->FormEntry['addKunjungan']['alasanTacc'] = null;
 
-
-
+            $this->FormEntry['addKunjungan']['nonSpesialis'] = $this->FormEntry['addKunjungan']['nonSpesialis'] ?? false;
+            // cari tau status nonSpesialis true/false untuk menggunakan TACC atau tidak
+            $this->getDiagnosaBpjs();
 
 
 
@@ -255,14 +256,16 @@ class FormEntryKunjungan extends Component
             //tenaga medis
             // pelayanan non kapitasi
             // status pulang
-
         } else {
-            // edit kunjungan
-            $noKunjungan = collect($this->FormEntry['dataKunjungan'])
-                ->where('field', '=', 'noKunjungan')
-                ->first()['message'] ?? null;
 
-            $this->FormEntry['addKunjungan']['noKunjugan'] = $noKunjungan;
+            if (isset($this->FormEntry['dataKunjungan'])) {
+                // edit kunjungan
+                $noKunjungan = collect($this->FormEntry['dataKunjungan'])
+                    ->where('field', '=', 'noKunjungan')
+                    ->first()['message'] ?? null;
+
+                $this->FormEntry['addKunjungan']['noKunjungan'] = $noKunjungan;
+            }
         }
     }
 
@@ -315,6 +318,7 @@ class FormEntryKunjungan extends Component
 
         $this->providerLovStatus = false;
         $this->providerLovSearch = '';
+        $this->synJsonRJ();
     }
     // LOV selected end
     // /////////////////////
@@ -339,18 +343,186 @@ class FormEntryKunjungan extends Component
             return $item;
         })->toArray();
     }
+    public function updatedspesialislovsearch()
+    {
+        // Variable Search
+        $search = $this->spesialisLovSearch;
 
+        $getspesialis = json_decode(DB::table('ref_bpjs_table')
+            ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper('Spesialis'))
+            ->first()->ref_json ?? '{}', true);
+
+        $this->spesialisLov = collect($getspesialis)->map(function ($item) {
+            $item['spesialisId'] = $item['kdSpesialis'];
+            unset($item['kdSpesialis']);
+            $item['spesialisDesc'] = $item['nmSpesialis'];
+            unset($item['nmSpesialis']);
+            return $item;
+        })->toArray();
+
+        // check LOV by id
+        $GetData = collect($this->spesialisLov)
+            ->where('spesialisId', '=', $search)
+            ->first();
+
+        if ($GetData) {
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSpesialis1'] = $GetData['spesialisId'];
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSpesialis1Desc'] = $GetData['spesialisDesc'];
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSpesialis'] = $GetData['spesialisId'];
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSpesialisDesc'] = $GetData['spesialisDesc'];
+
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis1'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis1Desc'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialisDesc'] = '';
+
+            $this->spesialisLovStatus = false;
+            $this->spesialisLovSearch = '';
+        } else {
+            // if there is no id found and check (min 1 char on search)
+            if (strlen($search) < 1) {
+                $this->spesialisLov = collect($getspesialis)->map(function ($item) {
+                    $item['spesialisId'] = $item['kdSpesialis'];
+                    unset($item['kdSpesialis']);
+                    $item['spesialisDesc'] = $item['nmSpesialis'];
+                    unset($item['nmSpesialis']);
+                    return $item;
+                })->toArray();
+            } else {
+                $this->spesialisLov = collect(collect($getspesialis)->map(function ($item) {
+                    $item['spesialisId'] = $item['kdSpesialis'];
+                    unset($item['kdSpesialis']);
+                    $item['spesialisDesc'] = $item['nmSpesialis'];
+                    unset($item['nmSpesialis']);
+                    return $item;
+                })->toArray())
+                    ->filter(function ($item) use ($search) {
+                        return false !== stristr($item['spesialisDesc'], $search);
+                    });
+            }
+            $this->spesialisLovStatus = true;
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSpesialis1'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSpesialis1Desc'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSpesialis'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSpesialisDesc'] = '';
+
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis1'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis1Desc'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialisDesc'] = '';
+        }
+        $this->synJsonRJ();
+    }
     // /////////////////////
     // LOV selected start
     public function setMyspesialisLov($id, $desc)
+    {
+        $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSpesialis1'] = $id;
+        $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSpesialis1Desc'] = $desc;
+        $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSpesialis'] = $id;
+        $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSpesialisDesc'] = $desc;
+
+        $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis1'] = '';
+        $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis1Desc'] = '';
+        $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis'] = '';
+        $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialisDesc'] = '';
+
+        $this->spesialisLovStatus = false;
+        $this->spesialisLovSearch = '';
+        $this->synJsonRJ();
+    }
+    // LOV selected end
+    // /////////////////////
+
+    // /////////subSpesialis////////////
+    public $subSpesialisLov = [];
+    public $subSpesialisLovStatus = 0;
+    public $subSpesialisLovSearch = '';
+    public function clicksubSpesialislov()
+    {
+        $this->subSpesialisLovStatus = true;
+        $getSubSpesialis = $this->getReferensiSubSpesialis($this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSpesialis1'] ?? '')->getOriginalContent()['response']['list'] ?? [];
+
+        $this->subSpesialisLov = collect($getSubSpesialis)->map(function ($item) {
+            $item['subSpesialisId'] = $item['kdSubSpesialis'];
+            unset($item['kdSubSpesialis']);
+            $item['subSpesialisDesc'] = $item['nmSubSpesialis'];
+            unset($item['nmSubSpesialis']);
+            return $item;
+        })->toArray();
+    }
+    public function updatedsubspesialislovsearch()
+    {
+        // Variable Search
+        $search = $this->subSpesialisLovSearch;
+
+
+        $getSubSpesialis = $this->getReferensiSubSpesialis($this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSpesialis1'] ?? '')->getOriginalContent()['response']['list'] ?? [];
+
+
+        $this->subSpesialisLov = collect($getSubSpesialis)->map(function ($item) {
+            $item['subSpesialisId'] = $item['kdSubSpesialis'];
+            unset($item['kdSubSpesialis']);
+            $item['subSpesialisDesc'] = $item['nmSubSpesialis'];
+            unset($item['nmSubSpesialis']);
+            return $item;
+        })->toArray();
+
+        // check LOV by id
+        $GetData = collect($this->subSpesialisLov)
+            ->where('subSpesialisId', '=', $search)
+            ->first();
+
+        if ($GetData) {
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis1'] = $GetData['subSpesialisId'];
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis1Desc'] = $GetData['subSpesialisDesc'];
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis'] = $GetData['subSpesialisId'];
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialisDesc'] = $GetData['subSpesialisDesc'];
+
+            $this->subSpesialisLovStatus = false;
+            $this->subSpesialisLovSearch = '';
+        } else {
+            // if there is no id found and check (min 1 char on search)
+            if (strlen($search) < 1) {
+                $this->subSpesialisLov = collect($getSubSpesialis)->map(function ($item) {
+                    $item['subSpesialisId'] = $item['kdSubSpesialis'];
+                    unset($item['kdSubSpesialis']);
+                    $item['subSpesialisDesc'] = $item['nmSubSpesialis'];
+                    unset($item['nmSubSpesialis']);
+                    return $item;
+                })->toArray();
+            } else {
+                $this->subSpesialisLov = collect(collect($getSubSpesialis)->map(function ($item) {
+                    $item['subSpesialisId'] = $item['kdSubSpesialis'];
+                    unset($item['kdSubSpesialis']);
+                    $item['subSpesialisDesc'] = $item['nmSubSpesialis'];
+                    unset($item['nmSubSpesialis']);
+                    return $item;
+                })->toArray())
+                    ->filter(function ($item) use ($search) {
+                        return false !== stristr($item['subSpesialisDesc'], $search);
+                    });
+            }
+            $this->subSpesialisLovStatus = true;
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis1'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis1Desc'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialisDesc'] = '';
+        }
+        $this->synJsonRJ();
+    }
+    // /////////////////////
+    // LOV selected start
+    public function setMysubSpesialisLov($id, $desc)
     {
         $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis1'] = $id;
         $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis1Desc'] = $desc;
         $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis'] = $id;
         $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialisDesc'] = $desc;
 
-        $this->spesialisLovStatus = false;
-        $this->spesialisLovSearch = '';
+        $this->subSpesialisLovStatus = false;
+        $this->subSpesialisLovSearch = '';
+        $this->synJsonRJ();
     }
     // LOV selected end
     // /////////////////////
@@ -377,6 +549,64 @@ class FormEntryKunjungan extends Component
         })->toArray();
     }
 
+    public function updatedsaranalovsearch()
+    {
+        // Variable Search
+        $search = $this->saranaLovSearch;
+
+        $getsarana = json_decode(DB::table('ref_bpjs_table')
+            ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper('Sarana'))
+            ->first()->ref_json ?? '{}', true);
+
+        $this->saranaLov = collect($getsarana)->map(function ($item) {
+            $item['saranaId'] = $item['kdSarana'];
+            unset($item['kdSarana']);
+            $item['saranaDesc'] = $item['nmSarana'];
+            unset($item['nmSarana']);
+            return $item;
+        })->toArray();
+
+        // check LOV by id
+        $GetData = collect($this->saranaLov)
+            ->where('saranaId', '=', $search)
+            ->first();
+
+        if ($GetData) {
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSarana'] = $GetData['saranaId'];
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSaranaDesc'] = $GetData['saranaDesc'];
+
+            $this->saranaLovStatus = false;
+            $this->saranaLovSearch = '';
+        } else {
+            // if there is no id found and check (min 1 char on search)
+            if (strlen($search) < 1) {
+                $this->saranaLov = collect($getsarana)->map(function ($item) {
+                    $item['saranaId'] = $item['kdSarana'];
+                    unset($item['kdSarana']);
+                    $item['saranaDesc'] = $item['nmSarana'];
+                    unset($item['nmSarana']);
+                    return $item;
+                })->toArray();
+            } else {
+                $this->saranaLov = collect(collect($getsarana)->map(function ($item) {
+                    $item['saranaId'] = $item['kdSarana'];
+                    unset($item['kdSarana']);
+                    $item['saranaDesc'] = $item['nmSarana'];
+                    unset($item['nmSarana']);
+                    return $item;
+                })->toArray())
+                    ->filter(function ($item) use ($search) {
+                        return false !== stristr($item['saranaDesc'], $search);
+                    });
+            }
+            $this->saranaLovStatus = true;
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSarana'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSaranaDesc'] = '';
+        }
+
+        $this->synJsonRJ();
+    }
+
     // /////////////////////
     // LOV selected start
     public function setMysaranaLov($id, $desc)
@@ -386,6 +616,7 @@ class FormEntryKunjungan extends Component
 
         $this->saranaLovStatus = false;
         $this->saranaLovSearch = '';
+        $this->synJsonRJ();
     }
     // LOV selected end
     // /////////////////////
@@ -419,7 +650,7 @@ class FormEntryKunjungan extends Component
                     ->where('field', '=', 'noKunjungan')
                     ->first()['message'] ?? null;
 
-                $this->FormEntry['addKunjungan']['noKunjugan'] = $noKunjungan;
+                $this->FormEntry['addKunjungan']['noKunjungan'] = $noKunjungan;
             } else {
                 $this->emit('toastr-error', json_encode($addKunjungan, true));
             }
@@ -445,8 +676,174 @@ class FormEntryKunjungan extends Component
         }
     }
 
+    public function deleteKunjunganBpjs(): void
+    {
+        try {
+            $deleteKunjungan = $this->deleteKunjungan($this->FormEntry['addKunjungan']['noKunjungan'] ?? '')
+                ->getOriginalContent();
+            if ($deleteKunjungan['metadata']['code'] === 200) {
+                $this->emit('toastr-success', $deleteKunjungan['metadata']['message']);
+                unset($this->FormEntry['dataKunjungan']);
+                unset($this->FormEntry['addKunjungan']);
+                $this->synJsonRJ();
+                $this->emit('toastr-success', 'Data Berhasil dihapus');
+            } else {
+                $this->emit('toastr-error', json_encode($deleteKunjungan, true));
+            }
+        } catch (\Exception $e) {
+            $this->emit('toastr-error', $e->getMessage());
+            return;
+        }
+    }
+
+    public function resetKunjunganBpjs(): void
+    {
+        try {
+            // ketika data kunjungan belum ter create masih bisa di reset
+            if (!isset($this->FormEntry['dataKunjungan'])) {
+                unset($this->FormEntry['addKunjungan']);
+                unset($this->FormEntry['dataKunjungan']);
+                $this->synJsonRJ();
+                $this->emit('toastr-success', 'Data Berhasil dihapus');
+            } else {
+                $this->emit('toastr-error', 'Data Kunjungan sudah di buat, anda tidak bisa me-reset data ini');
+            }
+        } catch (\Exception $e) {
+            $this->emit('toastr-error', $e->getMessage());
+            return;
+        }
+    }
 
 
+    public function getDiagnosaBpjs(): void
+    {
+        try {
+            $getDiagnosa = $this->getDiagnosa($this->FormEntry['addKunjungan']['kdDiag1'], 1, 10)
+                ->getOriginalContent();
+
+            if ($getDiagnosa['metadata']['code'] === 200) {
+                // dd($getDiagnosa['response']['list'][0]['nonSpesialis']);
+                $this->FormEntry['addKunjungan']['nonSpesialis'] = $getDiagnosa['response']['list'][0]['nonSpesialis'] ?? false;
+                $this->synJsonRJ();
+                $this->emit('toastr-success', 'syncronze nonSpesialis status ok!');
+                // dd($this->FormEntry['addKunjungan']);
+            } else {
+                $this->emit('toastr-error', json_encode($getDiagnosa, true));
+            }
+        } catch (\Exception $e) {
+            $this->emit('toastr-error', $e->getMessage());
+        }
+    }
+
+
+    // /////////faskesRujukan////////////
+    public $faskesRujukanLov = [];
+    public $faskesRujukanLovStatus = 0;
+    public $faskesRujukanLovSearch = '';
+    public function clickfaskesRujukanlov()
+    {
+        $this->faskesRujukanLovStatus = true;
+
+        $kdSubSpesialis = $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis']  ?? null;
+        $kdSarana = $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSarana'] ?? null;
+        $tglEstRujuk = $this->FormEntry['addKunjungan']['rujukLanjut']['tglEstRujuk'] ?? null;
+        $getFaskesRujukanSubSpesialis = $this->getFaskesRujukanSubSpesialis($kdSubSpesialis, $kdSarana, $tglEstRujuk)
+            ->getOriginalContent();
+
+        $this->faskesRujukanLov = $getFaskesRujukanSubSpesialis['response']['list'] ?? [];
+    }
+    public function updatedfaskesRujukanlovsearch()
+    {
+        // Variable Search
+        $search = $this->faskesRujukanLovSearch;
+
+        $kdSubSpesialis = $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis']  ?? null;
+        $kdSarana = $this->FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSarana'] ?? null;
+        $tglEstRujuk = $this->FormEntry['addKunjungan']['rujukLanjut']['tglEstRujuk'] ?? null;
+        $getFaskesRujukanSubSpesialis = $this->getFaskesRujukanSubSpesialis($kdSubSpesialis, $kdSarana, $tglEstRujuk)
+            ->getOriginalContent();
+
+        $this->faskesRujukanLov = $getFaskesRujukanSubSpesialis['response']['list'] ?? [];
+
+        // check LOV by id
+        $GetData = collect($this->faskesRujukanLov)
+            ->where('kdppk', '=', $search)
+            ->first();
+
+        if ($GetData) {
+            $this->FormEntry['addKunjungan']['rujukLanjut']['kdppk'] = $GetData['kdppk'];
+            $this->FormEntry['addKunjungan']['rujukLanjut']['nmppk'] = $GetData['nmppk'];
+            $this->FormEntry['addKunjungan']['rujukLanjut']['alamatPpk'] = $GetData['alamatPpk'];
+            $this->FormEntry['addKunjungan']['rujukLanjut']['telpPpk'] = $GetData['telpPpk'];
+            $this->FormEntry['addKunjungan']['rujukLanjut']['kelas'] = $GetData['kelas'];
+            $this->FormEntry['addKunjungan']['rujukLanjut']['nmkc'] = $GetData['nmkc'];
+            $this->FormEntry['addKunjungan']['rujukLanjut']['jadwal'] = $GetData['jadwal'];
+            $this->FormEntry['addKunjungan']['rujukLanjut']['jmlRujuk'] = $GetData['jmlRujuk'];
+            $this->FormEntry['addKunjungan']['rujukLanjut']['kapasitas'] = $GetData['kapasitas'];
+            $this->FormEntry['addKunjungan']['rujukLanjut']['persentase'] = $GetData['persentase'];
+
+
+
+
+            $this->faskesRujukanLovStatus = false;
+            $this->faskesRujukanLovSearch = '';
+        } else {
+            // if there is no id found and check (min 3 char on search)
+            if (strlen($search) < 3) {
+                $this->faskesRujukanLov = $getFaskesRujukanSubSpesialis['response']['list'] ?? [];
+            } else {
+                $this->faskesRujukanLov = collect($getFaskesRujukanSubSpesialis['response']['list'] ?? [])
+                    ->filter(function ($item) use ($search) {
+                        return false !== stristr($item['nmppk'], $search);
+                    });
+            }
+            $this->faskesRujukanLovStatus = true;
+            $this->FormEntry['addKunjungan']['rujukLanjut']['kdppk'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['nmppk'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['alamatPpk'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['telpPpk'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['kelas'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['nmkc'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['distance'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['jadwal'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['jmlRujuk'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['kapasitas'] = '';
+            $this->FormEntry['addKunjungan']['rujukLanjut']['persentase'] = '';
+        }
+        $this->synJsonRJ();
+    }
+    // /////////////////////
+    // LOV selected start
+    public function setMyfaskesRujukanLov($getData)
+    {
+        $GetData = json_decode($getData, true);
+        $this->FormEntry['addKunjungan']['rujukLanjut']['kdppk'] = $GetData['kdppk'];
+        $this->FormEntry['addKunjungan']['rujukLanjut']['nmppk'] = $GetData['nmppk'];
+        $this->FormEntry['addKunjungan']['rujukLanjut']['alamatPpk'] = $GetData['alamatPpk'];
+        $this->FormEntry['addKunjungan']['rujukLanjut']['telpPpk'] = $GetData['telpPpk'];
+        $this->FormEntry['addKunjungan']['rujukLanjut']['kelas'] = $GetData['kelas'];
+        $this->FormEntry['addKunjungan']['rujukLanjut']['nmkc'] = $GetData['nmkc'];
+        $this->FormEntry['addKunjungan']['rujukLanjut']['distance'] = $GetData['distance'];
+        $this->FormEntry['addKunjungan']['rujukLanjut']['jadwal'] = $GetData['jadwal'];
+        $this->FormEntry['addKunjungan']['rujukLanjut']['jmlRujuk'] = $GetData['jmlRujuk'];
+        $this->FormEntry['addKunjungan']['rujukLanjut']['kapasitas'] = $GetData['kapasitas'];
+        $this->FormEntry['addKunjungan']['rujukLanjut']['persentase'] = $GetData['persentase'];
+
+        $this->faskesRujukanLovStatus = false;
+        $this->faskesRujukanLovSearch = '';
+        $this->synJsonRJ();
+    }
+    // LOV selected end
+    // /////////////////////
+
+
+
+    private function synJsonRJ(): void
+    {
+        $this->updateJsonRJ($this->FormEntry['rjNo'], $this->FormEntry);
+        $this->emit('syncronizeAssessmentPerawatRJFindData');
+        $this->emit('syncronizeAssessmentDokterRJFindData');
+    }
     public function mount()
     {
         $this->findData($this->rjNoRef);

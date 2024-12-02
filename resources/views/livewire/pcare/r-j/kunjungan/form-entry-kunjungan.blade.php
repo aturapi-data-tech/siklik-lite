@@ -20,7 +20,7 @@
             @enderror
         </div> --}}
 
-        <div class="grid grid-cols-4 gap-2">
+        <div class="grid grid-cols-4 gap-2 p-2 my-1 border border-gray-300 rounded-lg">
             <div class="col-span-3">
                 <div class="text-base font-semibold text-gray-700">
                     {{ $displayPasien['pasien']['regNo'] ?? '-' }}
@@ -70,14 +70,76 @@
                     </x-light-button>
                 @endif
             </div>
+
+        </div>
+
+        <div class="flex justify-between">
+            <div class="flex justify-end px-4">
+                <div wire:loading wire:target="deleteKunjunganBpjs">
+                    <x-loading />
+                </div>
+
+                <x-red-button wire:click="deleteKunjunganBpjs()" type="button" wire:loading.remove>
+                    Delete Pcare
+                </x-red-button>
+
+                {{-- <x-red-button wire:click="getDiagnosaBpjs()" type="button" wire:loading.remove>
+                GetDiagnosa
+            </x-red-button> --}}
+            </div>
+
+            @if (!isset($FormEntry['dataKunjungan']))
+                <div class="flex justify-end px-4">
+                    <div wire:loading wire:target="resetKunjunganBpjs">
+                        <x-loading />
+                    </div>
+
+                    <x-yellow-button wire:click="resetKunjunganBpjs()" type="button" wire:loading.remove>
+                        reset Pcare
+                    </x-yellow-button>
+                </div>
+            @else
+                <livewire:component.cetak.cetak-surat-rujukan :rjNoRef="$rjNoRef"
+                    :wire:key="$rjNoRef.'cetak-surat-rujukan'">
+            @endif
+
+
+            @php
+                $tindakLanjut = $FormEntry['perencanaan']['tindakLanjut']['tindakLanjut'] ?? '';
+
+                switch ($tindakLanjut) {
+                    case '1':
+                        $tindakLanjutDesc = 'Meninggal';
+                        break;
+                    case '3':
+                        $tindakLanjutDesc = 'Berobat Jalan';
+                        break;
+                    case ' 4':
+                        $tindakLanjutDesc = 'Rujuk Vertikal';
+                        break;
+                    case '6':
+                        $tindakLanjutDesc = 'Rujuk Horizontal';
+                        break;
+                    case 'A':
+                        $tindakLanjutDesc = 'Rujuk Atas Permintaan Sendiri (APS)';
+                        break;
+                    default:
+                        $tindakLanjutDesc = '-';
+                }
+            @endphp
+
+            <div class="text-2xl font-semibold text-gray-700">
+                {{ $tindakLanjutDesc ?? '' }}
+            </div>
         </div>
 
         <x-border-form title="Kunjungan" align="start" bordercolor="border-gray-300" bgcolor="bg-white">
 
-            <div class="grid grid-cols-4 gap-2">
+            <div class="grid grid-cols-4 gap-2 p-2 my-1 border border-gray-300 rounded-lg">
                 <div class="flex">
                     <x-input-label for="FormEntry.addKunjungan.noKunjugan" :value="__('No Kunjungan')" :required="__($errors->has('FormEntry.addKunjungan.noKunjugan'))" />
-                    <p class="ml-2 font-normal text-primary">{{ $FormEntry['addKunjungan']['noKunjugan'] }}
+                    <p class="ml-2 font-normal text-primary">
+                        {{ $FormEntry['addKunjungan']['noKunjugan'] ?? '' }}
                     </p>
                 </div>
 
@@ -107,11 +169,12 @@
                 Pemeriksaan
             </div>
 
-            <div class="grid grid-cols-4 gap-2">
+            <div class="grid grid-cols-4 gap-2 p-2 my-1 border border-gray-300 rounded-lg">
 
                 <div class="flex">
                     <x-input-label for="FormEntry.addKunjungan.keluhan" :value="__('Keluhan')" :required="__($errors->has('FormEntry.addKunjungan.keluhan'))" />
-                    <p class="ml-2 font-normal text-primary">{{ $FormEntry['addKunjungan']['keluhan'] ?? '' }}
+                    <p class="ml-2 font-normal text-primary">
+                        {{ $FormEntry['addKunjungan']['keluhan'] ?? '' }}
                     </p>
                 </div>
 
@@ -124,7 +187,7 @@
             </div>
 
 
-            <div class="grid grid-cols-4 gap-2">
+            <div class="grid grid-cols-4 gap-2 p-2 my-1 border border-gray-300 rounded-lg">
                 <div class="flex">
                     <x-input-label for="FormEntry.addKunjungan.alergiMakanan" :value="__('Alergi Makanan')" :required="__($errors->has('FormEntry.addKunjungan.alergiMakanan'))" />
                     <p class="ml-2 font-normal text-primary">
@@ -147,15 +210,16 @@
                 </div>
 
             </div>
-
-            <div class="flex">
-                <x-input-label for="FormEntry.addKunjungan.kdPrognosa" :value="__('Prognosa')" :required="__($errors->has('FormEntry.addKunjungan.kdPrognosa'))" />
-                <p class="ml-2 font-normal text-primary">
-                    {{ $FormEntry['addKunjungan']['kdPrognosa'] ?? '' }}{{ $this->FormEntry['perencanaan']['prognosa']['prognosaDesc'] ?? '' }}
-                </p>
+            <div class="grid grid-cols-2 gap-2 p-2 my-1 border border-gray-300 rounded-lg">
+                <div class="flex">
+                    <x-input-label for="FormEntry.addKunjungan.kdPrognosa" :value="__('Prognosa')" :required="__($errors->has('FormEntry.addKunjungan.kdPrognosa'))" />
+                    <p class="ml-2 font-normal text-primary">
+                        {{ $FormEntry['addKunjungan']['kdPrognosa'] ?? '' }}{{ $this->FormEntry['perencanaan']['prognosa']['prognosaDesc'] ?? '' }}
+                    </p>
+                </div>
             </div>
 
-            <div class="grid grid-cols-4 gap-2">
+            <div class="grid grid-cols-4 gap-2 p-2 my-1 border border-gray-300 rounded-lg">
                 <div class="flex">
                     <x-input-label for="FormEntry.addKunjungan.terapiObat" :value="__('Terapi')" :required="__($errors->has('FormEntry.addKunjungan.terapiObat'))" />
                     <p class="ml-2 font-normal text-primary">
@@ -171,7 +235,7 @@
                 </div>
             </div>
 
-            <div class="flex">
+            {{-- <div class="flex">
                 <x-input-label for="FormEntry.addKunjungan.bmhp" :value="__('bmhp')" :required="__($errors->has('FormEntry.addKunjungan.bmhp'))" />
                 <d class="ml-2"iv class="flex items-center mb-2">
                     <x-text-input id="FormEntry.addKunjungan.bmhp" placeholder="bmhp" class="mt-1 ml-2"
@@ -180,17 +244,23 @@
                 @error('FormEntry.addKunjungan.bmhp')
                     <x-input-error :messages=$message />
                 @enderror
-            </div>
+            </div> --}}
 
-            <div class="grid grid-cols-4 gap-2">
+            <div class="grid grid-cols-2 gap-2 p-2 my-1 border border-gray-300 rounded-lg">
                 <div class="flex">
                     <x-input-label for="FormEntry.addKunjungan.kdDiag1" :value="__('Diag1')" :required="__($errors->has('FormEntry.addKunjungan.kdDiag1'))" />
                     <p class="ml-2 font-normal text-primary">
                         {{ $FormEntry['addKunjungan']['kdDiag1'] ?? '' }}{{ $this->FormEntry['diagnosis'][0]['diagDesc'] ?? '' }}
                     </p>
+
+                </div>
+                <div>
+                    <p>
+                        {{ isset($this->FormEntry['addKunjungan']['nonSpesialis']) ? 'Non Spesialis' : 'Spesialis' }}
+                    </p>
                 </div>
 
-                <div class="flex">
+                {{-- <div class="flex">
                     <x-input-label for="FormEntry.addKunjungan.kdDiag2" :value="__('Diag2')" :required="__($errors->has('FormEntry.addKunjungan.kdDiag2'))" />
                     <p class="ml-2 font-normal text-primary">
                         {{ $FormEntry['addKunjungan']['kdDiag2'] ?? '' }}{{ $this->FormEntry['diagnosis'][1]['diagDesc'] ?? '' }}
@@ -202,28 +272,30 @@
                     <p class="ml-2 font-normal text-primary">
                         {{ $FormEntry['addKunjungan']['kdDiag3'] ?? '' }}{{ $this->FormEntry['diagnosis'][2]['diagDesc'] ?? '' }}
                     </p>
-                </div>
+                </div> --}}
             </div>
 
 
 
 
-
-            <div class="flex">
-                <x-input-label for="FormEntry.addKunjungan.kdSadar" :value="__('Tingkat Kesadaran')" :required="__($errors->has('FormEntry.addKunjungan.kdSadar'))" />
-                <p class="ml-2 font-normal text-primary">
-                    {{ $FormEntry['addKunjungan']['kdSadar'] ?? '' }}{{ $this->FormEntry['pemeriksaan']['tandaVital']['tingkatKesadaranDesc'] ?? '' }}
-                </p>
+            <div class="grid grid-cols-2 gap-2 p-2 my-1 border border-gray-300 rounded-lg">
+                <div class="flex">
+                    <x-input-label for="FormEntry.addKunjungan.kdSadar" :value="__('Tingkat Kesadaran')" :required="__($errors->has('FormEntry.addKunjungan.kdSadar'))" />
+                    <p class="ml-2 font-normal text-primary">
+                        {{ $FormEntry['addKunjungan']['kdSadar'] ?? '' }}{{ $this->FormEntry['pemeriksaan']['tandaVital']['tingkatKesadaranDesc'] ?? '' }}
+                    </p>
+                </div>
             </div>
 
             <div class="my-2 text-2xl font-bold text-gray-700">
                 Tanda Vital
             </div>
 
-            <div class="grid grid-cols-4 gap-2">
+            <div class="grid grid-cols-4 gap-2 p-2 my-1 border border-gray-300 rounded-lg">
                 <div class="flex">
                     <x-input-label for="FormEntry.addKunjungan.suhu" :value="__('Suhu')" :required="__($errors->has('FormEntry.addKunjungan.suhu'))" />
-                    <p class="ml-2 font-normal text-primary">{{ $FormEntry['addKunjungan']['suhu'] ?? '' }}
+                    <p class="ml-2 font-normal text-primary">
+                        {{ $FormEntry['addKunjungan']['suhu'] ?? '' }}
                     </p>
                 </div>
 
@@ -254,7 +326,7 @@
                 Tekanan Darah
             </div>
 
-            <div class="grid grid-cols-4 gap-2">
+            <div class="grid grid-cols-4 gap-2 p-2 my-1 border border-gray-300 rounded-lg">
                 <div class="flex">
                     <x-input-label for="FormEntry.addKunjungan.sistole" :value="__('sistole')" :required="__($errors->has('FormEntry.addKunjungan.sistole'))" />
                     <p class="ml-2 font-normal text-primary">
@@ -287,7 +359,10 @@
 
 
         {{-- inap jalan --}}
-        @if ($this->FormEntry['addKunjungan']['kdStatusPulang'] === '4')
+        @php
+            $kdStatusPulang = $this->FormEntry['addKunjungan']['kdStatusPulang'] ?? '';
+        @endphp
+        @if ($kdStatusPulang === '4')
             <x-border-form title="Rujuk Lanjut" align="start" bordercolor="border-gray-300" bgcolor="bg-white">
 
                 {{-- <div>
@@ -302,111 +377,188 @@
                     <x-input-error :messages=$message />
                 @enderror
             </div> --}}
+                <div class="grid grid-cols-4 gap-2 p-2 my-1 border border-gray-300 rounded-lg">
+                    {{-- <div>
+                        <x-input-label for="FormEntry.addKunjungan.rujukLanjut.kdppk" :value="__('kdppk')"
+                            :required="__($errors->has('FormEntry.addKunjungan.rujukLanjut.kdppk'))" />
 
-                <div>
-                    <x-input-label for="FormEntry.addKunjungan.rujukLanjut.kdppk" :value="__('kdppk')"
-                        :required="__($errors->has('FormEntry.addKunjungan.rujukLanjut.kdppk'))" />
+                        <div class="flex ">
+                            <x-text-input placeholder="Provider" class="sm:rounded-none sm:rounded-l-lg"
+                                :errorshas="__($errors->has('FormEntry.addKunjungan.rujukLanjut.kdppk'))" :disabled=true
+                                value="{{ $FormEntry['addKunjungan']['rujukLanjut']['kdppk'] ?? '' }}{{ ' / ' }}{{ $FormEntry['addKunjungan']['rujukLanjut']['kdppkDesc'] ?? '' }}" />
 
-                    <div class="flex ">
-                        <x-text-input placeholder="Provider" class="sm:rounded-none sm:rounded-l-lg"
-                            :errorshas="__($errors->has('FormEntry.addKunjungan.rujukLanjut.kdppk'))" :disabled=true
-                            value="{{ $FormEntry['addKunjungan']['rujukLanjut']['kdppk'] ?? '' }}{{ ' / ' }}{{ $FormEntry['addKunjungan']['rujukLanjut']['kdppkDesc'] ?? '' }}" />
-
-                        <x-green-button :disabled=$disabledProperty
-                            class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
-                            wire:click.prevent="clickproviderlov()">
-                            <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                <path clip-rule="evenodd" fill-rule="evenodd"
-                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                            </svg>
-                        </x-green-button>
-                    </div>
+                            <x-green-button :disabled=$disabledProperty
+                                class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                wire:click.prevent="clickproviderlov()">
+                                <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path clip-rule="evenodd" fill-rule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                </svg>
+                            </x-green-button>
+                        </div> --}}
                     {{-- LOV provider --}}
 
-                    @include('livewire.component.l-o-v.p-care.list-of-value-provider.list-of-value-provider')
+                    {{-- @include('livewire.component.l-o-v.p-care.list-of-value-provider.list-of-value-provider')
 
-                    @error('FormEntry.addKunjungan.rujukLanjut.kdppk')
-                        <x-input-error :messages=$message />
-                    @enderror
+                        @error('FormEntry.addKunjungan.rujukLanjut.kdppk')
+                            <x-input-error :messages=$message />
+                        @enderror
 
-                </div>
+                    </div> --}}
 
-                <div>
-                    <x-input-label for="FormEntry.addKunjungan.rujukLanjut.tglEstRujuk" :value="__('tglEstRujuk')"
-                        :required="__($errors->has('FormEntry.addKunjungan.rujukLanjut.tglEstRujuk'))" />
-                    <div class="flex items-center mb-2">
-                        <x-text-input id="FormEntry.addKunjungan.rujukLanjut.tglEstRujuk" placeholder="tglEstRujuk"
-                            class="mt-1 ml-2" :errorshas="__($errors->has('FormEntry.addKunjungan.rujukLanjut.tglEstRujuk'))" :disabled=$disabledPropertyId
-                            wire:model="FormEntry.addKunjungan.rujukLanjut.tglEstRujuk" />
+                    <div>
+                        <x-input-label for="FormEntry.addKunjungan.rujukLanjut.tglEstRujuk" :value="__('tglEstRujuk')"
+                            :required="__($errors->has('FormEntry.addKunjungan.rujukLanjut.tglEstRujuk'))" />
+                        <div class="flex items-center mb-2">
+                            <x-text-input id="FormEntry.addKunjungan.rujukLanjut.tglEstRujuk"
+                                placeholder="[dd-mm-yyyy]" class="ml-2" :errorshas="__($errors->has('FormEntry.addKunjungan.rujukLanjut.tglEstRujuk'))"
+                                :disabled=$disabledPropertyId
+                                wire:model="FormEntry.addKunjungan.rujukLanjut.tglEstRujuk" />
+                        </div>
+                        @error('FormEntry.addKunjungan.rujukLanjut.tglEstRujuk')
+                            <x-input-error :messages=$message />
+                        @enderror
                     </div>
-                    @error('FormEntry.addKunjungan.rujukLanjut.tglEstRujuk')
-                        <x-input-error :messages=$message />
-                    @enderror
-                </div>
 
-                <div>
-                    <x-input-label for="FormEntry.addKunjungan.rujukLanjut.subSpesialis.kdSubSpesialis1"
-                        :value="__('kdSubSpesialis1')" :required="__($errors->has('FormEntry.addKunjungan.rujukLanjut.subSpesialis.kdSubSpesialis1'))" />
+                    <div>
+                        <div>
+                            <x-input-label for="FormEntry.addKunjungan.rujukLanjut.subSpesialis.kdSpesialis"
+                                :value="__('kdSpesialis')" :required="__(
+                                    $errors->has('FormEntry.addKunjungan.rujukLanjut.subSpesialis.kdSpesialis'),
+                                )" />
 
-                    <div class="flex ">
-                        <x-text-input placeholder="Spesialis" class="sm:rounded-none sm:rounded-l-lg"
-                            :errorshas="__(
-                                $errors->has('FormEntry.addKunjungan.rujukLanjut.subSpesialis.kdSubSpesialis1'),
-                            )" :disabled=true
-                            value="{{ $FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis1'] ?? '' }}{{ ' / ' }}{{ $FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis1Desc'] ?? '' }}" />
+                            <div class="flex ">
+                                <x-text-input placeholder="Spesialis" class="sm:rounded-none sm:rounded-l-lg"
+                                    :errorshas="__(
+                                        $errors->has('FormEntry.addKunjungan.rujukLanjut.subSpesialis.kdSpesialis'),
+                                    )" :disabled=true
+                                    value="{{ $FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSpesialis'] ?? '' }}{{ ' / ' }}{{ $FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSpesialisDesc'] ?? '' }}" />
 
-                        <x-green-button :disabled=$disabledProperty
-                            class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
-                            wire:click.prevent="clickspesialislov()">
-                            <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                <path clip-rule="evenodd" fill-rule="evenodd"
-                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                            </svg>
-                        </x-green-button>
+                                <x-green-button :disabled=$disabledProperty
+                                    class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                    wire:click.prevent="clickspesialislov()">
+                                    <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path clip-rule="evenodd" fill-rule="evenodd"
+                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                    </svg>
+                                </x-green-button>
+                            </div>
+                            {{-- LOV spesialis --}}
+
+                            @include('livewire.component.l-o-v.p-care.list-of-value-spesialis.list-of-value-spesialis')
+
+                            @error('FormEntry.addKunjungan.rujukLanjut.subSpesialis.kdSpesialis')
+                                <x-input-error :messages=$message />
+                            @enderror
+                        </div>
+
+                        <div>
+                            <x-input-label for="FormEntry.addKunjungan.rujukLanjut.subSpesialis.kdSubSpesialis1"
+                                :value="__('kdSubSpesialis1')" :required="__(
+                                    $errors->has('FormEntry.addKunjungan.rujukLanjut.subSpesialis.kdSubSpesialis1'),
+                                )" />
+
+                            <div class="flex ">
+                                <x-text-input placeholder="Spesialis" class="sm:rounded-none sm:rounded-l-lg"
+                                    :errorshas="__(
+                                        $errors->has('FormEntry.addKunjungan.rujukLanjut.subSpesialis.kdSubSpesialis1'),
+                                    )" :disabled=true
+                                    value="{{ $FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis1'] ?? '' }}{{ ' / ' }}{{ $FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSubSpesialis1Desc'] ?? '' }}" />
+
+                                <x-green-button :disabled=$disabledProperty
+                                    class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                    wire:click.prevent="clicksubSpesialislov()" wire:loading.remove>
+                                    <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path clip-rule="evenodd" fill-rule="evenodd"
+                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                    </svg>
+                                </x-green-button>
+
+                                <div wire:loading wire:target="clicksubSpesialislov">
+                                    <x-loading />
+                                </div>
+                            </div>
+                            {{-- LOV spesialis --}}
+
+                            @include('livewire.component.l-o-v.p-care.list-of-value-sub-spesialis.list-of-value-sub-spesialis')
+
+                            @error('FormEntry.addKunjungan.rujukLanjut.subSpesialis.kdSubSpesialis1')
+                                <x-input-error :messages=$message />
+                            @enderror
+                        </div>
                     </div>
-                    {{-- LOV spesialis --}}
 
-                    @include('livewire.component.l-o-v.p-care.list-of-value-spesialis.list-of-value-spesialis')
+                    <div>
+                        <x-input-label for="FormEntry.addKunjungan.rujukLanjut.subSpesialis.kdSarana"
+                            :value="__('kdSarana')" :required="__($errors->has('FormEntry.addKunjungan.rujukLanjut.subSpesialis.kdSarana'))" />
 
-                    @error('FormEntry.addKunjungan.rujukLanjut.subSpesialis.kdSubSpesialis1')
-                        <x-input-error :messages=$message />
-                    @enderror
-                </div>
+                        <div class="flex ">
+                            <x-text-input placeholder="kdSarana" class="sm:rounded-none sm:rounded-l-lg"
+                                :errorshas="__($errors->has('FormEntry.addKunjungan.rujukLanjut.subSpesialis.kdSarana'))" :disabled=true
+                                value="{{ $FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSarana'] ?? '' }}{{ ' / ' }}{{ $FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSaranaDesc'] ?? '' }}" />
 
-                <div>
-                    <x-input-label for="FormEntry.addKunjungan.rujukLanjut.subSpesialis.kdSarana" :value="__('kdSarana')"
-                        :required="__($errors->has('FormEntry.addKunjungan.rujukLanjut.subSpesialis.kdSarana'))" />
+                            <x-green-button :disabled=$disabledProperty
+                                class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                wire:click.prevent="clicksaranalov()">
+                                <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path clip-rule="evenodd" fill-rule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                </svg>
+                            </x-green-button>
+                        </div>
+                        {{-- LOV sarana --}}
 
-                    <div class="flex ">
-                        <x-text-input placeholder="kdSarana" class="sm:rounded-none sm:rounded-l-lg"
-                            :errorshas="__($errors->has('FormEntry.addKunjungan.rujukLanjut.subSpesialis.kdSarana'))" :disabled=true
-                            value="{{ $FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSarana'] ?? '' }}{{ ' / ' }}{{ $FormEntry['addKunjungan']['rujukLanjut']['subSpesialis']['kdSaranaDesc'] ?? '' }}" />
+                        @include('livewire.component.l-o-v.p-care.list-of-value-sarana.list-of-value-sarana')
 
-                        <x-green-button :disabled=$disabledProperty
-                            class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
-                            wire:click.prevent="clicksaranalov()">
-                            <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                <path clip-rule="evenodd" fill-rule="evenodd"
-                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                            </svg>
-                        </x-green-button>
+                        @error('FormEntry.addKunjungan.rujukLanjut.subSpesialis.kdSarana')
+                            <x-input-error :messages=$message />
+                        @enderror
                     </div>
-                    {{-- LOV sarana --}}
 
-                    @include('livewire.component.l-o-v.p-care.list-of-value-sarana.list-of-value-sarana')
 
-                    @error('FormEntry.addKunjungan.rujukLanjut.subSpesialis.kdSarana')
-                        <x-input-error :messages=$message />
-                    @enderror
+
+                    <div>
+                        <x-input-label for="FormEntry.addKunjungan.rujukLanjut.kdppk" :value="__('kdppk')"
+                            :required="__($errors->has('FormEntry.addKunjungan.rujukLanjut.kdppk'))" />
+
+                        <div class="flex ">
+                            <x-text-input placeholder="clickfaskesRujukanlov" class="sm:rounded-none sm:rounded-l-lg"
+                                :errorshas="__($errors->has('FormEntry.addKunjungan.rujukLanjut.kdppk'))" :disabled=true
+                                value="{{ $FormEntry['addKunjungan']['rujukLanjut']['kdppk'] ?? '' }}{{ ' / ' }}{{ $FormEntry['addKunjungan']['rujukLanjut']['nmppk'] ?? '' }}" />
+
+                            <div wire:loading wire:target="clickfaskesRujukanlov">
+                                <x-loading />
+                            </div>
+
+                            <x-green-button :disabled=$disabledProperty
+                                class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                wire:click.prevent="clickfaskesRujukanlov()" wire:loading.remove>
+                                <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path clip-rule="evenodd" fill-rule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                </svg>
+                            </x-green-button>
+                        </div>
+                        {{-- LOV faskes-rujukan --}}
+
+                        @include('livewire.component.l-o-v.p-care.list-of-value-faskes-rujukan.list-of-value-faskes-rujukan')
+
+                        @error('FormEntry.addKunjungan.rujukLanjut.kdppk')
+                            <x-input-error :messages=$message />
+                        @enderror
+
+                    </div>
+
                 </div>
-
 
                 {{-- tacc --}}
 
-                <div>
+                {{-- <div>
                     <x-input-label for="FormEntry.addKunjungan.kdTacc" :value="__('kdTacc')" :required="__($errors->has('FormEntry.addKunjungan.kdTacc'))" />
                     <div class="flex items-center mb-2">
                         <x-text-input id="FormEntry.addKunjungan.kdTacc" placeholder="kdTacc" class="mt-1 ml-2"
@@ -428,27 +580,29 @@
                     @error('FormEntry.addKunjungan.alasanTacc')
                         <x-input-error :messages=$message />
                     @enderror
-                </div>
+                </div> --}}
+                {{-- jika dia termasuk diagnosa NonSpesialistik atau false baru mucullkan --}}
+                @if ($this->FormEntry['addKunjungan']['nonSpesialis'] ?? false)
+                    <div class="grid grid-cols-1 gap-2 p-2 my-1 mt-2 ml-2 border border-gray-300 rounded-lg">
+                        @foreach ($refTacc as $tacc)
+                            <x-radio-button :label="__($tacc['nmTacc'] . ' / ' . $tacc['kdTacc'])" value="{{ $tacc['kdTacc'] }}"
+                                wire:model="FormEntry.addKunjungan.kdTacc" />
 
-                <div class="grid grid-cols-1 gap-2 mt-2 ml-2">
-                    @foreach ($refTacc as $tacc)
-                        <x-radio-button :label="__($tacc['nmTacc'] . ' / ' . $tacc['kdTacc'])" value="{{ $tacc['kdTacc'] }}"
-                            wire:model="FormEntry.addKunjungan.kdTacc" />
+                            <div class="grid grid-cols-4 gap-2 p-2 mx-4 my-1 border border-gray-300 rounded-lg ">
+                                @php
+                                    $kdTacc = $FormEntry['addKunjungan']['kdTacc'] ?? '';
+                                @endphp
+                                @if ($kdTacc === $tacc['kdTacc'])
+                                    @foreach ($tacc['alasanTacc'] as $key => $alasanTacc)
+                                        <x-radio-button :label="__($alasanTacc)" value="{{ $alasanTacc }}"
+                                            wire:model="FormEntry.addKunjungan.alasanTacc" />
+                                    @endforeach
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
 
-                        <div class="grid grid-cols-4 gap-2 mx-4 ">
-                            @php
-                                $kdTacc = $FormEntry['addKunjungan']['kdTacc'] ?? '';
-                            @endphp
-                            @if ($kdTacc === $tacc['kdTacc'])
-                                @foreach ($tacc['alasanTacc'] as $key => $alasanTacc)
-                                    <x-radio-button :label="__($alasanTacc)" value="{{ $alasanTacc }}"
-                                        wire:model="FormEntry.addKunjungan.alasanTacc" />
-                                @endforeach
-                            @endif
-                        </div>
-                    @endforeach
-
-                </div>
             </x-border-form>
         @endif
 

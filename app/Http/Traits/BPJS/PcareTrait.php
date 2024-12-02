@@ -44,9 +44,11 @@ trait PcareTrait
                 'code' => $code,
             ],
         ];
+
         if (!empty($errorMessages)) {
             $response['response'] = $errorMessages;
         }
+
         // Insert webLogStatus
         DB::table('web_log_status')->insert([
             'code' =>  $code,
@@ -466,6 +468,147 @@ trait PcareTrait
         }
     }
 
+    private function getDiagnosa($kodeNamaDiagnosa, $start, $end)
+    {
+        // Parameter 1 : Kode atau nama diagnosa
+
+        // Parameter 2 : Row data awal yang akan ditampilkan
+
+        // Parameter 3 : Limit jumlah data yang akan ditampilkan
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+
+        // Masukkan Nilai dari parameter
+        $r = [
+            'start' => $start,
+            'end' => $end,
+            'kodeNamaDiagnosa' => $kodeNamaDiagnosa
+        ];
+        // lakukan validasis
+        $validator = Validator::make($r, [
+            "start" => "required|numeric",
+            "end" => "required|numeric",
+            "kodeNamaDiagnosa" => "required"
+        ], $messages);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 201, null, null);
+        }
+
+
+
+        // handler when time out and off line mode
+        try {
+
+            $url = env('PCARE_URL') . "diagnosa/" . $kodeNamaDiagnosa . "/" . $start . "/" . $end;
+            $signature = $this->signature();
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->get($url);
+
+
+            // dd($response->transferStats->getTransferTime()); Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
+        }
+    }
+
+
+    private function getReferensiSubSpesialis($kodeSpesialis)
+    {
+        // Content-Type: application/json; charset=utf-8
+
+        // Parameter 1 : Kode Spesialis
+        $messages = customErrorMessagesTrait::messages();
+
+        // Masukkan Nilai dari parameter
+        $r = [
+            'kodeSpesialis' => $kodeSpesialis,
+
+        ];
+        // lakukan validasis
+        $validator = Validator::make($r, [
+            "kodeSpesialis" => "required",
+        ], $messages);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 201, null, null);
+        }
+
+
+
+        // handler when time out and off line mode
+        try {
+            $url = env('PCARE_URL') . "spesialis/" . $kodeSpesialis . "/subspesialis";
+
+            $signature = $this->signature();
+            $signature['Content-Type'] = 'application/json; charset=utf-8';
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->get($url);
+
+            // dd($response->getBody()->getContents()); //Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
+        }
+    }
+
+    private function getFaskesRujukanSubSpesialis($kodeSubspesialis, $kdSarana, $tglEstRujuk)
+    {
+        // Content-Type: application/json; charset=utf-8
+
+        // Parameter 1 : Kode Sub Spesialis
+
+        // Parameter 2 : Kode Sarana
+
+        // Parameter 3 : Tanggal Estimasi Rujuk, format: dd-mm-yyyy
+        $messages = customErrorMessagesTrait::messages();
+
+        // Masukkan Nilai dari parameter
+        $r = [
+            'kodeSubspesialis' => $kodeSubspesialis,
+            'kdSarana' => $kdSarana,
+            'tglEstRujuk' => $tglEstRujuk,
+        ];
+        // lakukan validasis
+        $validator = Validator::make($r, [
+            "kodeSubspesialis" => "required",
+            // "kdSarana" => "required",
+            "tglEstRujuk" => "required|date_format:d-m-Y",
+        ], $messages);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 201, null, null);
+        }
+
+
+
+        // handler when time out and off line mode
+        try {
+            $url = env('PCARE_URL') . "spesialis/rujuk/subspesialis/" . $kodeSubspesialis . "/sarana/" . $kdSarana . "/tglEstRujuk/" . $tglEstRujuk;
+
+            $signature = $this->signature();
+            // $signature['Content-Type'] = 'application/json; charset=utf-8';
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->get($url);
+
+            // dd($response->getBody()->getContents()); //Get Transfertime request
+            // dd($response->transferStats->getTransferTime()); Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
+        }
+    }
+
 
     // Get Peserta
     private function getPesertabyJenisKartu($jenisKartu, $nikNoka)
@@ -705,6 +848,12 @@ trait PcareTrait
 
         // Masukkan Nilai dari parameter
         $r = $data;
+        // $r['rujukLanjut']['subSpesialis']['kdSarana'] = 9;
+        $r['rujukLanjut']['khusus'] = null;
+
+
+        // dd($r);
+
         $rules = [
             "noKunjungan" => "",
             "noKartu" => "",
@@ -842,6 +991,41 @@ trait PcareTrait
             $response = Http::timeout(10)
                 ->withHeaders($signature)
                 ->put($url, $r);
+
+            // dd($response->getBody()->getContents()); //Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
+        }
+    }
+
+    private function deleteKunjungan(string $noKunjungan = '')
+    {
+        //parameter 1: 01:Makanan, 02:Udara, 03:Obat
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+
+        // Masukkan Nilai dari parameter
+        $r = ["noKunjungan" => $noKunjungan];
+        $rules = ["noKunjungan" => "required"];
+        // lakukan validasis
+        $validator = Validator::make($r, $rules, $messages);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 400, null, null);
+        }
+
+        // handler when time out and off line mode
+        try {
+
+            $url = env('PCARE_URL') . "kunjungan/" . $noKunjungan;
+            $signature = $this->signature();
+            $signature['Content-Type'] = 'text/plain';
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->delete($url);
 
             // dd($response->getBody()->getContents()); //Get Transfertime request
             // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
