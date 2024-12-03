@@ -25,7 +25,7 @@
 
                     <x-theme-line :themeline="__('3')"></x-theme-line>
 
-                    @role(['Dokter', 'Perawat', 'Mr', 'Admin'])
+                    @role(['Dokter', 'Perawat', 'Mr', 'Admin', 'Apoteker'])
                         <li class="border border-gray-300 rounded-lg shadow-lg shadow-gray-500/5">
 
                             <button type="button"
