@@ -380,7 +380,7 @@ class FormEntryDaftarRJ extends Component
                     // noUrutAntrian (count all kecuali KRonis) if KR 999
                     $noUrutAntrian = DB::table('rstxn_rjhdrs')
                         ->where('dr_id', '=', $this->FormEntry['drId'])
-                        ->where(DB::row("to_char(rj_date, 'ddmmyyyy')"), '=', Carbon::createFromFormat('d/m/Y H:i:s', $this->FormEntry['rjDate'], env('APP_TIMEZONE'))->format('dmY'))
+                        ->where(DB::raw("to_char(rj_date, 'ddmmyyyy')"), '=', Carbon::createFromFormat('d/m/Y H:i:s', $this->FormEntry['rjDate'], env('APP_TIMEZONE'))->format('dmY'))
                         ->where('klaim_id', '!=', 'KR')
                         ->count();
 
