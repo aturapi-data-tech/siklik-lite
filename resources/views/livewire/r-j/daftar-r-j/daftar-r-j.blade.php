@@ -349,6 +349,138 @@
 
 
 
+
+
+    <div class="h-[calc(100vh-250px)] mt-2 overflow-auto bg-white">
+        {{-- Top Bar --}}
+        <div class="flex justify-between">
+
+            <div class="flex w-full">
+            </div>
+
+            <div class="flex justify-end w-1/2">
+                <x-primary-button wire:click="getPedaftaranProviderBPJS('{{ $dateRjRef }}', 1, 15)"
+                    class="flex justify-center" wire:loading.remove>
+                    <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    Pendaftaran Provider
+                </x-primary-button>
+
+                <div wire:loading wire:key="loadingcloseModal" wire:target="getPedaftaranProviderBPJS">
+                    <x-loading />
+                </div>
+            </div>
+        </div>
+        <div class="h-[calc(100vh-250px)] mt-2 overflow-auto">
+            <!-- Table -->
+            <div class="flex flex-col mt-2">
+                <div class="overflow-x-auto rounded-lg">
+                    <div class="inline-block min-w-full align-middle">
+                        <div class="overflow-hidden shadow sm:rounded-lg">
+                            <table class="w-full text-sm text-left text-gray-900 table-auto dark:text-gray-400">
+                                <thead
+                                    class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                    <tr>
+                                        <th scope="col" class="px-4 py-3">No Urut</th>
+                                        <th scope="col" class="px-4 py-3">Tgl Daftar</th>
+                                        <th scope="col" class="px-4 py-3">Peserta</th>
+                                        <th scope="col" class="px-4 py-3">Poli</th>
+                                        <th scope="col" class="px-4 py-3">Keluhan</th>
+                                        <th scope="col" class="px-4 py-3">Status</th>
+                                        <th scope="col" class="px-4 py-3 text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white dark:bg-gray-800">
+                                    @if (isset($pendaftaranProvider['response']['list']) && count($pendaftaranProvider['response']['list']) > 0)
+                                        @foreach ($pendaftaranProvider['response']['list'] as $data)
+                                            <tr class="border-b group dark:border-gray-700">
+                                                <!-- No Urut -->
+                                                <td class="px-4 py-3 group-hover:bg-gray-100">
+                                                    {{ $data['noUrut'] }}
+                                                </td>
+                                                <!-- Tgl Daftar -->
+                                                <td class="px-4 py-3 group-hover:bg-gray-100">
+                                                    {{ $data['tgldaftar'] }}
+                                                </td>
+                                                <!-- Peserta -->
+                                                <td class="px-4 py-3 group-hover:bg-gray-100">
+                                                    <div>
+                                                        <div class="font-semibold text-primary">
+                                                            {{ $data['peserta']['noKartu'] }}
+                                                        </div>
+                                                        <div class="font-semibold text-gray-900">
+                                                            {{ $data['peserta']['nama'] }} /
+                                                            ({{ $data['peserta']['sex'] }})
+                                                        </div>
+                                                        <div class="font-normal text-gray-900">
+                                                            Tgl Lahir: {{ $data['peserta']['tglLahir'] }}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <!-- Poli -->
+                                                <td class="px-4 py-3 group-hover:bg-gray-100">
+                                                    <div>
+                                                        <div class="font-semibold text-primary">
+                                                            {{ $data['poli']['nmPoli'] }}
+                                                        </div>
+                                                        <div class="font-normal text-gray-900">
+                                                            Kode: {{ $data['poli']['kdPoli'] }}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <!-- Keluhan -->
+                                                <td class="px-4 py-3 group-hover:bg-gray-100">
+                                                    {{ $data['keluhan'] ? $data['keluhan'] : '-' }}
+                                                </td>
+                                                <!-- Status & Kunjungan -->
+                                                <td class="px-4 py-3 group-hover:bg-gray-100">
+                                                    <div class="font-semibold text-primary">
+                                                        {{ $data['status'] }}
+                                                    </div>
+                                                    <div class="text-sm text-gray-700">
+                                                        @if ($data['kunjSakit'])
+                                                            Kunjungan: Sakit
+                                                        @else
+                                                            Kunjungan: Sehat
+                                                        @endif
+                                                    </div>
+                                                </td>
+                                                <!-- Action -->
+                                                <td class="px-4 py-3 text-center group-hover:bg-gray-100">
+                                                    <div class="inline-flex">
+                                                        <button class="text-blue-500 hover:underline">Detail</button>
+                                                        <button
+                                                            class="ml-2 text-green-500 hover:underline">Edit</button>
+                                                        <button
+                                                            class="ml-2 text-red-500 hover:underline">Hapus</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @else
+                                        <tr>
+                                            <td colspan="7"
+                                                class="px-4 py-3 text-center text-gray-900 dark:text-gray-400">
+                                                Data Pendaftaran tidak ditemukan
+                                            </td>
+                                        </tr>
+                                    @endif
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
     {{-- Canvas
     Main BgColor /
     Size H/W --}}

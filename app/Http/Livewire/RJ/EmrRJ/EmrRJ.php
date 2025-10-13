@@ -359,6 +359,10 @@ class EmrRJ extends Component
             'ermMenuName' => 'Pelayanan Penunjang'
         ],
         [
+            'ermMenuId' => 'administrasi',
+            'ermMenuName' => 'Administrasi'
+        ],
+        [
             'ermMenuId' => 'rekamMedis',
             'ermMenuName' => 'Resume Medis'
         ],

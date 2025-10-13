@@ -38,7 +38,9 @@ class Pemeriksaan extends Component
         "umumTab" => "Umum",
         "tandaVital" => [
             "keadaanUmum" => "",
-            "tingkatKesadaran" => "",
+            "tingkatKesadaran" => "01",
+            "tingkatKesadaranDesc" => "Compos mentis",
+
             // "tingkatKesadaranOptions" => [
             //     ["tingkatKesadaran" => "Sadar Baik / Alert"],
             //     ["tingkatKesadaran" => "Berespon Dengan Kata-Kata / Voice"],
@@ -505,21 +507,90 @@ class Pemeriksaan extends Component
 
 
     protected $rules = [
-        // 'dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik' => 'required|numeric',
-        // 'dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik' => 'required|numeric',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi' => 'required|numeric',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas' => 'required|numeric',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu' => 'required|numeric',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.spo2' => 'numeric',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.gda' => 'numeric',
+        // Tanda Vital
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik' => 'required|numeric|min:40|max:250',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik' => 'required|numeric|min:30|max:180',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi' => 'required|numeric|min:30|max:160',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas' => 'required|numeric|min:5|max:70',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu' => 'required|numeric|min:35|max:42',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.spo2' => 'nullable|numeric|min:70|max:100',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.gda' => 'nullable|numeric|min:50|max:500',
 
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb' => 'required|numeric',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb' => 'required|numeric',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt' => 'required|numeric',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lk' => 'numeric',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lila' => 'numeric',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut' => 'required|numeric',
+        // Nutrisi
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb' => 'required|numeric|min:2|max:300', // Berat badan (kg)
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb' => 'required|numeric|min:30|max:250', // Tinggi badan (cm)
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt' => 'required|numeric|min:10|max:100', // Indeks Massa Tubuh
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lk' => 'nullable|numeric|min:10|max:100', // Lingkar Kepala (cm)
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lila' => 'nullable|numeric|min:5|max:100', // Lingkar Lengan Atas (cm)
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut' => 'required|numeric|min:10|max:200', // Lingkar Perut (cm)
     ];
+
+    protected $messages = [
+        // Tanda Vital
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik.required' => 'Sistolik wajib diisi.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik.numeric'  => 'Sistolik harus berupa angka.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik.min'      => 'Sistolik minimal 40 mmHg.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik.max'      => 'Sistolik maksimal 250 mmHg.',
+
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik.required' => 'Diastolik wajib diisi.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik.numeric'  => 'Diastolik harus berupa angka.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik.min'      => 'Diastolik minimal 30 mmHg.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik.max'      => 'Diastolik maksimal 180 mmHg.',
+
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi.required' => 'Frekuensi nadi wajib diisi.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi.numeric'  => 'Frekuensi nadi harus berupa angka.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi.min'      => 'Frekuensi nadi minimal 30 bpm.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi.max'      => 'Frekuensi nadi maksimal 160 bpm.',
+
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas.required' => 'Frekuensi nafas wajib diisi.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas.numeric'  => 'Frekuensi nafas harus berupa angka.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas.min'      => 'Frekuensi nafas minimal 5 kali per menit.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas.max'      => 'Frekuensi nafas maksimal 70 kali per menit.',
+
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu.required'   => 'Suhu tubuh wajib diisi.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu.numeric'    => 'Suhu tubuh harus berupa angka.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu.min'        => 'Suhu tubuh minimal 35°C.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu.max'        => 'Suhu tubuh maksimal 42°C.',
+
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.spo2.numeric'    => 'Saturasi oksigen (SpO2) harus berupa angka.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.spo2.min'        => 'Saturasi oksigen minimal 70%.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.spo2.max'        => 'Saturasi oksigen maksimal 100%.',
+
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.gda.numeric'     => 'Gula darah acak (GDA) harus berupa angka.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.gda.min'         => 'GDA minimal 50 mg/dL.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.gda.max'         => 'GDA maksimal 500 mg/dL.',
+
+        // Nutrisi
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb.required'  => 'Berat badan wajib diisi.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb.numeric'   => 'Berat badan harus berupa angka.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb.min'       => 'Berat badan minimal 2 kg.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb.max'       => 'Berat badan maksimal 300 kg.',
+
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb.required'  => 'Tinggi badan wajib diisi.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb.numeric'   => 'Tinggi badan harus berupa angka.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb.min'       => 'Tinggi badan minimal 30 cm.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb.max'       => 'Tinggi badan maksimal 250 cm.',
+
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt.required' => 'Indeks Massa Tubuh (IMT) wajib diisi.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt.numeric'  => 'IMT harus berupa angka.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt.min'      => 'IMT minimal 10.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt.max'      => 'IMT maksimal 100.',
+
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lk.numeric'   => 'Lingkar Kepala (LK) harus berupa angka.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lk.min'       => 'Lingkar Kepala minimal 10 cm.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lk.max'       => 'Lingkar Kepala maksimal 100 cm.',
+
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lila.numeric' => 'Lingkar Lengan Atas (LILA) harus berupa angka.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lila.min'     => 'LILA minimal 5 cm.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lila.max'     => 'LILA maksimal 100 cm.',
+
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut.required' => 'Lingkar Perut wajib diisi.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut.numeric'  => 'Lingkar Perut harus berupa angka.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut.min'      => 'Lingkar Perut minimal 10 cm.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut.max'      => 'Lingkar Perut maksimal 200 cm.',
+    ];
+
+
 
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
@@ -880,11 +951,11 @@ class Pemeriksaan extends Component
 
         // Proses Validasi///////////////////////////////////////////
         try {
-            $this->validate($this->rules, $messages);
+            $this->validate($this->rules, $this->messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
 
             $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
-            $this->validate($this->rules, $messages);
+            $this->validate($this->rules, $this->messages);
         }
     }
 

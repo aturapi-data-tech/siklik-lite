@@ -9,13 +9,13 @@ use Livewire\WithPagination;
 use Carbon\Carbon;
 
 use App\Http\Traits\customErrorMessagesTrait;
-use App\Http\Traits\BPJS\VclaimTrait;
 use App\Http\Traits\SATUSEHAT\SatuSehatTrait;
+use App\Http\Traits\BPJS\PcareTrait;
 
 
 class MasterPasien extends Component
 {
-    use WithPagination, customErrorMessagesTrait, VclaimTrait;
+    use WithPagination, customErrorMessagesTrait, PcareTrait;
 
 
     //  table data//////////////// reser
@@ -1332,7 +1332,7 @@ class MasterPasien extends Component
     private function validateDataPasien(): void
     {
         // customErrorMessages
-        $messages = customErrorMessagesTrait::messages();
+        // $messages = customErrorMessagesTrait::messages();
 
         // require nik ketika pasien tidak dikenal
 
@@ -1389,7 +1389,7 @@ class MasterPasien extends Component
             'dataPasien.pasien.domisil.propinsiName' => 'bail|required',
 
 
-            'dataPasien.pasien.identitas.idBpjs' => 'digits:13',
+            'dataPasien.pasien.identitas.idBpjs' => 'numeric|digits:13',
             'dataPasien.pasien.identitas.pasport' => '',
             'dataPasien.pasien.identitas.alamat' => '',
             'dataPasien.pasien.identitas.rt' => 'bail|required',
@@ -1425,11 +1425,121 @@ class MasterPasien extends Component
             'dataPasien.pasien.hubungan.hubunganDgnPasien.hubunganDgnPasienDesc' => 'bail|required',
         ];
 
+        $messages = [
+            // Data Pasien - Umum
+            'dataPasien.pasien.regName.required'                => 'Nama pasien wajib diisi.',
+            'dataPasien.pasien.regName.min'                     => 'Nama pasien minimal 3 karakter.',
+            'dataPasien.pasien.regName.max'                     => 'Nama pasien maksimal 200 karakter.',
+            'dataPasien.pasien.tempatLahir.required'            => 'Tempat lahir wajib diisi.',
+            'dataPasien.pasien.tglLahir.required'               => 'Tanggal lahir wajib diisi.',
+            'dataPasien.pasien.tglLahir.date_format'            => 'Format tanggal lahir tidak valid. Gunakan format dd/mm/YYYY.',
+            'dataPasien.pasien.thn.numeric'                     => 'Tahun harus berupa angka.',
+            'dataPasien.pasien.bln.numeric'                     => 'Bulan harus berupa angka.',
+            'dataPasien.pasien.hari.numeric'                    => 'Hari harus berupa angka.',
+
+            // Jenis Kelamin
+            'dataPasien.pasien.jenisKelamin.jenisKelaminId.required'   => 'Jenis kelamin wajib dipilih.',
+            'dataPasien.pasien.jenisKelamin.jenisKelaminDesc.required' => 'Deskripsi jenis kelamin wajib diisi.',
+
+            // Agama
+            'dataPasien.pasien.agama.agamaId.required'          => 'Agama wajib dipilih.',
+            'dataPasien.pasien.agama.agamaDesc.required'        => 'Deskripsi agama wajib diisi.',
+
+            // Status Perkawinan
+            'dataPasien.pasien.statusPerkawinan.statusPerkawinanId.required'   => 'Status perkawinan wajib dipilih.',
+            'dataPasien.pasien.statusPerkawinan.statusPerkawinanDesc.required' => 'Deskripsi status perkawinan wajib diisi.',
+
+            // Pendidikan
+            'dataPasien.pasien.pendidikan.pendidikanId.required'  => 'Pendidikan wajib dipilih.',
+            'dataPasien.pasien.pendidikan.pendidikanDesc.required' => 'Deskripsi pendidikan wajib diisi.',
+
+            // Pekerjaan
+            'dataPasien.pasien.pekerjaan.pekerjaanId.required'    => 'Pekerjaan wajib dipilih.',
+            'dataPasien.pasien.pekerjaan.pekerjaanDesc.required'  => 'Deskripsi pekerjaan wajib diisi.',
+
+            // Kewarganegaraan & Status
+            'dataPasien.pasien.kewarganegaraan.required'         => 'Kewarganegaraan wajib diisi.',
+            'dataPasien.pasien.status.statusId.required'         => 'Status pasien wajib dipilih.',
+            'dataPasien.pasien.status.statusDesc.required'       => 'Deskripsi status pasien wajib diisi.',
+
+            // Domisili
+            'dataPasien.pasien.domisil.alamat.required'          => 'Alamat domisili wajib diisi.',
+            'dataPasien.pasien.domisil.rt.required'              => 'RT domisili wajib diisi.',
+            'dataPasien.pasien.domisil.rw.required'              => 'RW domisili wajib diisi.',
+            'dataPasien.pasien.domisil.kodepos.required'         => 'Kode pos wajib diisi.',
+            'dataPasien.pasien.domisil.desaId.required'          => 'Desa wajib dipilih.',
+            'dataPasien.pasien.domisil.desaId.exists'            => 'Desa tidak valid.',
+            'dataPasien.pasien.domisil.kecamatanId.required'     => 'Kecamatan wajib dipilih.',
+            'dataPasien.pasien.domisil.kecamatanId.exists'       => 'Kecamatan tidak valid.',
+            'dataPasien.pasien.domisil.kotaId.required'          => 'Kota wajib dipilih.',
+            'dataPasien.pasien.domisil.kotaId.exists'            => 'Kota tidak valid.',
+            'dataPasien.pasien.domisil.propinsiId.required'      => 'Propinsi wajib dipilih.',
+            'dataPasien.pasien.domisil.propinsiId.exists'        => 'Propinsi tidak valid.',
+            'dataPasien.pasien.domisil.desaName.required'        => 'Nama desa wajib diisi.',
+            'dataPasien.pasien.domisil.kecamatanName.required'   => 'Nama kecamatan wajib diisi.',
+            'dataPasien.pasien.domisil.kotaName.required'        => 'Nama kota wajib diisi.',
+            'dataPasien.pasien.domisil.propinsiName.required'    => 'Nama propinsi wajib diisi.',
+
+            // Identitas
+            'dataPasien.pasien.identitas.idBpjs.numeric' => 'Nomor BPJS harus berupa angka.',
+            'dataPasien.pasien.identitas.idBpjs.digits'          => 'Nomor BPJS harus terdiri dari 13 digit.',
+            'dataPasien.pasien.identitas.rt.required'            => 'RT identitas wajib diisi.',
+            'dataPasien.pasien.identitas.rw.required'            => 'RW identitas wajib diisi.',
+            'dataPasien.pasien.identitas.kodepos.required'       => 'Kode pos identitas wajib diisi.',
+            'dataPasien.pasien.identitas.desaId.required'        => 'Desa identitas wajib dipilih.',
+            'dataPasien.pasien.identitas.desaId.exists'          => 'Desa identitas tidak valid.',
+            'dataPasien.pasien.identitas.kecamatanId.required'   => 'Kecamatan identitas wajib dipilih.',
+            'dataPasien.pasien.identitas.kecamatanId.exists'     => 'Kecamatan identitas tidak valid.',
+            'dataPasien.pasien.identitas.kotaId.required'        => 'Kota identitas wajib dipilih.',
+            'dataPasien.pasien.identitas.kotaId.exists'          => 'Kota identitas tidak valid.',
+            'dataPasien.pasien.identitas.propinsiId.required'    => 'Propinsi identitas wajib dipilih.',
+            'dataPasien.pasien.identitas.propinsiId.exists'      => 'Propinsi identitas tidak valid.',
+            'dataPasien.pasien.identitas.desaName.required'      => 'Nama desa identitas wajib diisi.',
+            'dataPasien.pasien.identitas.kecamatanName.required' => 'Nama kecamatan identitas wajib diisi.',
+            'dataPasien.pasien.identitas.kotaName.required'      => 'Nama kota identitas wajib diisi.',
+            'dataPasien.pasien.identitas.propinsiName.required'  => 'Nama propinsi identitas wajib diisi.',
+            'dataPasien.pasien.identitas.negara.required'        => 'Negara wajib diisi.',
+
+            // Kontak
+            'dataPasien.pasien.kontak.kodenegara.required'       => 'Kode negara wajib diisi.',
+            'dataPasien.pasien.kontak.nomerTelponSelulerPasien.required'  => 'Nomor telepon seluler wajib diisi.',
+            'dataPasien.pasien.kontak.nomerTelponSelulerPasien.digits_between' => 'Nomor telepon seluler harus antara 6 sampai 15 digit.',
+
+            // Hubungan - Ayah
+            'dataPasien.pasien.hubungan.namaAyah.min'            => 'Nama ayah minimal 3 karakter.',
+            'dataPasien.pasien.hubungan.namaAyah.max'            => 'Nama ayah maksimal 200 karakter.',
+            'dataPasien.pasien.hubungan.nomerTelponSelulerAyah.min' => 'Nomor telepon seluler ayah minimal 3 karakter.',
+            'dataPasien.pasien.hubungan.nomerTelponSelulerAyah.max' => 'Nomor telepon seluler ayah maksimal 200 karakter.',
+
+            // Hubungan - Ibu
+            'dataPasien.pasien.hubungan.namaIbu.min'             => 'Nama ibu minimal 3 karakter.',
+            'dataPasien.pasien.hubungan.namaIbu.max'             => 'Nama ibu maksimal 200 karakter.',
+            'dataPasien.pasien.hubungan.nomerTelponSelulerIbu.min'  => 'Nomor telepon seluler ibu minimal 3 karakter.',
+            'dataPasien.pasien.hubungan.nomerTelponSelulerIbu.max'  => 'Nomor telepon seluler ibu maksimal 200 karakter.',
+
+            // Hubungan - Penanggung Jawab
+            'dataPasien.pasien.hubungan.namaPenanggungJawab.required' => 'Nama penanggung jawab wajib diisi.',
+            'dataPasien.pasien.hubungan.namaPenanggungJawab.min'      => 'Nama penanggung jawab minimal 3 karakter.',
+            'dataPasien.pasien.hubungan.namaPenanggungJawab.max'      => 'Nama penanggung jawab maksimal 200 karakter.',
+            'dataPasien.pasien.hubungan.kodenegaraPenanggungJawab.required' => 'Kode negara penanggung jawab wajib diisi.',
+            'dataPasien.pasien.hubungan.nomerTelponSelulerPenanggungJawab.required' => 'Nomor telepon seluler penanggung jawab wajib diisi.',
+            'dataPasien.pasien.hubungan.nomerTelponSelulerPenanggungJawab.digits_between' => 'Nomor telepon seluler penanggung jawab harus antara 6 sampai 15 digit.',
+
+            // Hubungan dengan Pasien
+            'dataPasien.pasien.hubungan.hubunganDgnPasien.hubunganDgnPasienId.required'   => 'Hubungan dengan pasien wajib dipilih.',
+            'dataPasien.pasien.hubungan.hubunganDgnPasien.hubunganDgnPasienDesc.required' => 'Deskripsi hubungan dengan pasien wajib diisi.',
+
+            'dataPasien.pasien.identitas.nik.required' => 'NIK wajib diisi.',
+            'dataPasien.pasien.identitas.nik.numeric'   => 'NIK harus berupa angka.',
+            'dataPasien.pasien.identitas.nik.digits'    => 'NIK harus terdiri dari 16 digit.',
+        ];
+
+
         // gabunga array nik jika pasien tidak dikenal
         if ($this->dataPasien['pasien']['pasientidakdikenal']) {
-            $rules['dataPasien.pasien.identitas.nik'] =  'digits:16';
+            $rules['dataPasien.pasien.identitas.nik'] = 'numeric|digits:16';
         } else {
-            $rules['dataPasien.pasien.identitas.nik'] =  'required|digits:16';
+            $rules['dataPasien.pasien.identitas.nik'] = 'required|numeric|digits:16';
         }
 
         // Proses Validasi///////////////////////////////////////////
@@ -1527,64 +1637,6 @@ class MasterPasien extends Component
         $this->emit('toastr-success', "Data " . $this->dataPasien['pasien']['regName'] . " berhasil diupdate.");
     }
 
-    // update Data Pasien BPJS Search//////////////////////////////////////////////////
-    // ///////////////////////////////////////////////////////////////
-    // ///////////////////////////////////////////////////////////////
-    public function updatedDatapasienbpjssearch()
-    {
-
-        // 1.Cari berdasarkan nik ->if null DB
-        // 2.Cari berdasarkan reg_no ->if null DB
-        // 2.Cari berdasarkan nokaBPJS ->if null DB
-
-        // 4. Goto Pasien Baru berdasarkan nik apiBPJS ->if null
-        // 5. Entry Manual Pasien Baru
-
-        // by reg_no
-        $cariDataPasienRegNo = $this->findDataByKey('reg_no', $this->dataPasienBPJSSearch);
-        if ($cariDataPasienRegNo) {
-            $this->emit('toastr-success', "Data " . $this->dataPasien['pasien']['regName'] . " berhasil ditampilkan.");
-        } else {
-
-            // by nik
-            $cariDataPasienNik = $this->findDataByKey('nik_bpjs', $this->dataPasienBPJSSearch);
-            if ($cariDataPasienNik) {
-                $this->emit('toastr-success', "Data " . $this->dataPasien['pasien']['regName'] . " berhasil ditampilkan.");
-            } else {
-                // by nokaBPJS
-                $cariDataPasienNokaBpjs = $this->findDataByKey('nokartu_bpjs', $this->dataPasienBPJSSearch);
-                if ($cariDataPasienNokaBpjs) {
-                    $this->emit('toastr-success', "Data " . $this->dataPasien['pasien']['regName'] . " berhasil ditampilkan.");
-                } else {
-                    // resert variable dataPasien otomatis (insert mode) cek data dari bpjs server
-                    $this->reset('dataPasien');
-
-                    $CaridataVclaim = VclaimTrait::peserta_nik($this->dataPasienBPJSSearch, Carbon::now(env('APP_TIMEZONE'))
-                        ->format('Y-m-d'))
-                        ->getOriginalContent();
-
-                    if ($CaridataVclaim['metadata']['code'] == 200) {
-                        $CaridataVclaim = $CaridataVclaim['response']['peserta'];
-
-                        // set dataPasien
-                        $this->dataPasien['pasien']['regDate'] = Carbon::now(env('APP_TIMEZONE'));
-                        $this->dataPasien['pasien']['regName'] = $CaridataVclaim['nama'];
-                        $this->dataPasien['pasien']['identitas']['idBpjs'] = $CaridataVclaim['noKartu'];
-                        $this->dataPasien['pasien']['identitas']['nik'] = $CaridataVclaim['nik'];
-                        $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = ($CaridataVclaim['sex'] == 'L') ? 1 : 2;
-                        $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($CaridataVclaim['sex'] == 'L') ? 'Laki-laki' : 'Perempuan';
-
-                        $this->dataPasien['pasien']['tglLahir'] = Carbon::createFromFormat('Y-m-d', $CaridataVclaim['tglLahir'], env('APP_TIMEZONE'))->format('d/m/Y');
-
-                        $this->emit('toastr-success', $CaridataVclaim['nama'] . ' ' . $CaridataVclaim['nik']);
-                    } else {
-                        // dd($CaridataVclaim);
-                        $this->emit('toastr-error', $CaridataVclaim['metadata']['code'] . ' ' . $CaridataVclaim['metadata']['message']);
-                    }
-                }
-            }
-        }
-    }
 
 
 
@@ -1968,6 +2020,79 @@ class MasterPasien extends Component
             return;
         }
     }
+
+
+    public function cekNIKBpjs(string $nik = ''): void
+    {
+        if (!empty($nik) && $nik !== '-') {
+            // Get BPJS peserta by nik
+            $getpeserta = $this->getPesertabyJenisKartu('nik', $nik);
+        } else {
+            $this->emit('toastr-error', 'NIK kosong');
+            return;
+        }
+
+        $checkStatusPasien = $getpeserta->getOriginalContent() ?? [];
+
+        if (!isset($checkStatusPasien['response']['noKartu'])) {
+            $this->emit('toastr-error', 'NIK tidak ditemukan');
+            return;
+        }
+
+        $message = "NoKa: " . ($checkStatusPasien['response']['noKartu'] ?? '')
+            . " / NIK: " . ($checkStatusPasien['response']['noKTP'] ?? '')
+            . "\nNama: " . ($checkStatusPasien['response']['nama'] ?? '')
+            . " / Jenis Kelamin: " . ($checkStatusPasien['response']['jenisKelamin'] ?? '')
+            . " / Hubungan Keluarga: " . ($checkStatusPasien['response']['hubunganKeluarga'] ?? '')
+            . "\nProvider: " . ($checkStatusPasien['response']['provider']['kdProvider'] ?? '')
+            . " - " . ($checkStatusPasien['response']['provider']['nmProvider'] ?? '')
+            . "\nProvider Gigi: " . ($checkStatusPasien['response']['providerGigi']['kdProvider'] ?? '')
+            . " - " . ($checkStatusPasien['response']['providerGigi']['nmProvider'] ?? '')
+            . "\nJenis Kelas: " . ($checkStatusPasien['response']['jenisKelas'] ?? '')
+            . "\nJenis Peserta: " . ($checkStatusPasien['response']['jenisPeserta'] ?? '')
+            . "\nNo HP: " . ($checkStatusPasien['response']['noHP'] ?? '');
+
+
+        $this->emit('toastr-success', $message);
+        return;
+    }
+
+
+    public function ceKIdBprjs(string $noka = '')
+    {
+        if (!empty($noka) && $noka !== '-') {
+            // Get BPJS peserta by noka
+            $getpeserta = $this->getPesertabyJenisKartu('noka', $noka);
+        } else {
+            $this->emit('toastr-error', 'Noka kosong');
+            return;
+        }
+
+        $checkStatusPasien = $getpeserta->getOriginalContent() ?? [];
+
+        if (!isset($checkStatusPasien['response']['noKartu'])) {
+            $this->emit('toastr-error', 'NoKa tidak ditemukan');
+            return;
+        }
+
+        $message = "NoKa: " . ($checkStatusPasien['response']['noKartu'] ?? '')
+            . " / NIK: " . ($checkStatusPasien['response']['noKTP'] ?? '')
+            . "\nNama: " . ($checkStatusPasien['response']['nama'] ?? '')
+            . " / Jenis Kelamin: " . ($checkStatusPasien['response']['jenisKelamin'] ?? '')
+            . " / Hubungan Keluarga: " . ($checkStatusPasien['response']['hubunganKeluarga'] ?? '')
+            . "\nProvider: " . ($checkStatusPasien['response']['provider']['kdProvider'] ?? '')
+            . " - " . ($checkStatusPasien['response']['provider']['nmProvider'] ?? '')
+            . "\nProvider Gigi: " . ($checkStatusPasien['response']['providerGigi']['kdProvider'] ?? '')
+            . " - " . ($checkStatusPasien['response']['providerGigi']['nmProvider'] ?? '')
+            . "\nJenis Kelas: " . ($checkStatusPasien['response']['jenisKelas'] ?? '')
+            . "\nJenis Peserta: " . ($checkStatusPasien['response']['jenisPeserta'] ?? '')
+            . "\nNo HP: " . ($checkStatusPasien['response']['noHP'] ?? '');
+
+
+        $this->emit('toastr-success', $message);
+        return;
+    }
+
 
     public function mount() {}
 

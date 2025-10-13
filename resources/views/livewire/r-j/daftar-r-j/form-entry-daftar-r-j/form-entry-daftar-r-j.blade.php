@@ -42,12 +42,6 @@
                     <div class="mb-2">
                         @include('livewire.component.l-o-v.list-of-value-caridataPasien.list-of-value-caridataPasien')
                     </div>
-
-                    <div class="mb-2">
-                        @error('FormEntry.regNo')
-                            <x-input-error :messages=$message />
-                        @enderror
-                    </div>
                 </div>
 
                 @if ($pasien)
@@ -69,6 +63,12 @@
                             </div>
                         </div>
                     @endif
+                    @error('FormEntry.regNo')
+                        <x-input-error :messages=$message />
+                    @enderror
+                    @error('FormEntry.noKartu')
+                        <x-input-error :messages=$message />
+                    @enderror
                 @endif
 
                 <div>
@@ -174,6 +174,9 @@
                             </div>
                         </div>
                     @endif
+                    @error('FormEntry.kdpolibpjs')
+                        <x-input-error :messages=$message />
+                    @enderror
                 @endif
 
 
@@ -186,7 +189,7 @@
 
     <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 ">
         <div class="">
-            <div wire:loading wire:target="closeModal">
+            <div wire:loading wire:key="loadingcloseModal" wire:target="closeModal">
                 <x-loading />
             </div>
             <x-light-button wire:click="closeModal()" type="button" wire:loading.remove>Keluar</x-light-button>
@@ -194,7 +197,32 @@
 
         @if ($jenisKlaim['JenisKlaimId'] === 'JM')
             <div class="">
-                <div wire:loading wire:target="cekStatusPasienBPJS">
+                <div wire:loading wire:key="loadingdeletePendaftaranPasienBPJS"
+                    wire:target="deletePendaftaranPasienBPJS">
+                    <x-loading />
+                </div>
+                <x-red-button wire:click="deletePendaftaranPasienBPJS('{{ $jenisKlaim['JenisKlaimId'] }}')"
+                    type="button" wire:loading.remove>
+                    Hapus Pasien BPJS Pcare
+                </x-red-button>
+            </div>
+
+
+            <div class="">
+                <div wire:loading wire:key="loadingcheckPendaftaranPasienBPJSbyNomorUrut"
+                    wire:target="checkPendaftaranPasienBPJSbyNomorUrut">
+                    <x-loading />
+                </div>
+                <x-primary-button
+                    wire:click="checkPendaftaranPasienBPJSbyNomorUrut('{{ $FormEntry['noUrutBpjs'] ?? '' }}', '{{ $FormEntry['rjDate'] ?? '' }}')"
+                    wire:loading.attr="disabled" wire:key="btnCekPendaftaran" wire:loading.remove>
+                    Cek Pendaftaran BPJS PCare
+                </x-primary-button>
+            </div>
+
+
+            <div class="">
+                <div wire:loading wire:key="loadingcekStatusPasienBPJS" wire:target="cekStatusPasienBPJS">
                     <x-loading />
                 </div>
                 <x-yellow-button wire:click="cekStatusPasienBPJS()" type="button" wire:loading.remove>
@@ -204,10 +232,10 @@
         @endif
 
         <div class="">
-            <div wire:loading wire:target="store">
+            <div wire:loading wire:key="loadingstore" wire:target="store">
                 <x-loading />
             </div>
-            <x-green-button :disabled=$disabledProperty wire:click.prevent="store()" type="button" wire:loading.remove>
+            <x-green-button :disabled=$disabledProperty wire:click="store()" type="button" wire:loading.remove>
                 Simpan
             </x-green-button>
         </div>

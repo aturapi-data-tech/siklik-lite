@@ -11,6 +11,7 @@ use App\Http\Traits\EmrRJ\EmrRJTrait;
 use App\Http\Traits\MasterPasien\MasterPasienTrait;
 use App\Http\Traits\BPJS\PcareTrait;
 
+use Illuminate\Support\Facades\Validator;
 
 
 use Livewire\Component;
@@ -176,6 +177,7 @@ class FormEntryKunjungan extends Component
 
     private function syncDataPrimer(): void
     {
+
         if (isset($this->FormEntry['dataKunjungan'])) {
             // edit kunjungan
             $noKunjungan = collect($this->FormEntry['dataKunjungan'])
@@ -185,7 +187,7 @@ class FormEntryKunjungan extends Component
             $this->FormEntry['addKunjungan']['noKunjungan'] = $noKunjungan;
         }
         // sync data primer dilakukan ketika update
-        if (isset($this->FormEntry['addKunjungan']) == false) {
+        if (empty($this->FormEntry['addKunjungan']['noKunjungan'])) {
 
             // default array
             $this->FormEntry['addKunjungan'] = $this->addKunjungan;
@@ -255,6 +257,8 @@ class FormEntryKunjungan extends Component
             $this->FormEntry['addKunjungan']['nonSpesialis'] = $this->FormEntry['addKunjungan']['nonSpesialis'] ?? false;
             // cari tau status nonSpesialis true/false untuk menggunakan TACC atau tidak
             $this->getDiagnosaBpjs();
+
+            // dd($this->getRiwayatKunjungan($this->FormEntry['addKunjungan']['noKartu']));
         }
     }
 
@@ -632,7 +636,7 @@ class FormEntryKunjungan extends Component
         try {
             $addKunjungan = $this->addKunjungan($this->FormEntry['addKunjungan'])
                 ->getOriginalContent();
-            if ($addKunjungan['metadata']['code'] === 201) {
+            if ($addKunjungan['metadata']['code'] == 201) {
                 $this->FormEntry['dataKunjungan'] = $addKunjungan['response'];
 
                 $noKunjungan = collect($this->FormEntry['dataKunjungan'])
@@ -654,7 +658,7 @@ class FormEntryKunjungan extends Component
         try {
             $editKunjungan = $this->editKunjungan($this->FormEntry['addKunjungan'])
                 ->getOriginalContent();
-            if ($editKunjungan['metadata']['code'] === 200) {
+            if ($editKunjungan['metadata']['code'] == 200) {
                 $this->emit('toastr-success', $editKunjungan['metadata']['message']);
             } else {
                 $this->emit('toastr-error', json_encode($editKunjungan, true));
@@ -670,10 +674,12 @@ class FormEntryKunjungan extends Component
         try {
             $deleteKunjungan = $this->deleteKunjungan($this->FormEntry['addKunjungan']['noKunjungan'] ?? '')
                 ->getOriginalContent();
-            if ($deleteKunjungan['metadata']['code'] === 200) {
+            if ($deleteKunjungan['metadata']['code'] == 200) {
                 $this->emit('toastr-success', $deleteKunjungan['metadata']['message']);
                 unset($this->FormEntry['dataKunjungan']);
                 unset($this->FormEntry['addKunjungan']);
+                $this->FormEntry['noUrutBpjs'] = null;
+
                 $this->synJsonRJ();
                 $this->emit('toastr-success', 'Data Berhasil dihapus');
             } else {
@@ -710,7 +716,7 @@ class FormEntryKunjungan extends Component
             $getDiagnosa = $this->getDiagnosa($this->FormEntry['addKunjungan']['kdDiag1'], 1, 10)
                 ->getOriginalContent();
 
-            if ($getDiagnosa['metadata']['code'] === 200) {
+            if ($getDiagnosa['metadata']['code'] == 200) {
                 // dd($getDiagnosa['response']['list'][0]['nonSpesialis']);
                 $this->FormEntry['addKunjungan']['nonSpesialis'] = $getDiagnosa['response']['list'][0]['nonSpesialis'] ?? false;
                 $this->synJsonRJ();
@@ -842,6 +848,63 @@ class FormEntryKunjungan extends Component
     {
         $this->findData($this->rjNoRef);
     }
+
+
+
+    public function checkRiwayatKunjunganPasien($noKartu): void
+    {
+        $messages = [
+            'noKartu.required' => 'Nomor kartu BPJS tidak boleh kosong.',
+            'noKartu.digits' => 'Nomor kartu BPJS harus 13 digit.',
+            'noKartu.numeric' => 'Nomor kartu BPJS harus berupa angka.',
+        ];
+        $validator = Validator::make(
+            ['noKartu' => $noKartu],
+            ['noKartu' => 'required|numeric|digits:13'],
+            $messages
+        );
+        if ($validator->fails()) {
+            $this->emit('toastr-error', $validator->errors()->first());
+            return;
+        }
+
+        // Panggil fungsi getRiwayatKunjungan() yang sudah kamu punya
+        $getKunjungan = $this->getRiwayatKunjungan($noKartu);
+        $data = $getKunjungan->getData(true); // ambil array-nya
+
+        $list = $data['response']['list'] ?? [];
+
+        dd($list);
+        return;
+    }
+
+    public function checkRujukanKunjungan($noRujukan): void
+    {
+        $messages = [
+            'noRujukan.required' => 'Nomor rujukan BPJS tidak boleh kosong.',
+            'noRujukan.size'   => 'Nomor rujukan BPJS harus tepat 19 karakter.',
+        ];
+        $validator = Validator::make(
+            ['noRujukan' => $noRujukan],
+            ['noRujukan' => 'required|string|size:19'],
+            $messages
+        );
+        if ($validator->fails()) {
+            $this->emit('toastr-error', $validator->errors()->first());
+            return;
+        }
+
+        // Panggil fungsi getRujukanKunjungan() yang sudah kamu punya
+        $getKunjungan = $this->getRujukanKunjungan($noRujukan);
+        $data = $getKunjungan->getData(true); // ambil array-nya
+
+        $list = $data['response'] ?? [];
+
+        dd($list);
+        return;
+    }
+
+
 
     public function render()
     {

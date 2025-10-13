@@ -66,161 +66,187 @@
                                     <tbody class="bg-white dark:bg-gray-800">
 
                                         @foreach ($myQueryData as $myQData)
-                                            <tr class="border-b group dark:border-gray-700">
+                                            @php
+                                                $datadaftar_json =
+                                                    json_decode($myQData->datadaftar_json ?? '[]', true) ?: [];
 
+                                                $status = $myQData->layanan_status;
+                                                $statusText = match ($status) {
+                                                    'RI' => 'Rawat Inap',
+                                                    'RJ' => 'Rawat Jalan',
+                                                    'UGD' => 'UGD',
+                                                    default => '-',
+                                                };
+                                                $terapiObat = data_get(
+                                                    $datadaftar_json,
+                                                    'perencanaan.terapi.terapi',
+                                                    '',
+                                                );
+                                                $terapiNonObat = data_get(
+                                                    $datadaftar_json,
+                                                    'perencanaan.terapi.terapiNonObat',
+                                                    '',
+                                                );
+                                                $diagnosisList = data_get($datadaftar_json, 'diagnosis', []);
+                                                $tindakLanjut =
+                                                    data_get(
+                                                        $datadaftar_json,
+                                                        'perencanaan.tindakLanjut.tindakLanjut',
+                                                        '-',
+                                                    ) ?:
+                                                    '-';
+                                                $ketTindakLanjut =
+                                                    data_get(
+                                                        $datadaftar_json,
+                                                        'perencanaan.tindakLanjut.keteranganTindakLanjut',
+                                                        '-',
+                                                    ) ?:
+                                                    '-';
+                                                $sistolik = data_get(
+                                                    $datadaftar_json,
+                                                    'pemeriksaan.tandaVital.sistolik',
+                                                    '',
+                                                );
+                                                $diastolik = data_get(
+                                                    $datadaftar_json,
+                                                    'pemeriksaan.tandaVital.distolik',
+                                                    '',
+                                                );
+                                                $spo2 = data_get($datadaftar_json, 'pemeriksaan.tandaVital.spo2', '');
+                                                $gda = data_get($datadaftar_json, 'pemeriksaan.tandaVital.gda', '');
+                                                $tanggal = $myQData->txn_date;
+                                            @endphp
 
-                                                <td class="w-1/5 px-2 py-2 group-hover:bg-gray-100">
-                                                    <div class="overflow-auto w-52 ">
-                                                        <div class="font-semibold text-primary">
-                                                            {{ $myQData->layanan_status === 'RI'
-                                                                ? 'Rawat Inap'
-                                                                : ($myQData->layanan_status === 'UGD'
-                                                                    ? 'UGD'
-                                                                    : ($myQData->layanan_status === 'RJ'
-                                                                        ? 'Rawat Jalan'
-                                                                        : '-')) }}
-                                                        </div>
+                                            <tr
+                                                class="align-top border-b border-gray-200 group hover:bg-gray-50 dark:border-gray-700">
+                                                {{-- LAYANAN / KUNJUNGAN --}}
+                                                <td class="px-3 py-3">
+                                                    <div class="flex flex-col gap-1 w-full max-w-[280px]">
+                                                        <x-badge :badgecolor="match ($myQData->layanan_status) {
+                                                            'RI' => 'blue',
+                                                            'RJ' => 'green',
+                                                            'UGD' => 'red',
+                                                            default => 'dark',
+                                                        }">
+                                                            {{ $statusText }}
+                                                        </x-badge>
+
                                                         <div class="font-semibold text-gray-900">
-                                                            {{ $myQData->txn_date . ' / (' . $myQData->reg_no . ')' }}
+                                                            {{ $tanggal }}
+                                                            <span class="text-gray-500">/
+                                                                ({{ $myQData->reg_no }})</span>
                                                         </div>
-                                                        <div class="font-normal text-gray-900">
-                                                            {{ $myQData->poli }}
+                                                        <div class="text-gray-700">{{ $myQData->poli }}</div>
+                                                    </div>
+                                                </td>
+
+                                                {{-- TERAPI --}}
+                                                <td class="px-3 py-3">
+                                                    <div class="space-y-3">
+                                                        {{-- Terapi (Obat) --}}
+                                                        <div class="w-full">
+                                                            <x-input-label
+                                                                for="dataDaftarPoliRJ.perencanaan.terapi.terapi"
+                                                                :value="__('Terapi (Obat)')" :required="__(true)" />
+                                                            <div
+                                                                class="mt-1 text-gray-900 break-words whitespace-pre-line">
+                                                                {!! nl2br(e($terapiObat)) !!}
+                                                            </div>
+                                                        </div>
+
+                                                        {{-- Terapi Non Obat --}}
+                                                        <div class="w-full">
+                                                            <x-input-label
+                                                                for="dataDaftarPoliRJ.perencanaan.terapi.terapiNonObat"
+                                                                :value="__('Terapi Non Obat')" :required="__(true)" />
+                                                            <div
+                                                                class="mt-1 text-gray-900 break-words whitespace-pre-line">
+                                                                {!! nl2br(e($terapiNonObat)) !!}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </td>
 
-                                                @php
-                                                    $datadaftar_json = json_decode($myQData->datadaftar_json, true);
-                                                @endphp
+                                                {{-- DIAGNOSIS & TINDAK LANJUT --}}
+                                                <td class="px-3 py-3">
+                                                    <div class="w-full max-w-[340px]">
+                                                        @if (!empty($diagnosisList))
+                                                            <div class="mb-2 font-semibold text-gray-700">Diagnosis
+                                                            </div>
+                                                            <ul class="pl-5 space-y-1 list-disc">
+                                                                @foreach ($diagnosisList as $diagnosis)
+                                                                    <li class="break-words whitespace-pre-line">
+                                                                        {{ ($diagnosis['diagId'] ?? '') . ' - ' . ($diagnosis['diagDesc'] ?? '') }}
+                                                                    </li>
+                                                                @endforeach
+                                                            </ul>
+                                                        @endif
 
-                                                <td class="w-1/5 px-2 py-2 text-gray-900 group-hover:bg-gray-100">
-                                                    <div class="w-full overflow-auto whitespace-nowrap">
-
-                                                        {!! nl2br(
-                                                            e(
-                                                                isset($datadaftar_json['perencanaan']['terapi']['terapi'])
-                                                                    ? $datadaftar_json['perencanaan']['terapi']['terapi']
-                                                                    : '',
-                                                            ),
-                                                        ) !!}
+                                                        <div class="mt-3">
+                                                            <div class="font-semibold text-gray-700">Tindak Lanjut</div>
+                                                            <div class="text-gray-900">
+                                                                {{ $tindakLanjut }} / {{ $ketTindakLanjut }}
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </td>
 
-                                                <td class="w-1/5 px-2 py-2 text-gray-900 group-hover:bg-gray-100">
-                                                    <div class="overflow-auto w-52 whitespace-nowrap">
-                                                        @isset($datadaftar_json['diagnosis'])
-                                                            @foreach ($datadaftar_json['diagnosis'] as $diagnosis)
-                                                                {!! nl2br(e($diagnosis['diagId'] . ' - ' . $diagnosis['diagDesc'])) . '</br>' !!}
-                                                            @endforeach
-                                                        @endisset
-
-                                                        <br>
-                                                        Tindak Lanjut :
-                                                        {{ isset($datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut'])
-                                                            ? ($datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut']
-                                                                ? $datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut']
-                                                                : '-')
-                                                            : '-' }}
-                                                        /
-                                                        {{ isset($datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut'])
-                                                            ? ($datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut']
-                                                                ? $datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut']
-                                                                : '-')
-                                                            : '-' }}
+                                                {{-- TANDA VITAL --}}
+                                                <td class="px-3 py-3">
+                                                    <div class="space-y-1 text-gray-900">
+                                                        <div>TD: {{ $sistolik }} / {{ $diastolik }} <span
+                                                                class="text-gray-500">(mmHg)</span></div>
+                                                        <div>SPO₂: {{ $spo2 }} <span
+                                                                class="text-gray-500">(%)</span></div>
+                                                        <div>GDA: {{ $gda }} <span
+                                                                class="text-gray-500">(mg/dL)</span></div>
                                                     </div>
                                                 </td>
 
-                                                <td class="w-1/5 px-2 py-2 text-gray-900 group-hover:bg-gray-100">
-                                                    <div class="w-full overflow-auto whitespace-nowrap">
-                                                        TD :
-                                                        {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['sistolik'])
-                                                            ? $datadaftar_json['pemeriksaan']['tandaVital']['sistolik']
-                                                            : '' }}
-                                                        /
-                                                        {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['distolik'])
-                                                            ? $datadaftar_json['pemeriksaan']['tandaVital']['distolik']
-                                                            : '' }}
-                                                        (mmHg)
-                                                        <br>
-                                                        SPO2 :
-                                                        {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['spo2'])
-                                                            ? $datadaftar_json['pemeriksaan']['tandaVital']['spo2']
-                                                            : '' }}
-                                                        (%)
-                                                        <br>
-                                                        GDA :
-                                                        {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['gda'])
-                                                            ? $datadaftar_json['pemeriksaan']['tandaVital']['gda']
-                                                            : '' }}
-                                                        (mg/dL)
-                                                    </div>
-                                                </td>
-
-                                                <td class="w-1/5 px-2 py-2 text-gray-900 group-hover:bg-gray-100">
-                                                    <div>
+                                                {{-- AKSI --}}
+                                                <td class="px-3 py-3">
+                                                    <div class="flex flex-col gap-2">
                                                         <x-yellow-button
-                                                            wire:click.prevent="openModalLayanan('{{ $myQData->txn_no }}',
-                                                        '{{ $myQData->layanan_status }}',
-                                                        {{ $myQData->datadaftar_json }}
-                                                        )"
+                                                            wire:click.prevent="openModalLayanan('{{ $myQData->txn_no }}','{{ $myQData->layanan_status }}', {{ $myQData->datadaftar_json }})"
                                                             type="button" wire:loading.remove>
                                                             Resume Medis
                                                         </x-yellow-button>
                                                         <div wire:loading wire:target="openModalLayanan">
                                                             <x-loading />
                                                         </div>
-                                                    </div>
 
-                                                    <div>
                                                         <x-green-button
-                                                            wire:click.prevent="cetakRekamMedisRJGrid('{{ $myQData->txn_no }}',
-                                                        '{{ $myQData->layanan_status }}',
-                                                        {{ $myQData->datadaftar_json }}
-                                                        )"
+                                                            wire:click.prevent="cetakRekamMedisRJGrid('{{ $myQData->txn_no }}','{{ $myQData->layanan_status }}', {{ $myQData->datadaftar_json }})"
                                                             type="button" wire:loading.remove>
                                                             Cetak Resume Medis
                                                         </x-green-button>
                                                         <div wire:loading wire:target="cetakRekamMedisRJGrid">
                                                             <x-loading />
                                                         </div>
-                                                    </div>
 
-                                                    <div>
                                                         <x-green-button
-                                                            wire:click.prevent="cetakRekamMedisRJSuketIstirahatGrid('{{ $myQData->txn_no }}',
-                                                        '{{ $myQData->layanan_status }}',
-                                                        {{ $myQData->datadaftar_json }}
-                                                        )"
+                                                            wire:click.prevent="cetakRekamMedisRJSuketIstirahatGrid('{{ $myQData->txn_no }}','{{ $myQData->layanan_status }}', {{ $myQData->datadaftar_json }})"
                                                             type="button" wire:loading.remove>
-                                                            Cetak Surat Keterangan Istirahat
+                                                            Cetak Surat Istirahat
                                                         </x-green-button>
                                                         <div wire:loading
                                                             wire:target="cetakRekamMedisRJSuketIstirahatGrid">
                                                             <x-loading />
                                                         </div>
-                                                    </div>
 
-                                                    <div>
                                                         <x-green-button
-                                                            wire:click.prevent="cetakRekamMedisRJSuketSehatGrid('{{ $myQData->txn_no }}',
-                                                        '{{ $myQData->layanan_status }}',
-                                                        {{ $myQData->datadaftar_json }}
-                                                        )"
+                                                            wire:click.prevent="cetakRekamMedisRJSuketSehatGrid('{{ $myQData->txn_no }}','{{ $myQData->layanan_status }}', {{ $myQData->datadaftar_json }})"
                                                             type="button" wire:loading.remove>
-                                                            Cetak Surat Keterangan Sehat
+                                                            Cetak Surat Sehat
                                                         </x-green-button>
                                                         <div wire:loading wire:target="cetakRekamMedisRJSuketSehatGrid">
                                                             <x-loading />
                                                         </div>
                                                     </div>
-
                                                 </td>
-
-
-
-
                                             </tr>
                                         @endforeach
+
 
 
                                     </tbody>

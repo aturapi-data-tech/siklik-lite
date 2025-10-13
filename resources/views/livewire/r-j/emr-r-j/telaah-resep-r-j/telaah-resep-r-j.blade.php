@@ -257,7 +257,7 @@
                                 <div class="w-full overflow-auto">
 
                                     <div class="font-semibold text-gray-900">
-                                        {{ 'Nomer Pelayanan : ' . $myQData->rj_no }}
+                                        {{ 'Nomer Resep : ' . $myQData->rj_no }}
                                     </div>
                                     <div class = "flex space-x-1">
                                         <x-badge :badgecolor="__($badgecolorStatus)">

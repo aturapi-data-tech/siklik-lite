@@ -48,7 +48,6 @@ trait PcareTrait
         if (!empty($errorMessages)) {
             $response['response'] = $errorMessages;
         }
-
         // Insert webLogStatus
         DB::table('web_log_status')->insert([
             'code' =>  $code,
@@ -110,7 +109,6 @@ trait PcareTrait
 
                 $data = json_decode($response, true);
             }
-
             return $this->sendResponse($response->json('metaData.message'), $data, $code, $url, $requestTransferTime);
         }
     }
@@ -652,6 +650,46 @@ trait PcareTrait
         }
     }
 
+    private function getPeserta($noka)
+    {
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+
+        // Masukkan Nilai dari parameter
+        $r = [
+            'noka' => $noka,
+        ];
+        // lakukan validasis
+        $validator = Validator::make($r, [
+            "noka" => "required|min:11|max:16",
+        ], $messages);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 201, null, null);
+        }
+
+
+
+        // handler when time out and off line mode
+        try {
+
+            $url = env('PCARE_URL') . "peserta/" . $noka;
+            $signature = $this->signature();
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->get($url);
+
+
+            // dd($response->transferStats->getTransferTime()); Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
+        }
+    }
+
+
 
 
 
@@ -735,24 +773,30 @@ trait PcareTrait
             return $this->sendError($validator->errors()->first(), $validator->errors()->all(), 201, null, null);
         }
 
+        // 2. Konversi tanggal ke format PCare (YYYY-MM-DD)
+        try {
+            $tglFormatted = Carbon::createFromFormat('d-m-Y', $tglDaftar)->format('d-m-Y');
+        } catch (Exception $e) {
+            return $this->sendError("Format tanggal tidak valid, harus d-m-Y.", [], 422, null, null);
+        }
 
-
-        // handler when time out and off line mode
         try {
 
-            $url = env('PCARE_URL') . "pendaftaran";
+            $url = env('PCARE_URL')
+                . 'pendaftaran/peserta/' . $noKartu
+                . '/tglDaftar/' . $tglFormatted
+                . '/noUrut/' . $noUrut
+                . '/kdPoli/' . $kdPoli;
             $signature = $this->signature();
             $signature['Content-Type'] = 'text/plain';
             $response = Http::timeout(10)
                 ->withHeaders($signature)
-                ->post($url, $r);
-
-
+                ->delete($url, $r);
             // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
             return $this->response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
             /////////////////////////////////////////////////////////////////////////////
         } catch (Exception $e) {
-            return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
+            return $this->sendError($e->getMessage(), [], 408, $url, null);
         }
     }
 
@@ -821,7 +865,6 @@ trait PcareTrait
         }
 
 
-
         // handler when time out and off line mode
         try {
 
@@ -851,8 +894,7 @@ trait PcareTrait
         // $r['rujukLanjut']['subSpesialis']['kdSarana'] = 9;
         $r['rujukLanjut']['khusus'] = null;
 
-
-        // dd($r);
+        // dd($r['tglDaftar'], $r['tglPulang']);
 
         $rules = [
             "noKunjungan" => "",
@@ -869,7 +911,44 @@ trait PcareTrait
             "heartRate" => "",
             "lingkarPerut" => "",
             "kdStatusPulang" => "",
-            "tglPulang" => "",
+            "tglPulang" => [
+                'nullable',
+                'date_format:d-m-Y',
+                function ($attribute, $value, $fail) use ($r) {
+
+
+                    // kosong? skip
+                    if (empty($value)) {
+                        return;
+                    }
+
+                    try {
+                        // parse kedua tanggal
+                        $dtDaftar = Carbon::createFromFormat('d-m-Y', $r['tglDaftar']);
+                        $dtPulang = Carbon::createFromFormat('d-m-Y', $value);
+                    } catch (\Exception $e) {
+                        // jika format salah, date_format sudah menangani error-nya
+                        return;
+                    }
+
+                    // 1. tidak boleh sebelum tanggal daftar
+                    if ($dtPulang->lt($dtDaftar)) {
+                        $fail("Tanggal pulang tidak boleh sebelum tanggal daftar ({$dtDaftar->format('d-m-Y')}).");
+                    }
+
+                    // 2. tidak boleh setelah hari ini
+                    if ($dtPulang->gt(Carbon::now())) {
+                        $fail("Tanggal pulang tidak boleh lebih dari hari ini (" . Carbon::now()->format('d-m-Y') . ").");
+                    }
+
+                    // dd($dtPulang->lt($dtDaftar), [
+                    //     'input_tglDaftar' => $r['tglDaftar'],
+                    //     'input_tglPulang' => $value,
+                    //     'parsed_tglDaftar' => Carbon::createFromFormat('d-m-Y', $r['tglDaftar'])->toDateString(),
+                    //     'now'             => Carbon::now()->toDateString(),
+                    // ]);
+                },
+            ],
             "kdDokter" => "",
             "kdDiag1" => "",
             "kdDiag2" => "",
@@ -1034,5 +1113,108 @@ trait PcareTrait
         } catch (Exception $e) {
             return $this->sendError($e->getMessage(), $validator->errors()->all(), 408, $url, null);
         }
+    }
+
+    private function getRiwayatKunjungan($noKartu)
+    {
+        // 1. Validasi input
+        $messages = customErrorMessagesTrait::messages();
+        $validator = Validator::make(
+            ['noKartu' => $noKartu],
+            ['noKartu' => 'bail|required|digits:13'],
+            $messages
+        );
+
+        if ($validator->fails()) {
+            return $this->sendError(
+                $validator->errors()->first(),
+                $validator->errors()->all(),
+                422,
+                null,
+                null
+            );
+        }
+
+        // 2. Siapkan URL
+        $url = env('PCARE_URL') . "kunjungan/peserta/" . $noKartu;
+
+        // 3. Siapkan header (termasuk Content-Type)
+        $signature = $this->signature();
+        $signature['Content-Type'] = 'application/json; charset=utf-8';
+
+        // 4. Panggil API dengan GET
+        try {
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->get($url);
+        } catch (Exception $e) {
+            return $this->sendError(
+                'Gagal terhubung ke PCare: ' . $e->getMessage(),
+                [],
+                408,
+                $url,
+                null
+            );
+        }
+
+        // 5. Decrypt & handle response
+        return $this->response_decrypt(
+            $response,
+            $signature,
+            $url,
+            $response->transferStats->getTransferTime()
+        );
+    }
+
+    private function getRujukanKunjungan($noRujukan)
+    {
+
+        // 1. Validasi input
+        $messages = customErrorMessagesTrait::messages();
+        $validator = Validator::make(
+            ['noRujukan' => $noRujukan],
+            ['noRujukan' => 'bail|required'],
+            $messages
+        );
+
+        if ($validator->fails()) {
+            return $this->sendError(
+                $validator->errors()->first(),
+                $validator->errors()->all(),
+                422,
+                null,
+                null
+            );
+        }
+
+        // 2. Siapkan URL
+        $url = env('PCARE_URL') . "kunjungan/rujukan/" . $noRujukan;
+
+        // 3. Siapkan headers (dengan Content-Type)
+        $signature = $this->signature();
+        $signature['Content-Type'] = 'application/json; charset=utf-8';
+
+        // 4. Panggil API dengan GET
+        try {
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->get($url);
+        } catch (Exception $e) {
+            return $this->sendError(
+                'Gagal terhubung ke PCare: ' . $e->getMessage(),
+                [],
+                408,
+                $url,
+                null
+            );
+        }
+
+        // 5. Decrypt & handle response
+        return $this->response_decrypt(
+            $response,
+            $signature,
+            $url,
+            $response->transferStats->getTransferTime()
+        );
     }
 }

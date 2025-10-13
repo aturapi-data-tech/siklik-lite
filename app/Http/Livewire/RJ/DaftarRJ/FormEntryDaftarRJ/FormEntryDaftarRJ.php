@@ -76,13 +76,15 @@ class FormEntryDaftarRJ extends Component
 
     // rules///////////////////
     protected $rules = [
-        'FormEntry.rjDate' => 'bail|required|date_format:d/m/Y H:i:s',
+        'FormEntry.noKartu' => '',
+        'FormEntry.rjDate' => 'bail|required|date_format:d/m/Y H:i:s|after_or_equal:today',
         'FormEntry.rjNo' => 'bail|required',
         'FormEntry.passStatus' => '',
         'FormEntry.noAntrian' => 'bail|required',
         'FormEntry.noBooking' => 'bail|required',
 
-        'FormEntry.regNo' => 'bail|required|exists:rsmst_pasiens,reg_no',
+
+
 
         'FormEntry.drId' => 'bail|required|exists:rsmst_doctors,dr_id',
         'FormEntry.drDesc' => 'bail|required',
@@ -99,18 +101,21 @@ class FormEntryDaftarRJ extends Component
         'FormEntry.txnStatus' => 'bail|required|in:A,L,F,H',
         'FormEntry.ermStatus' => 'bail|required|in:A,L,F',
         'FormEntry.kunjSakit' => 'bail|required|in:1,0',
-        'FormEntry.kdTkp' => 'bail|required|in:10,20,50',
-
+        'FormEntry.kdTkp' => 'bail|required|in:10,20,50', //"tkp": [{ "kdTkp": "10", "nmTkp": "RJTP" }, { "kdTkp": "20", "nmTkp": "RITP" }, { "kdTkp": "50", "nmTkp": "Promotif" }]
     ];
+
+
+
 
     protected $validationAttributes = [
         'FormEntry.rjDate' => 'Tanggal Rawat Jalan',
-        'FormEntry.rjNo' => 'No Rawat Jalan',
-        'FormEntry.passStatus' => 'Status Pasien Baru / Lama',
-        'FormEntry.noAntrian' => 'Nomer Antrian',
-        'FormEntry.noBooking' => 'Nomer Booking',
+        'FormEntry.rjNo' => 'Nomor Rawat Jalan',
+        'FormEntry.noKartu' => 'Id BPJS',
+        'FormEntry.passStatus' => 'Status Pasien (Baru/Lama)',
+        'FormEntry.noAntrian' => 'Nomor Antrian',
+        'FormEntry.noBooking' => 'Nomor Booking',
 
-        'FormEntry.regNo' => 'Reg No',
+        'FormEntry.regNo' => 'Nomor Registrasi',
 
         'FormEntry.drId' => 'Kode Dokter',
         'FormEntry.drDesc' => 'Nama Dokter',
@@ -120,19 +125,65 @@ class FormEntryDaftarRJ extends Component
 
         'FormEntry.klaimId' => 'Klaim',
 
-
         'FormEntry.kddrbpjs' => 'Kode Dokter BPJS',
         'FormEntry.kdpolibpjs' => 'Kode Poli BPJS',
 
-        'FormEntry.rjStatus' => 'Status RJ',
+        'FormEntry.rjStatus' => 'Status Rawat Jalan',
         'FormEntry.txnStatus' => 'Status Transaksi',
         'FormEntry.ermStatus' => 'Status Rekam Medis',
         'FormEntry.kunjSakit' => 'Kunjungan Sakit',
-        'FormEntry.kdTkp' => 'Tkp',
-
+        'FormEntry.kdTkp' => 'Kode TKP',
     ];
 
-    protected $messages = [];
+    protected $messages = [
+        // Tanggal dan Waktu Rawat Jalan
+        'FormEntry.rjDate.required'         => 'Tanggal rawat jalan wajib diisi.',
+        'FormEntry.rjDate.date_format'      => 'Format tanggal rawat jalan tidak valid. Gunakan format dd/mm/YYYY H:i:s.',
+        'FormEntry.rjDate.after_or_equal'   => 'Tanggal rawat jalan tidak boleh lebih kecil dari hari ini.',
+
+        // Nomor Rawat Jalan
+        'FormEntry.rjNo.required'           => 'Nomor rawat jalan wajib diisi.',
+
+        // Nomor Antrian dan Booking
+        'FormEntry.noAntrian.required'      => 'Nomor antrian wajib diisi.',
+        'FormEntry.noBooking.required'      => 'Nomor booking wajib diisi.',
+
+        // Registrasi Pasien
+        'FormEntry.regNo.required'          => 'Nomor registrasi wajib diisi.',
+        'FormEntry.noKartu.required'          => 'Id BPJS wajib diisi.',
+
+        'FormEntry.regNo.exists'            => 'Nomor registrasi tidak ditemukan.',
+
+        // Dokter
+        'FormEntry.drId.required'           => 'Dokter wajib dipilih.',
+        'FormEntry.drId.exists'             => 'Dokter tidak valid.',
+        'FormEntry.drDesc.required'         => 'Deskripsi dokter wajib diisi.',
+
+        // Poli
+        'FormEntry.poliId.required'         => 'Poli wajib dipilih.',
+        'FormEntry.poliId.exists'           => 'Poli tidak valid.',
+        'FormEntry.poliDesc.required'       => 'Deskripsi poli wajib diisi.',
+
+        // Klaim
+        'FormEntry.klaimId.required'        => 'Klaim wajib dipilih.',
+        'FormEntry.klaimId.exists'          => 'Klaim tidak valid.',
+
+        // Status Rawat Jalan dan Transaksi
+        'FormEntry.rjStatus.required'       => 'Status rawat jalan wajib diisi.',
+        'FormEntry.rjStatus.in'             => 'Status rawat jalan tidak valid. (A, L, F, I)',
+        'FormEntry.txnStatus.required'      => 'Status transaksi wajib diisi.',
+        'FormEntry.txnStatus.in'            => 'Status transaksi tidak valid. (A, L, F, H)',
+        'FormEntry.ermStatus.required'      => 'Status EMR wajib diisi.',
+        'FormEntry.ermStatus.in'            => 'Status EMR tidak valid. (A, L, F)',
+
+        // Kunjungan Sakit
+        'FormEntry.kunjSakit.required'      => 'Kunjungan sakit wajib diisi.',
+        'FormEntry.kunjSakit.in'            => 'Nilai untuk kunjungan sakit tidak valid. (1, 0)',
+
+        // Kode TKP
+        'FormEntry.kdTkp.required'          => 'Kode TKP wajib diisi.',
+        'FormEntry.kdTkp.in'                => 'Kode TKP tidak valid. (10, 20, 50)',
+    ];
 
     // rules///////////////////
 
@@ -228,7 +279,6 @@ class FormEntryDaftarRJ extends Component
 
     public function store(): void
     {
-
         // validate
         $this->setDataPrimer();
         $this->validateData();
@@ -254,7 +304,7 @@ class FormEntryDaftarRJ extends Component
     private function addPedaftaranBPJS($statusPasien): void
     {
         if ($statusPasien == 'JM') {
-            $kdProvider = $this->checkStatusKlaimPasien['metadata']['code'] === 200 ?
+            $kdProvider = $this->checkStatusKlaimPasien['metadata']['code'] == 200 ?
                 $this->checkStatusKlaimPasien['response']['kdProviderPst']['kdProvider']
                 : '';
 
@@ -282,18 +332,99 @@ class FormEntryDaftarRJ extends Component
                     "kdTkp" => $this->FormEntry['kdTkp']
                 ];
                 $addPedaftaran = $this->addPedaftaran($dataPedaftaran)->getOriginalContent();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->emit('toastr-error', $e->getMessage());
                 return;
             }
 
-            if ($addPedaftaran['metadata']['code'] === 201) {
+            if ($addPedaftaran['metadata']['code'] == 201) {
                 $this->FormEntry['noUrutBpjs'] = $addPedaftaran['response']['message'];
             } else {
                 $this->emit('toastr-error', $addPedaftaran['metadata']['message']);
             }
         }
     }
+
+    public function deletePendaftaranPasienBPJS(string $statusPasien): void
+    {
+        // Hanya untuk pasien BPJS (status JM)
+        if ($statusPasien !== 'JM') {
+            return;
+        }
+
+        // 1. Ambil data peserta
+        try {
+            $displayPasien = $this->findDataMasterPasien($this->FormEntry['regNo']);
+            $noKartu       = $displayPasien['pasien']['identitas']['idBpjs'] ?? '';
+        } catch (Exception $e) {
+            $this->emit('toastr-error', 'Gagal ambil data peserta: ' . $e->getMessage());
+            return;
+        }
+
+        // 2. Siapkan parameter delete
+        try {
+            // Format tanggal pendaftaran dari formEntry (d/m/Y H:i:s → d-m-Y)
+            $tglDaftar = Carbon::createFromFormat(
+                'd/m/Y H:i:s',
+                $this->FormEntry['rjDate'],
+                env('APP_TIMEZONE')
+            )->format('d-m-Y');
+        } catch (Exception $e) {
+            $this->emit('toastr-error', 'Format tanggal pendaftaran tidak valid.');
+            return;
+        }
+
+        $noUrut = $this->FormEntry['noUrutBpjs'] ?? '';
+        $kdPoli = $this->FormEntry['kdpolibpjs'] ?? '';
+
+        // 3. Panggil deletePedaftaran (method Anda sebelumnya)
+        try {
+            $result = $this
+                ->deletePedaftaran($noKartu, $tglDaftar, $noUrut, $kdPoli)
+                ->getOriginalContent();
+        } catch (Exception $e) {
+            $this->emit('toastr-error', 'Error saat hapus pendaftaran: ' . $e->getMessage());
+            return;
+        }
+
+        // 4. Tangani response dari PCare
+        if (isset($result['metadata']['code']) && $result['metadata']['code'] == 200) {
+            // sukses: reset noUrutBpjs di formEntry
+            $this->FormEntry['noUrutBpjs'] = null;
+            $this->emit('toastr-success', 'Pendaftaran BPJS berhasil dihapus.');
+            return;
+        } else {
+            $msgResponse = $result['response']['message'] ?? 'x';
+            $msg = $result['metadata']['message'] . '  ' . $msgResponse
+                ?? 'Gagal menghapus pendaftaran.';
+            $this->emit('toastr-error', $msg);
+            return;
+        }
+    }
+
+    public function checkPendaftaranPasienBPJSbyNomorUrut(string $noUrut, string $tglDaftar): void
+    {
+        // Pastikan input tidak kosong
+        if (empty($noUrut) || empty($tglDaftar)) {
+            $this->emit('toastr-error', 'Nomor urut atau tanggal daftar tidak boleh kosong');
+            $this->emit('dataPendaftaranPasienUpdated', $this->dataPendaftaranPasien);
+            return;
+        }
+
+        // Konversi format tanggal dari: 28/07/2025 18:51:33 → 28-07-2025
+        try {
+            $tglDaftarFormatted = Carbon::createFromFormat('d/m/Y H:i:s', $tglDaftar)->format('d-m-Y');
+        } catch (\Exception $e) {
+            $this->emit('toastr-error', 'Format tanggal tidak valid. Gunakan format dd/mm/yyyy hh:mm:ss');
+            return;
+        }
+
+        // Panggil API PCare untuk ambil data pendaftaran berdasarkan no urut dan tgl
+        $getPendaftaran = $this->getPendaftaranbyNomorUrut($noUrut, $tglDaftarFormatted);
+        dd($getPendaftaran->getData(true));
+        return;
+    }
+
 
     private function checkJnsKlaimPasien($statusPasien = 'UM', $regNo = ''): void
     {
@@ -305,14 +436,15 @@ class FormEntryDaftarRJ extends Component
             $noka = $displayPasien['pasien']['identitas']['idBpjs'] ?? '';
             $nik = $displayPasien['pasien']['identitas']['nik'] ?? '';
 
-            if ($noka && $noka != '-') {
-                // getBpjs peserta by noka
+            if (!empty($noka) && $noka !== '-') {
+                // Get BPJS peserta by noka
                 $getpeserta = $this->getPesertabyJenisKartu('noka', $noka);
-            } else if ($nik && $nik != '-') {
-                // getBpjs peserta by nik jika noka kosong
+            } elseif (!empty($nik) && $nik !== '-') {
+                // Get BPJS peserta by nik jika noka kosong
                 $getpeserta = $this->getPesertabyJenisKartu('nik', $nik);
             } else {
                 $this->emit('toastr-error', 'Noka dan NIK kosong');
+                return;
             }
 
             $this->checkStatusKlaimPasien = $getpeserta->getOriginalContent() ?? [];
@@ -455,15 +587,63 @@ class FormEntryDaftarRJ extends Component
     // validate Data RJ//////////////////////////////////////////////////
     private function validateData(): void
     {
+        $this->rules['FormEntry.regNo'] = 'required';
+        $this->rules['FormEntry.kdpolibpjs'] = '';
+        $this->rules['FormEntry.noKartu'] = '';
+
+        // timpa jika JM
+        if ($this->FormEntry['klaimId'] == 'JM') {
+            $this->rules['FormEntry.noKartu'] = 'required';
+
+            if (!empty($this->FormEntry['noUrutBpjs'])) {
+                $this->rules['FormEntry.regNo'] = [
+                    'required',
+                    function ($attribute, $value, $fail) {
+                        // Pastikan format tanggal sesuai dengan aturan yang digunakan
+                        $date = Carbon::createFromFormat('d/m/Y H:i:s', $this->FormEntry['rjDate'])->format('d/m/Y');
+                        // Misalnya, model Registration mewakili pendaftaran pasien
+                        $exists = DB::table('rstxn_rjhdrs')
+                            ->where('reg_no', '=', $value)
+                            ->where('dr_id', '=', $this->FormEntry['drId'] ?? '')
+                            ->where('poli_id', '=', $this->FormEntry['poliId'] ?? '')
+                            ->where('klaim_id', '=', $this->FormEntry['klaimId'] ?? '')
+                            ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $date ?? '')
+                            ->exists();
+                        if ($exists) {
+                            $fail('Pendaftaran dengan poli yang sama dalam satu hari sudah ada.');
+                        }
+                    },
+                ];
+            }
+
+            $this->rules['FormEntry.kdpolibpjs'] = [
+                'required',
+                function ($attribute, $value, $fail) {
+                    $allowedPoli = ['020', '021', '023', '024', '025', '026'];
+                    // Jika kunjungan sehat (kunjSakit == 0), maka nilai harus ada dalam array allowedPoli.
+                    if ($this->FormEntry['kunjSakit'] == 0 && !in_array($value, $allowedPoli)) {
+                        $fail('Untuk kunjungan sehat, Kode Poli harus salah satu dari: ' . implode(', ', $allowedPoli) . '.');
+                    }
+
+                    if ($this->FormEntry['kunjSakit'] == 1 && in_array($value, $allowedPoli)) {
+                        $fail('Untuk kunjungan sakit, Kode Poli tidak boleh salah satu dari: ' . implode(', ', $allowedPoli) . '.');
+                    }
+                    // Jika kunjungan sakit (kunjSakit == 1), tidak perlu dicek apakah nilai ada di dalam allowedPoli.
+                },
+            ];
+        }
+
+
+
+
         // Proses Validasi///////////////////////////////////////////
         try {
 
-            $this->validate($this->rules, customErrorMessagesTrait::messages(), $this->validationAttributes);
+            $this->validate($this->rules, $this->messages, $this->validationAttributes);
         } catch (\Illuminate\Validation\ValidationException $e) {
             $this->emit('toastr-error', $e->getMessage());
-            $this->validate($this->rules, customErrorMessagesTrait::messages(), $this->validationAttributes);
+            $this->validate($this->rules, $this->messages, $this->validationAttributes);
         }
-
         $this->resetValidation();
     }
 
@@ -478,6 +658,10 @@ class FormEntryDaftarRJ extends Component
         // Pasien Baru Lama di blade wire:model
         $this->FormEntry['passStatus'] = isset($this->FormEntry['passStatus']) ? ($this->FormEntry['passStatus'] == 'N' ? 'N' : '') : '';
         $this->FormEntry['regNo'] = isset($this->pasien['regNo']) ? $this->pasien['regNo'] : '';
+
+        $displayPasien  = $this->findDataMasterPasien($this->FormEntry['regNo']);
+        $this->FormEntry['noKartu'] = isset($displayPasien['pasien']['identitas']['idBpjs']) ? $displayPasien['pasien']['identitas']['idBpjs'] : '';
+
         $this->FormEntry['drId'] = isset($this->dokter['DokterId']) ? $this->dokter['DokterId'] : '';
         $this->FormEntry['drDesc'] = isset($this->dokter['DokterDesc']) ? $this->dokter['DokterDesc'] : '';
         $this->FormEntry['poliId'] = isset($this->dokter['PoliId']) ? $this->dokter['PoliId'] : '';

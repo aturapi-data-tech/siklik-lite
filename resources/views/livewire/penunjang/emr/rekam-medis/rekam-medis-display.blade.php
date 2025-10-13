@@ -1,191 +1,127 @@
-<div>
+<div class="flex flex-col my-2">
+    <div class="overflow-x-auto rounded-lg">
+        <div class="inline-block min-w-full align-middle">
+            <div class="mb-2 overflow-hidden shadow sm:rounded-lg">
+                <table class="w-full text-sm text-left text-gray-700 table-fixed dark:text-gray-300">
+                    <thead class="text-xs uppercase bg-gray-100 dark:bg-gray-800/60">
+                        <tr>
+                            <th scope="col" class="w-full px-4 py-3">
+                                <x-sort-link :active="false" role="button" href="#" wire:click.prevent="">
+                                    Resume Medis
+                                </x-sort-link>
+                            </th>
+                        </tr>
+                    </thead>
 
-    @php
-        $disabledProperty = true;
-        $disabledPropertyRjStatus = false;
-    @endphp
+                    <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
+                        @foreach ($myQueryData as $myQData)
+                            @php
+                                $json = json_decode($myQData->datadaftar_json ?? '[]', true) ?: [];
+                                $terapi = trim(data_get($json, 'perencanaan.terapi.terapi', ''));
+                                $terapiNonObat = trim(data_get($json, 'perencanaan.terapi.terapiNonObat', ''));
+                                $diagnosis = data_get($json, 'diagnosis', []);
+                                $isPrb = (bool) data_get($json, 'statusPRB.penanggungJawab.statusPRB', false);
 
-    <div class="w-full mb-1 ">
+                                $statusText = match ($myQData->layanan_status) {
+                                    'RI' => 'Rawat Inap',
+                                    'RJ' => 'Rawat Jalan',
+                                    'UGD' => 'UGD',
+                                    default => '-',
+                                };
+                            @endphp
 
-        <div class="grid grid-cols-1">
+                            <tr class="group hover:bg-gray-50 dark:hover:bg-gray-800/40">
+                                <td class="px-4 py-3 text-gray-900 align-top dark:text-gray-100">
 
-            <div id="TransaksiRawatJalan" class="px-2">
-                {{-- <x-input-label for="" :value="__($myTitle)" :required="__(false)" class="pt-2 sm:text-xl" /> --}}
+                                    {{-- Header Baris --}}
+                                    <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                                        <span class="font-semibold text-primary">{{ $statusText }}</span>
+                                        <span class="text-gray-600 dark:text-gray-400">/ {{ $myQData->reg_name }}</span>
 
-
-
-                <!-- Table -->
-                <div class="flex flex-col my-2">
-                    <div class="overflow-x-auto rounded-lg">
-                        <div class="inline-block min-w-full align-middle">
-                            <div class="mb-2 overflow-hidden shadow sm:rounded-lg">
-                                <table class="w-full text-sm text-left text-gray-500 table-auto dark:text-gray-400">
-                                    <thead
-                                        class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
-                                        <tr>
-                                            <th scope="col" class="w-1/3 px-4 py-3 overflow-auto">
-
-                                                <x-sort-link :active=false wire:click.prevent="" role="button"
-                                                    href="#">
-                                                    resumemedis
-                                                </x-sort-link>
-                                            </th>
-
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white dark:bg-gray-800">
-
-                                        @foreach ($myQueryData as $myQData)
-                                            <tr class="border-b group dark:border-gray-700">
-
-
-
-                                                @php
-                                                    $datadaftar_json = json_decode($myQData->datadaftar_json, true);
-                                                @endphp
-
-                                                <td
-                                                    class="px-4 py-3 text-gray-900 group-hover:bg-gray-100 whitespace-nowrap">
-                                                    <div class="">
-                                                        <div class="font-semibold text-primary">
-                                                            {{ $myQData->layanan_status === 'RI'
-                                                                ? 'Rawat Inap'
-                                                                : ($myQData->layanan_status === 'UGD'
-                                                                    ? 'UGD'
-                                                                    : ($myQData->layanan_status === 'RJ'
-                                                                        ? 'Rawat Jalan'
-                                                                        : '-')) }}
-                                                            {{ ' / ' . $myQData->reg_name }}
-
-                                                            {{-- Status PRB --}}
-                                                            @isset($datadaftar_json['statusPRB']['penanggungJawab']['statusPRB'])
-                                                                @if ($datadaftar_json['statusPRB']['penanggungJawab']['statusPRB'])
-                                                                    <x-badge :badgecolor="__('dark')">
-                                                                        PRB
-                                                                    </x-badge>
-                                                                @else
-                                                                    {{-- <x-badge :badgecolor="__('dark')">
-                                                                        NonPRB
-                                                                    </x-badge> --}}
-                                                                @endif
-                                                            @else
-                                                                {{-- <x-badge :badgecolor="__('dark')">
-                                                                    NonPRB
-                                                                </x-badge> --}}
-                                                            @endisset
-                                                        </div>
-                                                        <div class="font-semibold text-gray-900">
-                                                            {{ $myQData->txn_date . ' / (' . $myQData->reg_no . ') / ' . $myQData->nokartu_bpjs }}
-                                                        </div>
-                                                        <div class="font-normal text-gray-900">
-                                                            {{ $myQData->poli . ' ' . $myQData->kd_dr_bpjs }}
-                                                        </div>
-                                                    </div>
-                                                    <div class="ml-8">
-                                                        {{-- <span class="font-semibold">TTV:</span>
-                                                        <br>
-                                                        TD :
-                                                        {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['sistolik'])
-                                                            ? $datadaftar_json['pemeriksaan']['tandaVital']['sistolik']
-                                                            : '' }}
-                                                        /
-                                                        {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['distolik'])
-                                                            ? $datadaftar_json['pemeriksaan']['tandaVital']['distolik']
-                                                            : '' }}
-                                                        (mmHg)
-                                                        <br>
-                                                        SPO2 :
-                                                        {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['spo2'])
-                                                            ? $datadaftar_json['pemeriksaan']['tandaVital']['spo2']
-                                                            : '' }}
-                                                        (%)
-                                                        <br>
-                                                        GDA :
-                                                        {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['gda'])
-                                                            ? $datadaftar_json['pemeriksaan']['tandaVital']['gda']
-                                                            : '' }}
-                                                        (mg/dL)
-                                                        <br> --}}
-                                                        <span class="font-semibold"> Diagnosis :</span>
-                                                        <br>
-                                                        @isset($datadaftar_json['diagnosis'])
-                                                            @foreach ($datadaftar_json['diagnosis'] as $diagnosis)
-                                                                {!! nl2br(e($diagnosis['diagId'] . ' - ' . $diagnosis['diagDesc'])) . '</br>' !!}
-                                                            @endforeach
-                                                        @endisset
-                                                        <span class="font-semibold"> Terapi :</span>
-                                                        <br>
-                                                        {!! nl2br(
-                                                            e(
-                                                                isset($datadaftar_json['perencanaan']['terapi']['terapi'])
-                                                                    ? $datadaftar_json['perencanaan']['terapi']['terapi']
-                                                                    : '',
-                                                            ),
-                                                        ) !!}
-                                                    </div>
-
-                                                    @role(['Dokter', 'Admin'])
-                                                        <div class="flex justify-between">
-                                                            <div>
-                                                                <x-yellow-button
-                                                                    wire:click.prevent="copyResep({{ $myQData->txn_no }},'{{ $myQData->layanan_status }}')"
-                                                                    type="button" wire:loading.remove>
-                                                                    Copy Resep
-                                                                </x-yellow-button>
-                                                                <div wire:loading wire:target="copyResep">
-                                                                    <x-loading />
-                                                                </div>
-                                                            </div>
-
-
-                                                            <div>
-                                                                <x-light-button
-                                                                    wire:click.prevent="myiCare('{{ $myQData->nokartu_bpjs }}','{{ isset($datadaftar_json['sep']['noSep']) ? $datadaftar_json['sep']['noSep'] : '' }}')"
-                                                                    type="button" wire:loading.remove>
-                                                                    i-Care
-                                                                </x-light-button>
-                                                                <div wire:loading wire:target="myiCare">
-                                                                    <x-loading />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    @endrole
-                                                </td>
-
-
-
-
-                                            </tr>
-                                        @endforeach
-
-
-                                    </tbody>
-                                </table>
-                                {{-- no data found start --}}
-                                @if ($myQueryData->count() == 0)
-                                    <div class="w-full p-4 text-sm text-center text-gray-900 dark:text-gray-400">
-                                        {{ 'Data Layanan Tidak ditemukan' }}
+                                        @if ($isPrb)
+                                            <x-badge :badgecolor="'dark'">PRB</x-badge>
+                                        @endif
                                     </div>
-                                @endif
-                                {{-- no data found end --}}
 
-                            </div>
+                                    <div class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                        {{ $myQData->txn_date }} / ({{ $myQData->reg_no }}) /
+                                        {{ $myQData->nokartu_bpjs }}
+                                    </div>
+                                    <div class="text-sm text-gray-700 dark:text-gray-300">
+                                        {{ $myQData->poli }} {{ $myQData->kd_dr_bpjs }}
+                                    </div>
 
-                            {{ $myQueryData->links('vendor.livewire.simple-tailwind') }}
+                                    {{-- Konten --}}
+                                    <div class="mt-2 ml-6 space-y-2">
 
-                        </div>
+                                        {{-- Diagnosis --}}
+                                        <div>
+                                            <div class="font-semibold">Diagnosis :</div>
+                                            @if (!empty($diagnosis))
+                                                <ul class="mt-1 list-disc pl-5 space-y-0.5">
+                                                    @foreach ($diagnosis as $d)
+                                                        <li class="break-words">
+                                                            {{ ($d['diagId'] ?? '-') . ' - ' . ($d['diagDesc'] ?? '-') }}
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            @else
+                                                <div class="text-gray-500">-</div>
+                                            @endif
+                                        </div>
+
+                                        {{-- Terapi (Obat) --}}
+                                        <div>
+                                            <div class="font-semibold">Terapi (Obat) :</div>
+                                            <div class="break-words whitespace-pre-line">
+                                                {!! $terapi !== '' ? nl2br(e($terapi)) : '<span class="text-gray-500">-</span>' !!}
+                                            </div>
+                                        </div>
+
+                                        {{-- Terapi Non Obat --}}
+                                        <div>
+                                            <div class="font-semibold">Terapi Non Obat :</div>
+                                            <div class="break-words whitespace-pre-line">
+                                                {!! $terapiNonObat !== '' ? nl2br(e($terapiNonObat)) : '<span class="text-gray-500">-</span>' !!}
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    {{-- Aksi --}}
+                                    @role(['Dokter', 'Admin'])
+                                        <div class="flex flex-wrap gap-2 mt-3">
+                                            <x-yellow-button
+                                                wire:click.prevent="copyResep({{ $myQData->txn_no }}, '{{ $myQData->layanan_status }}')"
+                                                type="button" wire:loading.remove>
+                                                Copy Resep
+                                            </x-yellow-button>
+                                            <div wire:loading wire:target="copyResep"><x-loading /></div>
+
+                                            <x-light-button
+                                                wire:click.prevent="myiCare('{{ $myQData->nokartu_bpjs }}','{{ data_get($json, 'sep.noSep', '') }}')"
+                                                type="button" wire:loading.remove>
+                                                i-Care
+                                            </x-light-button>
+                                            <div wire:loading wire:target="myiCare"><x-loading /></div>
+                                        </div>
+                                    @endrole
+
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
+                {{-- No data --}}
+                @if ($myQueryData->count() == 0)
+                    <div class="w-full p-4 text-sm text-center text-gray-700 dark:text-gray-300">
+                        Data Layanan Tidak ditemukan
                     </div>
-
-                    @if ($isOpenRekamMedisicare)
-                        @include('livewire.emr.rekam-medis.create-icare')
-                    @endif
-
-
-                </div>
+                @endif
             </div>
 
-
-
+            {{ $myQueryData->links('vendor.livewire.simple-tailwind') }}
         </div>
     </div>
 </div>

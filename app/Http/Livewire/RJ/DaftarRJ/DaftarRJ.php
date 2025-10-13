@@ -7,11 +7,13 @@ use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use App\Http\Traits\BPJS\PcareTrait;
 
 use App\Http\Traits\customErrorMessagesTrait;
 
 class DaftarRJ extends Component
 {
+    use PcareTrait;
 
     use WithPagination;
     protected $listeners = ['CloseModal' => 'closeModal'];
@@ -22,6 +24,25 @@ class DaftarRJ extends Component
     public string $myTitle = 'Data Pasien Rawat Jalan';
     public string $mySnipt = 'Rekam Medis Pasien';
     public string $myProgram = 'Pasien Rawat Jalan';
+
+
+    public array $pendaftaranProvider = [];
+
+
+    public function getPedaftaranProviderBPJS($tglDaftar, $start, $end): void
+    {
+
+        $tglDaftarFormatted = Carbon::createFromFormat('d/m/Y', $tglDaftar, env('APP_TIMEZONE'))->format('d-m-Y');
+        try {
+
+            $data = $this->getPendaftaranProvider($tglDaftarFormatted, $start, $end)->getOriginalContent();
+            dd($data);
+            $this->pendaftaranProvider = isset($data['response']['count']) ? $data : [];
+        } catch (\Exception $e) {
+            $this->emit('toastr-error', $e->getMessage());
+            return;
+        }
+    }
 
     /////////////////////
     // TopBar Parameters

@@ -60,7 +60,7 @@
                     <x-loading />
                 </div>
 
-                @if (!isset($this->FormEntry['dataKunjungan']))
+                @if (empty($FormEntry['addKunjungan']['noKunjungan']))
                     <x-green-button wire:click="store()" type="button" wire:loading.remove>
                         Kirim Pcare
                     </x-green-button>
@@ -74,7 +74,7 @@
         </div>
 
         <div class="flex justify-between">
-            @if (isset($FormEntry['dataKunjungan']))
+            @if (!empty($FormEntry['addKunjungan']['noKunjungan']))
                 <div class="flex justify-end px-4">
                     <div wire:loading wire:target="deleteKunjunganBpjs">
                         <x-loading />
@@ -90,7 +90,7 @@
                 </div>
             @endif
 
-            @if (!isset($FormEntry['dataKunjungan']))
+            @if (empty($FormEntry['addKunjungan']['noKunjungan']))
                 <div class="flex justify-end px-4">
                     <div wire:loading wire:target="resetKunjunganBpjs">
                         <x-loading />
@@ -101,8 +101,28 @@
                     </x-yellow-button>
                 </div>
             @else
-                <livewire:component.cetak.cetak-surat-rujukan :rjNoRef="$rjNoRef"
-                    :wire:key="$rjNoRef.'cetak-surat-rujukan'">
+                <div class="flex justify-end px-4">
+                    <div>
+                        <livewire:component.cetak.cetak-surat-rujukan :rjNoRef="$rjNoRef"
+                            :wire:key="$rjNoRef.'cetak-surat-rujukan'">
+                    </div>
+
+                    <div wire:loading wire:target="checkRiwayatKunjunganPasien,checkRujukanKunjungan">
+                        <x-loading />
+                    </div>
+
+                    <x-yellow-button
+                        wire:click="checkRiwayatKunjunganPasien('{{ addslashes($FormEntry['addKunjungan']['noKartu']) ?? '' }}')"
+                        type="button" wire:key="btnCheckRiwayatKunjungan" wire:loading.remove>
+                        Cek Riwayat Kunjungan
+                    </x-yellow-button>
+
+                    <x-yellow-button
+                        wire:click="checkRujukanKunjungan('{{ addslashes($FormEntry['addKunjungan']['noKunjungan']) ?? '' }}')"
+                        type="button" wire:key="btnCheckRiwayatKunjungan" wire:loading.remove>
+                        {{ 'Kunjungan ' . addslashes($FormEntry['addKunjungan']['noKunjungan']) ?? '' }}
+                    </x-yellow-button>
+                </div>
             @endif
 
 
@@ -154,14 +174,19 @@
                 <div class="flex">
                     <x-input-label for="FormEntry.addKunjungan.kdDokter" :value="__('Dokter')" :required="__($errors->has('FormEntry.addKunjungan.kdDokter'))" />
                     <p class="ml-2 font-normal text-primary">
-                        {{ $FormEntry['addKunjungan']['kdDokter'] ?? '' }}{{ $this->FormEntry['drDesc'] ?? '' }}
+                        {{ $FormEntry['addKunjungan']['kdDokter'] ?? '' }}/{{ $this->FormEntry['drDesc'] ?? '' }}
                     </p>
                 </div>
 
-                <div class="flex">
+                <div class="grid grid-cols-1 gap-1">
                     <x-input-label for="FormEntry.addKunjungan.tglDaftar" :value="__('Tanggal Daftar')" :required="__($errors->has('FormEntry.addKunjungan.tglDaftar'))" />
                     <p class="ml-2 font-normal text-primary">
                         {{ $FormEntry['addKunjungan']['tglDaftar'] ?? '' }}
+                    </p>
+
+                    <x-input-label for="FormEntry.addKunjungan.tglPulang" :value="__('Tanggal Pulang')" :required="__($errors->has('FormEntry.addKunjungan.tglPulang'))" />
+                    <p class="ml-2 font-normal text-primary">
+                        {{ $FormEntry['addKunjungan']['tglPulang'] ?? '' }}
                     </p>
                 </div>
             </div>
@@ -567,32 +592,32 @@
                 </div>
 
                 {{-- tacc --}}
-
-                {{-- <div>
-                    <x-input-label for="FormEntry.addKunjungan.kdTacc" :value="__('kdTacc')" :required="__($errors->has('FormEntry.addKunjungan.kdTacc'))" />
-                    <div class="flex items-center mb-2">
-                        <x-text-input id="FormEntry.addKunjungan.kdTacc" placeholder="kdTacc" class="mt-1 ml-2"
-                            :errorshas="__($errors->has('FormEntry.addKunjungan.kdTacc'))" :disabled=$disabledPropertyId
-                            wire:model="FormEntry.addKunjungan.kdTacc" />
-                    </div>
-                    @error('FormEntry.addKunjungan.kdTacc')
-                        <x-input-error :messages=$message />
-                    @enderror
-                </div>
-
-                <div>
-                    <x-input-label for="FormEntry.addKunjungan.alasanTacc" :value="__('alasanTacc')" :required="__($errors->has('FormEntry.addKunjungan.alasanTacc'))" />
-                    <div class="flex items-center mb-2">
-                        <x-text-input id="FormEntry.addKunjungan.alasanTacc" placeholder="alasanTacc"
-                            class="mt-1 ml-2" :errorshas="__($errors->has('FormEntry.addKunjungan.alasanTacc'))" :disabled=$disabledPropertyId
-                            wire:model="FormEntry.addKunjungan.alasanTacc" />
-                    </div>
-                    @error('FormEntry.addKunjungan.alasanTacc')
-                        <x-input-error :messages=$message />
-                    @enderror
-                </div> --}}
-                {{-- jika dia termasuk diagnosa NonSpesialistik atau false baru mucullkan --}}
                 @if ($this->FormEntry['addKunjungan']['nonSpesialis'] ?? false)
+                    <div>
+                        <x-input-label for="FormEntry.addKunjungan.kdTacc" :value="__('kdTacc')" :required="__($errors->has('FormEntry.addKunjungan.kdTacc'))" />
+                        <div class="flex items-center mb-2">
+                            <x-text-input id="FormEntry.addKunjungan.kdTacc" placeholder="kdTacc" class="mt-1 ml-2"
+                                :errorshas="__($errors->has('FormEntry.addKunjungan.kdTacc'))" :disabled=$disabledPropertyId
+                                wire:model="FormEntry.addKunjungan.kdTacc" />
+                        </div>
+                        @error('FormEntry.addKunjungan.kdTacc')
+                            <x-input-error :messages=$message />
+                        @enderror
+                    </div>
+
+                    <div>
+                        <x-input-label for="FormEntry.addKunjungan.alasanTacc" :value="__('alasanTacc')" :required="__($errors->has('FormEntry.addKunjungan.alasanTacc'))" />
+                        <div class="flex items-center mb-2">
+                            <x-text-input id="FormEntry.addKunjungan.alasanTacc" placeholder="alasanTacc"
+                                class="mt-1 ml-2" :errorshas="__($errors->has('FormEntry.addKunjungan.alasanTacc'))" :disabled=$disabledPropertyId
+                                wire:model="FormEntry.addKunjungan.alasanTacc" />
+                        </div>
+                        @error('FormEntry.addKunjungan.alasanTacc')
+                            <x-input-error :messages=$message />
+                        @enderror
+                    </div>
+
+                    {{-- jika dia termasuk diagnosa NonSpesialistik atau false baru mucullkan --}}
                     <div class="grid grid-cols-1 gap-2 p-2 my-1 mt-2 ml-2 border border-gray-300 rounded-lg">
                         @foreach ($refTacc as $tacc)
                             <x-radio-button :label="__($tacc['nmTacc'] . ' / ' . $tacc['kdTacc'])" value="{{ $tacc['kdTacc'] }}"
