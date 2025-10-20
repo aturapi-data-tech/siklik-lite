@@ -57,13 +57,13 @@
                                     @click="activeTab ='{{ $dataDaftarPoliRJ['anamnesa']['riwayatPenyakitDahuluTab'] }}'">{{ $dataDaftarPoliRJ['anamnesa']['riwayatPenyakitDahuluTab'] }}</label>
                             </li>
 
-                            {{-- <li class="mr-2">
+                            <li class="mr-2">
                                 <label
                                     class="inline-block p-2 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
                                     :class="activeTab === '{{ $dataDaftarPoliRJ['anamnesa']['penyakitKeluargaTab'] }}' ?
                                         'text-primary border-primary bg-gray-100' : ''"
                                     @click="activeTab ='{{ $dataDaftarPoliRJ['anamnesa']['penyakitKeluargaTab'] }}'">{{ $dataDaftarPoliRJ['anamnesa']['penyakitKeluargaTab'] }}</label>
-                            </li> --}}
+                            </li>
 
                             {{-- <li class="mr-2">
                                 <label

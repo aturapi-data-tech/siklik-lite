@@ -3,10 +3,10 @@
 
 
         <div class="pt-2">
-            <x-input-label for="dataDaftarPoliRJ.anamnesa.penyakitKeluarga.penyakitKeluarga" :value="__('Penyakit Keluarga')"
-                :required="__(false)" />
+            <x-input-label for="dataDaftarPoliRJ.anamnesa.penyakitKeluarga.penyakitKeluarga" class="pt-2 sm:text-xl"
+                :value="__('Penyakit Keluarga')" :required="__(false)" />
 
-            <div class="grid grid-cols-5 gap-2 pt-2">
+            <div class="grid grid-cols-4 gap-2 pt-2">
                 <x-check-box value='1' :label="__('hipertensi')"
                     wire:model.debounce.500ms="dataDaftarPoliRJ.anamnesa.penyakitKeluarga.hipertensi" />
                 <x-check-box value='1' :label="__('diabetesMelitus')"
