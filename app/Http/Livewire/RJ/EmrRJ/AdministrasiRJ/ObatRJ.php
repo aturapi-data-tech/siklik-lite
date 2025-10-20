@@ -24,7 +24,7 @@ class ObatRJ extends Component
 
     // listener from blade////////////////
     protected $listeners = [
-        'storeAssessmentDokterRJ' => 'store',
+        // 'storeAssessmentDokterRJ' => 'store',
         'syncronizeAssessmentDokterRJFindData' => 'mount',
         'syncronizeAssessmentPerawatRJFindData' => 'mount'
     ];
