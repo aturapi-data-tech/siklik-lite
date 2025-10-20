@@ -103,15 +103,14 @@
                                 :regNoRef="$regNoRef">
                     </div>
 
-                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
-                        :class="{
-                            'active': activeTab === 'administrasi'
-                        }"
-                        x-show.transition.in.opacity.duration.600="activeTab === 'administrasi'">
 
+                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 "
+                        :class="{
+                            'active': activeTabDokter === 'administrasi'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTabDokter === 'administrasi'">
                         <livewire:r-j.emr-r-j.administrasi-r-j.administrasi-r-j :wire:key="'content-administrasiRj'"
                             :rjNoRef="$rjNoRef">
-
                     </div>
 
                     <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 "

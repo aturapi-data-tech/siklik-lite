@@ -29,7 +29,7 @@ class AssessmentDokter extends Component
     public $regNoRef;
 
 
-    public function storeAssessmentDokterRJ()
+    public function storeAssessmentDokter()
     {
         $this->emit('storeAssessmentDokterRJ');
         $this->emit('toastr-success', "Data Pemeriksaan berhasil disimpan.");

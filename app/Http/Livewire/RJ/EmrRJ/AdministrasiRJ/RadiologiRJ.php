@@ -24,7 +24,7 @@ class RadiologiRJ extends Component
 
     // listener from blade////////////////
     protected $listeners = [
-        'storeAssessmentDokterRJ' => 'store',
+        'storeAssessmentDokterRJ' => 'mount',
         'syncronizeAssessmentDokterRJFindData' => 'mount',
         'syncronizeAssessmentPerawatRJFindData' => 'mount'
     ];

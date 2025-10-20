@@ -83,11 +83,11 @@
             <div class="">
             </div>
             <div>
-                <div wire:loading wire:target="storeAssessmentDokterRJ">
+                <div wire:loading wire:target="storeAssessmentDokter">
                     <x-loading />
                 </div>
 
-                <x-green-button :disabled=false wire:click.prevent="storeAssessmentDokterRJ()" type="button"
+                <x-green-button :disabled=false wire:click.prevent="storeAssessmentDokter()" type="button"
                     wire:loading.remove>
                     Simpan
                 </x-green-button>

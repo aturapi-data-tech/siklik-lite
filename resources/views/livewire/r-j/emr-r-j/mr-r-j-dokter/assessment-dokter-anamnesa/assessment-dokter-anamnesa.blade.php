@@ -34,7 +34,7 @@
                         {{-- @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.anamnesaDiperolehTab') --}}
                         @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.riwayatPenyakitSekarangUmumTab')
                         @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.riwayatPenyakitDahuluTab')
-                        {{-- @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.penyakitKeluargaTab') --}}
+                        @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.penyakitKeluargaTab')
                         {{-- @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.statusFungsionalTab') --}}
                         {{-- @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.statusPsikologisTab') --}}
                         {{-- @include('livewire.r-j.emr-r-j.mr-r-j.anamnesa.edukasiTab')
