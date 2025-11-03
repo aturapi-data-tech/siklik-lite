@@ -284,12 +284,12 @@
                                                             class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
                                                             <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
                                                                 aria-labelledby="dropdownButton{{ $RJp->rj_no }}">
-                                                                <li>
+                                                                {{-- <li>
                                                                     <x-dropdown-link
                                                                         wire:click="tampil('{{ $RJp->rj_no }}')">
                                                                         {{ __('Tampil | ' . $RJp->reg_name) }}
                                                                     </x-dropdown-link>
-                                                                </li>
+                                                                </li> --}}
                                                                 <li>
                                                                     <x-dropdown-link
                                                                         wire:click="edit('{{ $RJp->rj_no }}')">

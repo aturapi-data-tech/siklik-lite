@@ -1562,7 +1562,7 @@ class MasterPasien extends Component
             'reg_date' => Carbon::now(env('APP_TIMEZONE')),
             'reg_no' => $this->dataPasien['pasien']['regNo'], //primarykey insert when select max
             'reg_name' => strtoupper($this->dataPasien['pasien']['regName']),
-            'nokartu_bpjs' => $this->dataPasien['pasien']['identitas']['idBpjs'],
+            'nokartu_bpjs' => $this->dataPasien['pasien']['identitas']['idBpjs'] ?? '',
             'nik_bpjs' => $this->dataPasien['pasien']['identitas']['nik'],
             'sex' => $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] == 1 ? 'L' : 'P',
             'birth_date' => DB::raw("to_date('" . $this->dataPasien['pasien']['tglLahir'] . "','dd/mm/yyyy')"),
@@ -1604,7 +1604,7 @@ class MasterPasien extends Component
                 'reg_date' => Carbon::now(env('APP_TIMEZONE')),
                 // 'reg_no' => $this->dataPasien['pasien']['regNo'], //primarykey insert when select max
                 'reg_name' => strtoupper($this->dataPasien['pasien']['regName']),
-                'nokartu_bpjs' => $this->dataPasien['pasien']['identitas']['idBpjs'],
+                'nokartu_bpjs' => $this->dataPasien['pasien']['identitas']['idBpjs'] ?? '',
                 'nik_bpjs' => $this->dataPasien['pasien']['identitas']['nik'],
                 'sex' => $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] == 1 ? 'L' : 'P',
                 'birth_date' => DB::raw("to_date('" . $this->dataPasien['pasien']['tglLahir'] . "','dd/mm/yyyy')"),

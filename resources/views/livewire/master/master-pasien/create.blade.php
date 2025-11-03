@@ -532,7 +532,7 @@
                                                     </div>
 
                                                     <x-yellow-button :disabled=$disabledProperty
-                                                        wire:click.prevent="ceKIdBprjs('{{ $dataPasien['pasien']['identitas']['idBpjs'] }}')"
+                                                        wire:click.prevent="ceKIdBprjs('{{ $dataPasien['pasien']['identitas']['idBpjs'] ?? '' }}')"
                                                         type="button" wire:loading.remove>
                                                         IdBPJS
                                                     </x-yellow-button>
