@@ -3,25 +3,47 @@
 namespace App\Http\Livewire\RJ\EmrRJ\TelaahResepRJ;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-
-use Illuminate\Pagination\Paginator;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
-
 use Carbon\Carbon;
-use Spatie\ArrayToXml\ArrayToXml;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use App\Http\Traits\EmrRJ\EmrRJTrait;
 
 
 class TelaahResepRJ extends Component
 {
-    use WithPagination;
+    use WithPagination, EmrRJTrait;
+
 
     protected $listeners = [
         'rj:refresh-summary' => 'sumAll'
     ];
+
+    // dataDaftarPoliRJ RJ
+    public $rjNoRef;
+
+    public int $sumRsAdmin;
+    public int $sumRjAdmin;
+    public int $sumPoliPrice;
+
+    public int $sumJasaKaryawan;
+    public int $sumJasaDokter;
+    public int $sumJasaMedis;
+
+    public int $sumObat;
+    public int $sumLaboratorium;
+    public int $sumRadiologi;
+
+    public int $sumLainLain;
+
+    public int $sumTotalRJ;
+
+
 
     // primitive Variable
     public string $myTitle = 'Resep Rawat Jalan';
@@ -273,26 +295,7 @@ class TelaahResepRJ extends Component
     public int $eresepRacikan;
     public int $eresep;
 
-    public int $rjNoRef;
     public string $regNoRef;
-
-    public int $sumRsAdmin;
-    public int $sumRjAdmin;
-    public int $sumPoliPrice;
-
-    public int $sumJasaKaryawan;
-    public int $sumJasaDokter;
-    public int $sumJasaMedis;
-
-    public int $sumObat;
-    public int $sumLaboratorium;
-    public int $sumRadiologi;
-
-    public int $sumLainLain;
-
-    public int $sumTotalRJ;
-
-
 
 
 
@@ -415,14 +418,9 @@ class TelaahResepRJ extends Component
         $this->sumAdmin();
     }
 
-    private function sumAdmin(): void
+    private function sumAdmin()
     {
         $sumAdmin = $this->findData($this->rjNoRef);
-
-
-        $this->eresepRacikan = collect(isset($sumAdmin['eresepRacikan']) ? $sumAdmin['eresepRacikan'] : [])->count();
-        $this->eresep = collect(isset($sumAdmin['eresep']) ? $sumAdmin['eresep'] : [])->count();
-
 
         $this->sumRsAdmin = $sumAdmin['rsAdmin'] ? $sumAdmin['rsAdmin'] : 0;
         $this->sumRjAdmin = $sumAdmin['rjAdmin'] ? $sumAdmin['rjAdmin'] : 0;
@@ -452,174 +450,148 @@ class TelaahResepRJ extends Component
         $this->sumTotalRJ = $this->sumPoliPrice + $this->sumRjAdmin + $this->sumRsAdmin  + $this->sumJasaKaryawan + $this->sumJasaDokter + $this->sumJasaMedis + $this->sumLainLain + $this->sumObat + $this->sumLaboratorium + $this->sumRadiologi;
     }
 
-    public function setttdTelaahResep($rjNo)
+
+    public function setttdTelaahResep(string $rjNo): void
     {
-        $myUserNameActive = auth()->user()->myuser_name;
-        if (auth()->user()->hasRole('Apoteker')) {
-            if (isset($this->dataDaftarPoliRJ['telaahResep']['penanggungJawab']) == false) {
-                $this->dataDaftarPoliRJ['telaahResep']['penanggungJawab'] = [
-                    'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
-                    'userLogCode' => auth()->user()->myuser_code
-                ];
+        $user = auth()->user();
 
-                DB::table('rstxn_rjhdrs')
-                    ->where('rj_no', $rjNo)
-                    ->update([
-                        'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
-                        'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-                    ]);
-
-                $this->emit('rj:refresh-summary');
-            }
-        } else {
-            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Apoteker.');
+        if (!$user || !$user->hasRole('Apoteker')) {
+            $name = $user->myuser_name ?? 'User';
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Anda tidak dapat melakukan TTD-E karena User Role {$name} bukan Apoteker.");
             return;
+        }
+
+        if (empty($rjNo)) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor RJ kosong.');
+            return;
+        }
+
+        $lockKey = "rj:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo, $user) {
+                DB::transaction(function () use ($rjNo, $user) {
+
+                    // 1) Ambil data FRESH setelah lock
+                    $freshWrap = $this->findDataRJ($rjNo);
+                    $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+
+                    // 2) Pastikan struktur ada
+                    if (!isset($fresh['telaahResep']) || !is_array($fresh['telaahResep'])) {
+                        $fresh['telaahResep'] = [];
+                    }
+
+                    // 3) Idempotent
+                    if (!empty($fresh['telaahResep']['penanggungJawab'])) {
+                        $who  = $fresh['telaahResep']['penanggungJawab']['userLog'] ?? '-';
+                        $when = $fresh['telaahResep']['penanggungJawab']['userLogDate'] ?? '-';
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addWarning("Sudah ditandatangani oleh {$who} pada {$when}.");
+                        return;
+                    }
+
+                    // 4) Set TTD
+                    $now = Carbon::now(config('app.timezone', env('APP_TIMEZONE', 'Asia/Jakarta')));
+                    $fresh['telaahResep']['penanggungJawab'] = [
+                        'userLog'     => $user->myuser_name,
+                        'userLogDate' => $now->format('d/m/Y H:i:s'),
+                        'userLogCode' => $user->myuser_code,
+                    ];
+
+                    // 5) Simpan
+                    $this->updateJsonRJ($rjNo, $fresh);
+
+                    // 6) Toast + refresh
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                        ->addSuccess('TTD Telaah Resep tersimpan.');
+                });
+            });
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk. Gagal memperoleh lock. Coba lagi.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal TTD Telaah Resep: ' . $e->getMessage());
         }
     }
 
-    public function setttdTelaahObat($rjNo)
+
+    public function setttdTelaahObat(string $rjNo): void
     {
-        $myUserNameActive = auth()->user()->myuser_name;
-        if (auth()->user()->hasRole('Apoteker')) {
-            if (isset($this->dataDaftarPoliRJ['telaahObat']['penanggungJawab']) == false) {
-                $this->dataDaftarPoliRJ['telaahObat']['penanggungJawab'] = [
-                    'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
-                    'userLogCode' => auth()->user()->myuser_code
-                ];
+        $user = auth()->user();
 
-                DB::table('rstxn_rjhdrs')
-                    ->where('rj_no', $rjNo)
-                    ->update([
-                        'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
-                        'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-                    ]);
-
-                $this->emit('rj:refresh-summary');
-            }
-        } else {
-            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Apoteker.');
+        if (!$user || !$user->hasRole('Apoteker')) {
+            $name = $user->myuser_name ?? 'User';
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Anda tidak dapat melakukan TTD-E karena User Role {$name} bukan Apoteker.");
             return;
         }
+
+        if (empty($rjNo)) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor RJ kosong.');
+            return;
+        }
+
+        $lockKey = "rj:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo, $user) {
+                DB::transaction(function () use ($rjNo, $user) {
+
+                    // 1) Read-fresh setelah lock
+                    $freshWrap = $this->findDataRJ($rjNo);
+                    $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+
+                    // 2) Pastikan struktur ada
+                    if (!isset($fresh['telaahObat']) || !is_array($fresh['telaahObat'])) {
+                        $fresh['telaahObat'] = [];
+                    }
+
+                    // 3) Idempotent
+                    if (!empty($fresh['telaahObat']['penanggungJawab'])) {
+                        $who  = $fresh['telaahObat']['penanggungJawab']['userLog'] ?? '-';
+                        $when = $fresh['telaahObat']['penanggungJawab']['userLogDate'] ?? '-';
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addWarning("Sudah ditandatangani oleh {$who} pada {$when}.");
+                        return;
+                    }
+
+                    // 4) Set TTD
+                    $now = Carbon::now(config('app.timezone', env('APP_TIMEZONE', 'Asia/Jakarta')));
+                    $fresh['telaahObat']['penanggungJawab'] = [
+                        'userLog'     => $user->myuser_name,
+                        'userLogDate' => $now->format('d/m/Y H:i:s'),
+                        'userLogCode' => $user->myuser_code,
+                    ];
+
+                    // 5) Simpan
+                    $this->updateJsonRJ($rjNo, $fresh);
+
+                    // 6) Toast + refresh
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                        ->addSuccess('TTD Telaah Obat tersimpan.');
+                });
+            });
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk. Gagal memperoleh lock. Coba lagi.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal TTD Telaah Obat: ' . $e->getMessage());
+        }
     }
+
+
 
     private function findData($rjNo): array
     {
         $dataRawatJalan = [];
 
-        $findData = DB::table('rsview_rjkasir')
-            ->select('datadaftarpolirj_json', 'vno_sep')
-            ->where('rj_no', $rjNo)
-            ->first();
+        $findDataRJ = $this->findDataRJ($rjNo);
+        $dataRawatJalan  = $findDataRJ['dataDaftarRJ'];
 
-        $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json   : null;
 
-        if ($dataDaftarPoliRJ_json) {
-            $dataRawatJalan = json_decode($findData->datadaftarpolirj_json, true);
-        } else {
-
-            $this->emit('toastr-error', "Data tidak dapat di proses json.");
-            $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
-                ->select(
-                    DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
-                    DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
-                    'rj_no',
-                    'reg_no',
-                    'reg_name',
-                    'sex',
-                    'address',
-                    'thn',
-                    DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
-                    'poli_id',
-                    'poli_desc',
-                    'dr_id',
-                    'dr_name',
-                    'klaim_id',
-                    // 'entry_id',
-                    'shift',
-                    'vno_sep',
-                    'no_antrian',
-
-                    'nobooking',
-
-                    'kd_dr_bpjs',
-                    'kd_poli_bpjs',
-                    'rj_status',
-                    'txn_status',
-                    'erm_status',
-                )
-                ->where('rj_no', '=', $rjNo)
-                ->first();
-
-            $dataRawatJalan = [
-                "regNo" =>  $dataDaftarPoliRJ->reg_no,
-
-                "drId" =>  $dataDaftarPoliRJ->dr_id,
-                "drDesc" =>  $dataDaftarPoliRJ->dr_name,
-
-                "poliId" =>  $dataDaftarPoliRJ->poli_id,
-                "klaimId" => $dataDaftarPoliRJ->klaim_id,
-                // "poliDesc" =>  $dataDaftarPoliRJ->poli_desc ,
-
-                // "kddrbpjs" =>  $dataDaftarPoliRJ->kd_dr_bpjs ,
-                // "kdpolibpjs" =>  $dataDaftarPoliRJ->kd_poli_bpjs ,
-
-                "rjDate" =>  $dataDaftarPoliRJ->rj_date,
-                "rjNo" =>  $dataDaftarPoliRJ->rj_no,
-                "shift" =>  $dataDaftarPoliRJ->shift,
-                "noAntrian" =>  $dataDaftarPoliRJ->no_antrian,
-                "noBooking" =>  $dataDaftarPoliRJ->nobooking,
-                "slCodeFrom" => "02",
-                "passStatus" => "",
-                "rjStatus" =>  $dataDaftarPoliRJ->rj_status,
-                "txnStatus" =>  $dataDaftarPoliRJ->txn_status,
-                "ermStatus" =>  $dataDaftarPoliRJ->erm_status,
-                "cekLab" => "0",
-                "kunjunganInternalStatus" => "0",
-                "noReferensi" =>  $dataDaftarPoliRJ->reg_no,
-                "postInap" => [],
-                "internal12" => "1",
-                "internal12Desc" => "Faskes Tingkat 1",
-                "internal12Options" => [
-                    [
-                        "internal12" => "1",
-                        "internal12Desc" => "Faskes Tingkat 1"
-                    ],
-                    [
-                        "internal12" => "2",
-                        "internal12Desc" => "Faskes Tingkat 2 RS"
-                    ]
-                ],
-                "kontrol12" => "1",
-                "kontrol12Desc" => "Faskes Tingkat 1",
-                "kontrol12Options" => [
-                    [
-                        "kontrol12" => "1",
-                        "kontrol12Desc" => "Faskes Tingkat 1"
-                    ],
-                    [
-                        "kontrol12" => "2",
-                        "kontrol12Desc" => "Faskes Tingkat 2 RS"
-                    ],
-                ],
-                "taskIdPelayanan" => [
-                    "taskId1" => "",
-                    "taskId2" => "",
-                    "taskId3" =>  $dataDaftarPoliRJ->rj_date,
-                    "taskId4" => "",
-                    "taskId5" => "",
-                    "taskId6" => "",
-                    "taskId7" => "",
-                    "taskId99" => "",
-                ],
-                'sep' => [
-                    "noSep" =>  $dataDaftarPoliRJ->vno_sep,
-                    "reqSep" => [],
-                    "resSep" => [],
-                ]
-            ];
-        }
 
         $rsAdmin = DB::table('rstxn_rjhdrs')
             ->select('rs_admin', 'rj_admin', 'poli_price', 'klaim_id', 'pass_status')
@@ -642,6 +614,7 @@ class TelaahResepRJ extends Component
             ->select('rad_desc', 'rstxn_rjrads.rad_price as rad_price', 'rad_dtl')
             ->where('rj_no', $rjNo)
             ->get();
+
 
 
         // RJ Admin
@@ -712,8 +685,6 @@ class TelaahResepRJ extends Component
                 ]);
         }
 
-
-
         $dataRawatJalan['rjObat'] = json_decode(json_encode($rsObat, true), true);
         $dataRawatJalan['rjLab'] = json_decode(json_encode($rsLab, true), true);
         $dataRawatJalan['rjRad'] = json_decode(json_encode($rsRad, true), true);
@@ -726,7 +697,6 @@ class TelaahResepRJ extends Component
         if (!isset($dataRawatJalan['telaahObat'])) {
             $dataRawatJalan['telaahObat'] = $this->telaahObat;
         }
-
         $this->dataDaftarPoliRJ = $dataRawatJalan;
         return ($dataRawatJalan);
     }
