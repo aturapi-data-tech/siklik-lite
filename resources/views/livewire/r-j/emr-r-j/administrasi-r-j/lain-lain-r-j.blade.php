@@ -11,15 +11,14 @@
 
         <div id="TransaksiRawatJalan" class="">
 
-            @if (!$collectingMyLainLain)
+            @empty($formEntryLainLain['LainLainId'])
                 <div>
                     <x-input-label for="dataLainLainLovSearch" :value="__('Lain Lain')" :required="__(true)" />
 
                     {{-- Lov dataLainLainLov --}}
                     <div x-data="{ selecteddataLainLainLovIndex: @entangle('selecteddataLainLainLovIndex') }" @click.outside="$wire.dataLainLainLovSearch = ''">
-                        <x-text-input id="dataLainLainLovSearch" placeholder="Lain Lain" class="mt-1 ml-2"
-                            :errorshas="__($errors->has('dataLainLainLovSearch'))" :disabled=$disabledPropertyRjStatus
-                            wire:model.debounce.500ms="dataLainLainLovSearch"
+                        <x-text-input id="dataLainLainLovSearch" placeholder="Lain Lain" class="mt-1 ml-2" :errorshas="__($errors->has('dataLainLainLovSearch'))"
+                            :disabled=$disabledPropertyRjStatus wire:model.debounce.500ms="dataLainLainLovSearch"
                             x-on:click.outside="$wire.resetdataLainLainLov()"
                             x-on:keyup.escape="$wire.resetdataLainLainLov()"
                             x-on:keyup.down="$wire.selectNextdataLainLainLov()"
@@ -79,51 +78,48 @@
                     </div>
                     {{-- Lov dataLainLainLov --}}
                 </div>
-            @endif
-
-            @if ($collectingMyLainLain)
-                {{-- collectingMyLainLain / obat --}}
+            @else
+                {{-- formEntryLainLain / obat --}}
                 <div class="grid grid-cols-12 gap-2 " x-data>
                     <div class="col-span-1">
-                        <x-input-label for="collectingMyLainLain.LainLainId" :value="__('Kode')" :required="__(true)" />
+                        <x-input-label for="formEntryLainLain.LainLainId" :value="__('Kode')" :required="__(true)" />
 
                         <div>
-                            <x-text-input id="collectingMyLainLain.LainLainId" placeholder="Kode" class="mt-1 ml-2"
-                                :errorshas="__($errors->has('collectingMyLainLain.LainLainId'))" :disabled=true
-                                wire:model.debounce.500ms="collectingMyLainLain.LainLainId" />
+                            <x-text-input id="formEntryLainLain.LainLainId" placeholder="Kode" class="mt-1 ml-2"
+                                :errorshas="__($errors->has('formEntryLainLain.LainLainId'))" :disabled=true wire:model.debounce.500ms="formEntryLainLain.LainLainId" />
 
-                            @error('collectingMyLainLain.LainLainId')
+                            @error('formEntryLainLain.LainLainId')
                                 <x-input-error :messages=$message />
                             @enderror
                         </div>
                     </div>
 
                     <div class="col-span-3">
-                        <x-input-label for="collectingMyLainLain.LainLainDesc" :value="__('Lain Lain')" :required="__(true)" />
+                        <x-input-label for="formEntryLainLain.LainLainDesc" :value="__('Lain Lain')" :required="__(true)" />
 
                         <div>
-                            <x-text-input id="collectingMyLainLain.LainLainDesc" placeholder="Lain Lain"
-                                class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyLainLain.LainLainDesc'))" :disabled=true
-                                wire:model.debounce.500ms="collectingMyLainLain.LainLainDesc" />
+                            <x-text-input id="formEntryLainLain.LainLainDesc" placeholder="Lain Lain" class="mt-1 ml-2"
+                                :errorshas="__($errors->has('formEntryLainLain.LainLainDesc'))" :disabled=true
+                                wire:model.debounce.500ms="formEntryLainLain.LainLainDesc" />
 
-                            @error('collectingMyLainLain.LainLainDesc')
+                            @error('formEntryLainLain.LainLainDesc')
                                 <x-input-error :messages=$message />
                             @enderror
                         </div>
                     </div>
 
                     <div class="col-span-3">
-                        <x-input-label for="collectingMyLainLain.LainLainPrice" :value="__('Tarif')" :required="__(true)" />
+                        <x-input-label for="formEntryLainLain.LainLainPrice" :value="__('Tarif')" :required="__(true)" />
 
                         <div>
-                            <x-text-input id="collectingMyLainLain.LainLainPrice" placeholder="Tarif" class="mt-1 ml-2"
-                                :errorshas="__($errors->has('collectingMyLainLain.LainLainPrice'))" :disabled=$disabledPropertyRjStatus
-                                wire:model.debounce.500ms="collectingMyLainLain.LainLainPrice" x-init="$refs.collectingMyLainLainLainLainPrice.focus()"
-                                x-ref="collectingMyLainLainLainLainPrice"
+                            <x-text-input id="formEntryLainLain.LainLainPrice" placeholder="Tarif" class="mt-1 ml-2"
+                                :errorshas="__($errors->has('formEntryLainLain.LainLainPrice'))" :disabled=$disabledPropertyRjStatus
+                                wire:model.debounce.500ms="formEntryLainLain.LainLainPrice" x-init="$refs.formEntryLainLainLainLainPrice.focus()"
+                                x-ref="formEntryLainLainLainLainPrice"
                                 x-on:keyup.enter="$wire.insertLainLain()
-                                $refs.collectingMyLainLainLainLainPrice.focus()" />
+                                $refs.formEntryLainLainLainLainPrice.focus()" />
 
-                            @error('collectingMyLainLain.LainLainPrice')
+                            @error('formEntryLainLain.LainLainPrice')
                                 <x-input-error :messages=$message />
                             @enderror
                         </div>
@@ -134,8 +130,8 @@
                     <div class="col-span-1">
                         <x-input-label for="" :value="__('Hapus')" :required="__(true)" />
 
-                        <x-alternative-button class="inline-flex ml-2" wire:click.prevent="resetcollectingMyLainLain()"
-                            x-on:click="$refs.collectingMyLainLainLainLainDesc.focus()">
+                        <x-alternative-button class="inline-flex ml-2" wire:click.prevent="resetformEntryLainLain()"
+                            x-on:click="$refs.formEntryLainLainLainLainDesc.focus()">
                             <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
                                 xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
                                 <path
@@ -145,8 +141,8 @@
                     </div>
 
                 </div>
-                {{-- collectingMyLainLain / obat --}}
-            @endif
+                {{-- formEntryLainLain / obat --}}
+            @endempty
 
 
 

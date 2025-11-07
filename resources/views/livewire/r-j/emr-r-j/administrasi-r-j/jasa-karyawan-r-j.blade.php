@@ -11,7 +11,7 @@
 
         <div id="TransaksiRawatJalan" class="">
 
-            @if (!$collectingMyJasaKaryawan)
+            @empty($formEntryJasaKaryawan['JasaKaryawanId'])
                 <div>
                     <x-input-label for="dataJasaKaryawanLovSearch" :value="__('Jasa Karyawan')" :required="__(true)" />
 
@@ -81,54 +81,49 @@
                     </div>
                     {{-- Lov dataJasaKaryawanLov --}}
                 </div>
-            @endif
-
-            @if ($collectingMyJasaKaryawan)
-                {{-- collectingMyJasaKaryawan / obat --}}
+            @else
+                {{-- formEntryJasaKaryawan / obat --}}
                 <div class="grid grid-cols-12 gap-2 " x-data>
                     <div class="col-span-1">
-                        <x-input-label for="collectingMyJasaKaryawan.JasaKaryawanId" :value="__('Kode')"
-                            :required="__(true)" />
+                        <x-input-label for="formEntryJasaKaryawan.JasaKaryawanId" :value="__('Kode')" :required="__(true)" />
 
                         <div>
-                            <x-text-input id="collectingMyJasaKaryawan.JasaKaryawanId" placeholder="Kode"
-                                class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyJasaKaryawan.JasaKaryawanId'))" :disabled=true
-                                wire:model.debounce.500ms="collectingMyJasaKaryawan.JasaKaryawanId" />
+                            <x-text-input id="formEntryJasaKaryawan.JasaKaryawanId" placeholder="Kode" class="mt-1 ml-2"
+                                :errorshas="__($errors->has('formEntryJasaKaryawan.JasaKaryawanId'))" :disabled=true
+                                wire:model.debounce.500ms="formEntryJasaKaryawan.JasaKaryawanId" />
 
-                            @error('collectingMyJasaKaryawan.JasaKaryawanId')
+                            @error('formEntryJasaKaryawan.JasaKaryawanId')
                                 <x-input-error :messages=$message />
                             @enderror
                         </div>
                     </div>
 
                     <div class="col-span-3">
-                        <x-input-label for="collectingMyJasaKaryawan.JasaKaryawanDesc" :value="__('Jasa Karyawan')"
-                            :required="__(true)" />
+                        <x-input-label for="formEntryJasaKaryawan.JasaKaryawanDesc" :value="__('Jasa Karyawan')" :required="__(true)" />
 
                         <div>
-                            <x-text-input id="collectingMyJasaKaryawan.JasaKaryawanDesc" placeholder="Jasa Karyawan"
-                                class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyJasaKaryawan.JasaKaryawanDesc'))" :disabled=true
-                                wire:model.debounce.500ms="collectingMyJasaKaryawan.JasaKaryawanDesc" />
+                            <x-text-input id="formEntryJasaKaryawan.JasaKaryawanDesc" placeholder="Jasa Karyawan"
+                                class="mt-1 ml-2" :errorshas="__($errors->has('formEntryJasaKaryawan.JasaKaryawanDesc'))" :disabled=true
+                                wire:model.debounce.500ms="formEntryJasaKaryawan.JasaKaryawanDesc" />
 
-                            @error('collectingMyJasaKaryawan.JasaKaryawanDesc')
+                            @error('formEntryJasaKaryawan.JasaKaryawanDesc')
                                 <x-input-error :messages=$message />
                             @enderror
                         </div>
                     </div>
 
                     <div class="col-span-3">
-                        <x-input-label for="collectingMyJasaKaryawan.JasaKaryawanPrice" :value="__('Tarif')"
-                            :required="__(true)" />
+                        <x-input-label for="formEntryJasaKaryawan.JasaKaryawanPrice" :value="__('Tarif')" :required="__(true)" />
 
                         <div>
-                            <x-text-input id="collectingMyJasaKaryawan.JasaKaryawanPrice" placeholder="Tarif"
-                                class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyJasaKaryawan.JasaKaryawanPrice'))" :disabled=$disabledPropertyRjStatus
-                                wire:model.debounce.500ms="collectingMyJasaKaryawan.JasaKaryawanPrice"
-                                x-init="$refs.collectingMyJasaKaryawanJasaKaryawanPrice.focus()" x-ref="collectingMyJasaKaryawanJasaKaryawanPrice"
+                            <x-text-input id="formEntryJasaKaryawan.JasaKaryawanPrice" placeholder="Tarif" class="mt-1 ml-2"
+                                :errorshas="__($errors->has('formEntryJasaKaryawan.JasaKaryawanPrice'))" :disabled=$disabledPropertyRjStatus
+                                wire:model.debounce.500ms="formEntryJasaKaryawan.JasaKaryawanPrice" x-init="$refs.formEntryJasaKaryawanJasaKaryawanPrice.focus()"
+                                x-ref="formEntryJasaKaryawanJasaKaryawanPrice"
                                 x-on:keyup.enter="$wire.insertJasaKaryawan()
-                                $refs.collectingMyJasaKaryawanJasaKaryawanPrice.focus()" />
+                                $refs.formEntryJasaKaryawanJasaKaryawanPrice.focus()" />
 
-                            @error('collectingMyJasaKaryawan.JasaKaryawanPrice')
+                            @error('formEntryJasaKaryawan.JasaKaryawanPrice')
                                 <x-input-error :messages=$message />
                             @enderror
                         </div>
@@ -139,9 +134,8 @@
                     <div class="col-span-1">
                         <x-input-label for="" :value="__('Hapus')" :required="__(true)" />
 
-                        <x-alternative-button class="inline-flex ml-2"
-                            wire:click.prevent="resetcollectingMyJasaKaryawan()"
-                            x-on:click="$refs.collectingMyJasaKaryawanJasaKaryawanDesc.focus()">
+                        <x-alternative-button class="inline-flex ml-2" wire:click.prevent="resetformEntryJasaKaryawan()"
+                            x-on:click="$refs.formEntryJasaKaryawanJasaKaryawanDesc.focus()">
                             <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
                                 xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
                                 <path
@@ -151,8 +145,8 @@
                     </div>
 
                 </div>
-                {{-- collectingMyJasaKaryawan / obat --}}
-            @endif
+                {{-- formEntryJasaKaryawan / obat --}}
+            @endempty
 
 
 

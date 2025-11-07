@@ -20,8 +20,7 @@ class TelaahResepRJ extends Component
     use WithPagination;
 
     protected $listeners = [
-        'syncronizeAssessmentDokterRJFindData' => 'sumAll',
-        'syncronizeAssessmentPerawatRJFindData' => 'sumAll'
+        'rj:refresh-summary' => 'sumAll'
     ];
 
     // primitive Variable
@@ -471,8 +470,7 @@ class TelaahResepRJ extends Component
                         'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
                     ]);
 
-                $this->emit('syncronizeAssessmentDokterRJFindData');
-                $this->emit('syncronizeAssessmentPerawatRJFindData');
+                $this->emit('rj:refresh-summary');
             }
         } else {
             $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Apoteker.');
@@ -498,8 +496,7 @@ class TelaahResepRJ extends Component
                         'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
                     ]);
 
-                $this->emit('syncronizeAssessmentDokterRJFindData');
-                $this->emit('syncronizeAssessmentPerawatRJFindData');
+                $this->emit('rj:refresh-summary');
             }
         } else {
             $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Apoteker.');

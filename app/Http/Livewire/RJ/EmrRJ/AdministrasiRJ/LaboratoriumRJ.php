@@ -22,12 +22,9 @@ class LaboratoriumRJ extends Component
     use WithPagination;
 
 
-    // listener from blade////////////////
-    protected $listeners = [
-        'storeAssessmentDokterRJ' => 'mount',
-        'syncronizeAssessmentDokterRJFindData' => 'mount',
-        'syncronizeAssessmentPerawatRJFindData' => 'mount'
-    ];
+
+
+
 
 
     //////////////////////////////z

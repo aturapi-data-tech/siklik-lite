@@ -3,15 +3,15 @@
 namespace App\Http\Livewire\RJ\EmrRJ\MrRJ\Pemeriksaan;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
-use Illuminate\Support\Str;
-
-// use Spatie\ArrayToXml\ArrayToXml;
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
+
 use App\Http\Traits\EmrRJ\EmrRJTrait;
 use App\Http\Traits\LOV\Pcare\LOVGetKesadaran\LOVGetKesadaranTrait;
 
@@ -19,11 +19,15 @@ class Pemeriksaan extends Component
 {
     use WithPagination, WithFileUploads, EmrRJTrait, LOVGetKesadaranTrait;
 
-    // listener from blade////////////////
+    // ==========================
+    // Listeners
+    // ==========================
     protected $listeners = [
-        'syncronizeAssessmentPerawatRJFindData' => 'mount'
-
+        'emr:rj:store'        => 'store',
+        // RACE-FIX: samakan pattern Anamnesa
     ];
+
+
 
     //////////////////////////////
     // Ref on top bar
@@ -33,93 +37,35 @@ class Pemeriksaan extends Component
     // dataDaftarPoliRJ RJ
     public array $dataDaftarPoliRJ = [];
     public array $kesadaran = [];
-    // data pemeriksaan=>[]
+
+    // ==========================
+    // DEFAULT SUBTREE
+    // ==========================
     public array $pemeriksaan = [
         "umumTab" => "Umum",
         "tandaVital" => [
             "keadaanUmum" => "",
             "tingkatKesadaran" => "01",
             "tingkatKesadaranDesc" => "Compos mentis",
-
-            // "tingkatKesadaranOptions" => [
-            //     ["tingkatKesadaran" => "Sadar Baik / Alert"],
-            //     ["tingkatKesadaran" => "Berespon Dengan Kata-Kata / Voice"],
-            //     ["tingkatKesadaran" => "Hanya Beresponse Jika Dirangsang Nyeri / Pain"],
-            //     ["tingkatKesadaran" => "Pasien Tidak Sadar / Unresponsive"],
-            //     ["tingkatKesadaran" => "Gelisah Atau Bingung"],
-            //     ["tingkatKesadaran" => "Acute Confusional States"],
-            // ],
-            // jalan nafas
-            // "jalanNafas" => [
-            //     "jalanNafas" => "",
-            //     "jalanNafasOptions" => [
-            //         ["jalanNafas" => "Paten"],
-            //         ["jalanNafas" => "Obstruksi Partial"],
-            //         ["jalanNafas" => "Obstruksi Total"],
-            //         ["jalanNafas" => "Stridor"],
-            //     ]
-            // ],
-
-            // // pernafasan
-            // "pernafasan" => [
-            //     "pernafasan" => "",
-            //     "pernafasanOptions" => [
-            //         ["pernafasan" => "Normal"],
-            //         ["pernafasan" => "Kusmaul"],
-            //         ["pernafasan" => "Takipneu"],
-            //         ["pernafasan" => "Retraktif"],
-            //         ["pernafasan" => "Dangkal"],
-
-            //     ]
-            // ],
-
-            // "gerakDada" => [
-            //     "gerakDada" => "",
-            //     "gerakDadaOptions" => [
-            //         ["gerakDada" => "Simetris"],
-            //         ["gerakDada" => "Asimetris"],
-            //     ]
-            // ],
-
-            // // sirkulasi
-            // "sirkulasi" => [
-            //     "sirkulasi" => "",
-            //     "sirkulasiOptions" => [
-            //         ["sirkulasi" => "Normal"],
-            //         ["sirkulasi" => "Sianosis"],
-            //         ["sirkulasi" => "Berkeringat"],
-            //         ["sirkulasi" => "Joundise"],
-            //         ["sirkulasi" => "Pucat"],
-
-            //     ]
-            // ],
-
-            // neurologis
-
-            // "e" => "", //number
-            // "m" => "", //number
-            // "v" => "", //number
-            // "gcs" => "", //number
-            "sistolik" => "", //number
-            "distolik" => "", //number
-            "frekuensiNafas" => "", //number
-            "frekuensiNadi" => "", //number
-            "suhu" => "", //number
-            // "saturasiO2" => "", //number
-            "spo2" => "", //number
-            "gda" => "", //number
-            "waktuPemeriksaan" => "", //date dd/mm/yyyy hh24:mi:ss
+            "sistolik" => "",
+            "distolik" => "",
+            "frekuensiNafas" => "",
+            "frekuensiNadi" => "",
+            "suhu" => "",
+            "spo2" => "",
+            "gda" => "",
+            "waktuPemeriksaan" => "",
         ],
 
         "nutrisi" => [
-            "bb" => "", //number
-            "tb" => "", //number
-            "imt" => "", //number
-            "lk" => "", //number
-            "lila" => "", //number
-            "liPerut" => "" //number
-
+            "bb" => "",
+            "tb" => "",
+            "imt" => "",
+            "lk" => "",
+            "lila" => "",
+            "liPerut" => ""
         ],
+
         "fungsional" => [
             "alatBantu" => "",
             "prothesa" => "",
@@ -246,7 +192,7 @@ class Pemeriksaan extends Component
                 ],
                 "desc" => "",
             ],
-            "payudarah" => [
+            "payudara" => [
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
@@ -392,11 +338,6 @@ class Pemeriksaan extends Component
             ],
         ],
 
-        "fungsional" => [
-            "alatBantu" => "",
-            "prothesa" => "",
-            "cacatTubuh" => "",
-        ],
         "suspekAkibatKerja" => [
             "suspekAkibatKerja" => "",
             "keteranganSuspekAkibatKerja" => "",
@@ -407,7 +348,6 @@ class Pemeriksaan extends Component
         ],
         "FisikujiFungsi" => [
             "FisikujiFungsi" => "",
-
         ],
         "eeg" => [
             "hasilPemeriksaan" => "",
@@ -416,15 +356,14 @@ class Pemeriksaan extends Component
             "hasilPerekaman" => "",
             "kesimpulan" => "",
             "saran" => "",
-
         ],
         "emg" => [
             "keluhanPasien" => "",
-            "pengobatan     " => "",
-            "td" => "", //number
-            "rr" => "", //number
-            "hr" => "", //number
-            "s" => "", //number
+            "pengobatan" => "",
+            "td" => "",
+            "rr" => "",
+            "hr" => "",
+            "s" => "",
             "gcs" => "",
             "fkl" => "",
             "nprs" => "",
@@ -445,69 +384,48 @@ class Pemeriksaan extends Component
             "impresion" => "",
         ],
         "ravenTest" => [
-            "skoring" => "", //number
-            "presentil" => "", //number
+            "skoring" => "",
+            "presentil" => "",
             "interpretasi" => "",
             "anjuran" => "",
-
-
         ],
-        "penunjang" => "",
-        // "pemeriksaanPenunjang" =>
-        // [
-        //     "lab" => [],
-        //     "rad" => [
-        //         "radHdr" => [
-        //             "radHdrNo" => "",
-        //             "radDtl" => [],
-        //         ],
 
-        //     ],
-        // ]
-
+        // Container penunjang
+        "pemeriksaanPenunjang" => [
+            "lab" => [],
+            "rad" => [],
+        ],
+        // uploadHasilPenunjang akan dibuat dinamis
     ];
 
     public $filePDF, $descPDF;
-    public bool $isOpenRekamMedisuploadpenunjangHasil;
+    public bool $isOpenRekamMedisuploadpenunjangHasil = false;
 
-
-    //////////////////////////////////////////////////////////////////////
-
-    // open and close modal start////////////////
-    //  modal status////////////////
-
+    // Modal laboratorium
     public bool $isOpenLaboratorium = false;
     public string $isOpenModeLaboratorium = 'insert';
-
-    public  $isPemeriksaanLaboratorium = [];
-    public  $isPemeriksaanLaboratoriumSelected = [];
+    public array $isPemeriksaanLaboratorium = [];
+    public $isPemeriksaanLaboratoriumSelected = [];
     public int $isPemeriksaanLaboratoriumSelectedKeyHdr = 0;
     public int $isPemeriksaanLaboratoriumSelectedKeyDtl = 0;
 
-
-
+    // Modal radiologi
     public bool $isOpenRadiologi = false;
     public string $isOpenModeRadiologi = 'insert';
-
-    public  $isPemeriksaanRadiologi = [];
-    public  $isPemeriksaanRadiologiSelected = [];
+    public array $isPemeriksaanRadiologi = [];
+    public $isPemeriksaanRadiologiSelected = [];
     public int $isPemeriksaanRadiologiSelectedKeyHdr = 0;
     public int $isPemeriksaanRadiologiSelectedKeyDtl = 0;
 
+    // LOV kesadaran
+    public array $tingkatKesadaranLov = [];
+    public bool $tingkatKesadaranLovStatus = false;
+    public string $tingkatKesadaranLovSearch = '';
 
-
-    // open and close modal start////////////////
-    //  modal status////////////////
-
-
-    public $tingkatKesadaranLov = [];
-    public $tingkatKesadaranLovStatus = 0;
-    public $tingkatKesadaranLovSearch = '';
-
-
-
+    // ==========================
+    // Validation
+    // ==========================
     protected $rules = [
-        // Tanda Vital
         'dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik' => 'required|numeric|min:40|max:250',
         'dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik' => 'required|numeric|min:30|max:180',
         'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi' => 'required|numeric|min:30|max:160',
@@ -516,95 +434,153 @@ class Pemeriksaan extends Component
         'dataDaftarPoliRJ.pemeriksaan.tandaVital.spo2' => 'nullable|numeric|min:70|max:100',
         'dataDaftarPoliRJ.pemeriksaan.tandaVital.gda' => 'nullable|numeric|min:50|max:500',
 
-        // Nutrisi
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb' => 'required|numeric|min:2|max:300', // Berat badan (kg)
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb' => 'required|numeric|min:30|max:250', // Tinggi badan (cm)
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt' => 'required|numeric|min:10|max:100', // Indeks Massa Tubuh
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lk' => 'nullable|numeric|min:10|max:100', // Lingkar Kepala (cm)
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lila' => 'nullable|numeric|min:5|max:100', // Lingkar Lengan Atas (cm)
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut' => 'required|numeric|min:10|max:200', // Lingkar Perut (cm)
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb' => 'required|numeric|min:2|max:300',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb' => 'required|numeric|min:30|max:250',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt' => 'required|numeric|min:10|max:100',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lk' => 'nullable|numeric|min:10|max:100',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lila' => 'nullable|numeric|min:5|max:100',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut' => 'required|numeric|min:10|max:200',
     ];
 
     protected $messages = [
-        // Tanda Vital
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik.required' => 'Sistolik wajib diisi.',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik.numeric'  => 'Sistolik harus berupa angka.',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik.min'      => 'Sistolik minimal 40 mmHg.',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik.max'      => 'Sistolik maksimal 250 mmHg.',
+        // tanda vital
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik.required' => 'Kolom :attribute wajib diisi.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik.numeric' => ':attribute harus berupa angka.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik.min' => ':attribute minimal :min mmHg.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik.max' => ':attribute maksimal :max mmHg.',
 
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik.required' => 'Diastolik wajib diisi.',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik.numeric'  => 'Diastolik harus berupa angka.',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik.min'      => 'Diastolik minimal 30 mmHg.',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik.max'      => 'Diastolik maksimal 180 mmHg.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik.required' => 'Kolom :attribute wajib diisi.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik.numeric' => ':attribute harus berupa angka.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik.min' => ':attribute minimal :min mmHg.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik.max' => ':attribute maksimal :max mmHg.',
 
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi.required' => 'Frekuensi nadi wajib diisi.',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi.numeric'  => 'Frekuensi nadi harus berupa angka.',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi.min'      => 'Frekuensi nadi minimal 30 bpm.',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi.max'      => 'Frekuensi nadi maksimal 160 bpm.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi.required' => ':attribute wajib diisi.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi.numeric' => ':attribute harus angka.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi.min' => ':attribute minimal :min x/menit.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi.max' => ':attribute maksimal :max x/menit.',
 
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas.required' => 'Frekuensi nafas wajib diisi.',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas.numeric'  => 'Frekuensi nafas harus berupa angka.',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas.min'      => 'Frekuensi nafas minimal 5 kali per menit.',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas.max'      => 'Frekuensi nafas maksimal 70 kali per menit.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas.required' => ':attribute wajib diisi.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas.numeric' => ':attribute harus angka.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas.min' => ':attribute minimal :min x/menit.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas.max' => ':attribute maksimal :max x/menit.',
 
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu.required'   => 'Suhu tubuh wajib diisi.',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu.numeric'    => 'Suhu tubuh harus berupa angka.',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu.min'        => 'Suhu tubuh minimal 35°C.',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu.max'        => 'Suhu tubuh maksimal 42°C.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu.required' => ':attribute wajib diisi.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu.numeric' => ':attribute harus angka.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu.min' => ':attribute minimal :min °C.',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu.max' => ':attribute maksimal :max °C.',
 
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.spo2.numeric'    => 'Saturasi oksigen (SpO2) harus berupa angka.',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.spo2.min'        => 'Saturasi oksigen minimal 70%.',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.spo2.max'        => 'Saturasi oksigen maksimal 100%.',
+        // nutrisi
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb.required' => ':attribute wajib diisi.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb.numeric' => ':attribute harus berupa angka.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb.min' => ':attribute minimal :min kg.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb.max' => ':attribute maksimal :max kg.',
 
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.gda.numeric'     => 'Gula darah acak (GDA) harus berupa angka.',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.gda.min'         => 'GDA minimal 50 mg/dL.',
-        'dataDaftarPoliRJ.pemeriksaan.tandaVital.gda.max'         => 'GDA maksimal 500 mg/dL.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb.required' => ':attribute wajib diisi.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb.numeric' => ':attribute harus berupa angka.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb.min' => ':attribute minimal :min cm.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb.max' => ':attribute maksimal :max cm.',
 
-        // Nutrisi
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb.required'  => 'Berat badan wajib diisi.',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb.numeric'   => 'Berat badan harus berupa angka.',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb.min'       => 'Berat badan minimal 2 kg.',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb.max'       => 'Berat badan maksimal 300 kg.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt.required' => ':attribute wajib diisi.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt.numeric' => ':attribute harus berupa angka.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt.min' => ':attribute minimal :min.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt.max' => ':attribute maksimal :max.',
 
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb.required'  => 'Tinggi badan wajib diisi.',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb.numeric'   => 'Tinggi badan harus berupa angka.',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb.min'       => 'Tinggi badan minimal 30 cm.',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb.max'       => 'Tinggi badan maksimal 250 cm.',
-
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt.required' => 'Indeks Massa Tubuh (IMT) wajib diisi.',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt.numeric'  => 'IMT harus berupa angka.',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt.min'      => 'IMT minimal 10.',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt.max'      => 'IMT maksimal 100.',
-
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lk.numeric'   => 'Lingkar Kepala (LK) harus berupa angka.',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lk.min'       => 'Lingkar Kepala minimal 10 cm.',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lk.max'       => 'Lingkar Kepala maksimal 100 cm.',
-
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lila.numeric' => 'Lingkar Lengan Atas (LILA) harus berupa angka.',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lila.min'     => 'LILA minimal 5 cm.',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lila.max'     => 'LILA maksimal 100 cm.',
-
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut.required' => 'Lingkar Perut wajib diisi.',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut.numeric'  => 'Lingkar Perut harus berupa angka.',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut.min'      => 'Lingkar Perut minimal 10 cm.',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut.max'      => 'Lingkar Perut maksimal 200 cm.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut.required' => ':attribute wajib diisi.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut.numeric' => ':attribute harus angka.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut.min' => ':attribute minimal :min cm.',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut.max' => ':attribute maksimal :max cm.',
     ];
 
+    protected $validationAttributes = [
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik' => 'Tekanan darah sistolik',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik' => 'Tekanan darah diastolik',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi' => 'Frekuensi nadi',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas' => 'Frekuensi napas',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu' => 'Suhu tubuh',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.spo2' => 'Saturasi oksigen (SpO₂)',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.gda' => 'Gula darah acak (GDA)',
 
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb' => 'Berat badan',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb' => 'Tinggi badan',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt' => 'Indeks massa tubuh (IMT)',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lk' => 'Lingkar kepala',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.lila' => 'Lingkar lengan atas (LILA)',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.liPerut' => 'Lingkar perut',
+    ];
 
-    ////////////////////////////////////////////////
-    ///////////begin////////////////////////////////
-    ////////////////////////////////////////////////
-
+    // ==========================
+    // Lifecycle/UI
+    // ==========================
     public function updated($propertyName)
     {
-        // dd($propertyName);
-        $this->validateOnly($propertyName);
-        $this->scoringIMT();
-        $this->store();
+        // RACE-FIX: jangan autosave di setiap ketikan
+        if (str_starts_with($propertyName, 'dataDaftarPoliRJ.pemeriksaan.')) {
+            $this->validateOnly($propertyName);
+            $this->scoringIMT();
+        }
     }
 
-    // lab
+    // ==========================
+    // PUBLIC API (no autosave)
+    // ==========================
+    public function store(): void
+    {
+        // 1) Validasi form
+        $this->validateDataRJ();
+
+        // 2) RJ No
+        $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor RJ kosong.');
+            return;
+        }
+
+        $lockKey = "rj:{$rjNo}";
+
+        // 3) Mutex + Transaction + PATCH subtree
+        try {
+            // RACE-FIX: lock + block
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+
+                // Ambil FRESH state dari DB
+                $freshWrap = $this->findDataRJ($rjNo);
+                $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+                if (!is_array($fresh)) $fresh = [];
+
+                // Bootstrap subtree pemeriksaan
+                if (!isset($fresh['pemeriksaan']) || !is_array($fresh['pemeriksaan'])) {
+                    $fresh['pemeriksaan'] = $this->pemeriksaan;
+                }
+
+                // PATCH: replace hanya subtree 'pemeriksaan' dari form saat ini
+                $fresh['pemeriksaan'] = $this->dataDaftarPoliRJ['pemeriksaan'];
+
+                // Tulis dalam transaksi
+                DB::transaction(function () use ($rjNo, $fresh) {
+                    // gunakan helper trait seperti di Anamnesa
+                    $this->updateJsonRJ($rjNo, $fresh); // RACE-FIX: single writer, bukan json_encode manual
+                });
+
+                // Sinkronkan state komponen
+                $this->dataDaftarPoliRJ = $fresh;
+            });
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sedang sibuk. Gagal memperoleh kunci data (lock). Silakan coba lagi.');
+
+            return;
+        }
+
+        // 4) Broadcast ke modul lain
+
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess('Pemeriksaan berhasil disimpan.');
+    }
+
+    // ==========================
+    // Lab
+    // ==========================
     private function openModalLaboratorium(): void
     {
         $this->isOpenLaboratorium = true;
@@ -615,12 +591,18 @@ class Pemeriksaan extends Component
     {
         $this->openModalLaboratorium();
         $this->renderisPemeriksaanLaboratorium();
-        // $this->findData($id);
     }
 
     public function closeModalLaboratorium(): void
     {
-        $this->reset(['isOpenLaboratorium', 'isOpenModeLaboratorium', 'isPemeriksaanLaboratorium', 'isPemeriksaanLaboratoriumSelected', 'isPemeriksaanLaboratoriumSelectedKeyHdr', 'isPemeriksaanLaboratoriumSelectedKeyDtl']);
+        $this->reset([
+            'isOpenLaboratorium',
+            'isOpenModeLaboratorium',
+            'isPemeriksaanLaboratorium',
+            'isPemeriksaanLaboratoriumSelected',
+            'isPemeriksaanLaboratoriumSelectedKeyHdr',
+            'isPemeriksaanLaboratoriumSelectedKeyDtl'
+        ]);
     }
 
     private function renderisPemeriksaanLaboratorium()
@@ -634,10 +616,9 @@ class Pemeriksaan extends Component
                 ->get();
 
             $this->isPemeriksaanLaboratorium = json_decode(
-                $isPemeriksaanLaboratorium->map(function ($isPemeriksaanLaboratorium) {
-                    $isPemeriksaanLaboratorium->labStatus = 0;
-
-                    return $isPemeriksaanLaboratorium;
+                $isPemeriksaanLaboratorium->map(function ($row) {
+                    $row->labStatus = 0;
+                    return $row;
                 }),
                 true
             );
@@ -646,118 +627,142 @@ class Pemeriksaan extends Component
 
     public function PemeriksaanLaboratoriumIsSelectedFor($key): void
     {
-        $this->isPemeriksaanLaboratorium[$key]['labStatus'] = $this->isPemeriksaanLaboratorium[$key]['labStatus'] ? 0 : 1;
+        $this->isPemeriksaanLaboratorium[$key]['labStatus'] =
+            $this->isPemeriksaanLaboratorium[$key]['labStatus'] ? 0 : 1;
         $this->renderPemeriksaanLaboratoriumIsSelected($key);
     }
 
     public function RemovePemeriksaanLaboratoriumIsSelectedFor($key): void
     {
-        $this->isPemeriksaanLaboratorium[$key]['labStatus'] = $this->isPemeriksaanLaboratorium[$key]['labStatus'] ? 0 : 1;
+        $this->isPemeriksaanLaboratorium[$key]['labStatus'] =
+            $this->isPemeriksaanLaboratorium[$key]['labStatus'] ? 0 : 1;
         $this->renderPemeriksaanLaboratoriumIsSelected($key);
     }
 
     private function renderPemeriksaanLaboratoriumIsSelected($key): void
     {
         $this->isPemeriksaanLaboratoriumSelected = collect($this->isPemeriksaanLaboratorium)
-            ->where('labStatus', 1);
+            ->where('labStatus', 1)
+            ->values();
     }
 
     public function kirimLaboratorium()
     {
-        $sql = "select rj_status  from rstxn_rjhdrs where rj_no=:rjNo";
-        $checkStatusRJ = DB::scalar($sql, [
-            "rjNo" => $this->dataDaftarPoliRJ['rjNo'],
-        ]);
+        $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor RJ kosong.');
+            return;
+        }
 
-        if ($checkStatusRJ == 'A') {
-            // hasil Key = 0 atau urutan pemeriksan lab lebih dari 1
-            $this->isPemeriksaanLaboratoriumSelectedKeyHdr = collect(isset($this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab']) ? $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'] : [])->count();
+        $sql = "select rj_status from rstxn_rjhdrs where rj_no=:rjNo";
+        $checkStatusRJ = DB::scalar($sql, ["rjNo" => $rjNo]);
 
-            $sql = "select nvl(max(to_number(checkup_no))+1,1) from lbtxn_checkuphdrs";
-            $checkupNo = DB::scalar($sql);
+        if ($checkStatusRJ !== 'A') {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addWarning('Pasien sudah pulang. Pemeriksaan tidak dapat dilanjutkan.');
+            return;
+        }
 
-            // array Hdr
-            $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labHdrNo'] =  $checkupNo;
-            $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labHdrDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
+        $lockKey = "rj:{$rjNo}";
+        try {
+            // RACE-FIX: protect penulisan header/dtl + patch JSON sekaligus
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
 
+                // 1) Fresh
+                $freshWrap = $this->findDataRJ($rjNo);
+                $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+                if (!is_array($fresh)) $fresh = [];
+                if (!isset($fresh['pemeriksaan']) || !is_array($fresh['pemeriksaan'])) {
+                    $fresh['pemeriksaan'] = $this->pemeriksaan;
+                }
+                if (!isset($fresh['pemeriksaan']['pemeriksaanPenunjang'])) {
+                    $fresh['pemeriksaan']['pemeriksaanPenunjang'] = ['lab' => [], 'rad' => []];
+                }
 
-            // insert Hdr
-            DB::table('lbtxn_checkuphdrs')->insert([
-                'reg_no' => $this->dataDaftarPoliRJ['regNo'],
-                'dr_id' => $this->dataDaftarPoliRJ['drId'],
-                'checkup_date' => DB::raw("to_date('" . Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
-                'status_rjri' => 'RJ',
-                'checkup_status' => 'P',
-                'ref_no' => $this->dataDaftarPoliRJ['rjNo'],
-                'checkup_no' => $checkupNo,
+                // 2) Generate nomor & insert ke tabel LAB dalam transaksi
+                DB::transaction(function () use (&$fresh, $rjNo) {
 
-            ]);
+                    $hdrIndex = collect($fresh['pemeriksaan']['pemeriksaanPenunjang']['lab'])->count();
 
+                    $sql = "select nvl(max(to_number(checkup_no))+1,1) from lbtxn_checkuphdrs";
+                    $checkupNo = DB::scalar($sql);
 
-            // hasil Key Dtl dari jml yang selected -1 karena array dimulai dari 0
-            $this->isPemeriksaanLaboratoriumSelectedKeyDtl = collect($this->isPemeriksaanLaboratoriumSelected)->count() - 1;
+                    // Insert hdr
+                    DB::table('lbtxn_checkuphdrs')->insert([
+                        'reg_no' => $fresh['regNo'],
+                        'dr_id' => $fresh['drId'],
+                        'checkup_date' => DB::raw("to_date('" . Carbon::now(env('APP_TIMEZONE', 'Asia/Jakarta'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
+                        'status_rjri' => 'RJ',
+                        'checkup_status' => 'P',
+                        'ref_no' => $rjNo,
+                        'checkup_no' => $checkupNo,
+                    ]);
 
+                    $selected = collect($this->isPemeriksaanLaboratorium)->where('labStatus', 1)->values();
 
-            // array Dtl
-            $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labDtl'] =  collect($this->isPemeriksaanLaboratorium)
-                ->where('labStatus', 1)
-                ->toArray();
+                    // Simpan ke JSON (dtl preview)
+                    $fresh['pemeriksaan']['pemeriksaanPenunjang']['lab'][$hdrIndex]['labHdr'] = [
+                        'labHdrNo' => $checkupNo,
+                        'labHdrDate' => Carbon::now(env('APP_TIMEZONE', 'Asia/Jakarta'))->format('d/m/Y H:i:s'),
+                        'labDtl' => $selected->toArray(),
+                    ];
 
-            // insert Dtl
-            foreach ($this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labDtl'] as $labDtl) {
-                $sql = "select nvl(to_number(max(checkup_dtl))+1,1) from LBTXN_CHECKUPDTLS";
-                $checkupDtl = DB::scalar($sql);
-
-                // insert Prise checkup dtl
-                DB::table('lbtxn_checkupdtls')->insert([
-                    'clabitem_id' => $labDtl['clabitem_id'],
-                    'checkup_no' => $checkupNo,
-                    'checkup_dtl' => $checkupDtl,
-                    'lab_item_code' => $labDtl['item_code'],
-                    'price' => $labDtl['price']
-                ]);
-
-                foreach ($this->isPemeriksaanLaboratoriumSelected as $isPemeriksaanLaboratoriumSelected) {
-
-                    // insert No Prise checkup dtl
-                    $items = DB::table('lbmst_clabitems')->select('clabitem_desc', 'clabitem_id', 'price', 'clabitem_group', 'item_code')
-                        ->where('clabitem_group', $labDtl['clabitem_id'])
-                        ->orderBy('item_seq', 'asc')
-                        ->orderBy('clabitem_desc', 'asc')
-                        ->get();
-
-                    foreach ($items as $item) {
+                    // Insert dtl utama + subitems
+                    foreach ($selected as $labDtl) {
                         $sql = "select nvl(to_number(max(checkup_dtl))+1,1) from LBTXN_CHECKUPDTLS";
                         $checkupDtl = DB::scalar($sql);
 
                         DB::table('lbtxn_checkupdtls')->insert([
-                            'clabitem_id' => $item->clabitem_id,
+                            'clabitem_id' => $labDtl['clabitem_id'],
                             'checkup_no' => $checkupNo,
                             'checkup_dtl' => $checkupDtl,
-                            'lab_item_code' => $item->item_code,
-                            'price' => $item->price
+                            'lab_item_code' => $labDtl['item_code'],
+                            'price' => $labDtl['price']
                         ]);
 
-                        $this->isPemeriksaanLaboratoriumSelectedKeyDtl = $this->isPemeriksaanLaboratoriumSelectedKeyDtl + 1;
+                        // subitems
+                        $items = DB::table('lbmst_clabitems')
+                            ->select('clabitem_desc', 'clabitem_id', 'price', 'clabitem_group', 'item_code')
+                            ->where('clabitem_group', $labDtl['clabitem_id'])
+                            ->orderBy('item_seq', 'asc')
+                            ->orderBy('clabitem_desc', 'asc')
+                            ->get();
+
+                        foreach ($items as $item) {
+                            $sql = "select nvl(to_number(max(checkup_dtl))+1,1) from LBTXN_CHECKUPDTLS";
+                            $checkupDtl = DB::scalar($sql);
+
+                            DB::table('lbtxn_checkupdtls')->insert([
+                                'clabitem_id' => $item->clabitem_id,
+                                'checkup_no' => $checkupNo,
+                                'checkup_dtl' => $checkupDtl,
+                                'lab_item_code' => $item->item_code,
+                                'price' => $item->price
+                            ]);
+                        }
                     }
-                }
 
+                    // Tulis balik JSON RJ (single writer)
+                    $this->updateJsonRJ($rjNo, $fresh);
+                });
 
-                $this->isPemeriksaanLaboratoriumSelectedKeyDtl = $this->isPemeriksaanLaboratoriumSelectedKeyDtl + 1;
-            }
+                // sinkronkan state komponen
+                $this->dataDaftarPoliRJ = $fresh;
+            });
 
-
-
-            $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
             $this->closeModalLaboratorium();
-        } else {
-            $this->emit('toastr-error', "Pasien Sudah Pulang, Anda tidak bisa meneruskan pemeriksaan ini.");
-            return;
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Permintaan laboratorium berhasil dikirim.');
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sedang sibuk. Gagal memperoleh kunci data (lock). Silakan coba lagi.');
         }
     }
-    // Lab
 
-    // Rad
+    // ==========================
+    // Radiologi
+    // ==========================
     private function openModalRadiologi(): void
     {
         $this->isOpenRadiologi = true;
@@ -768,27 +773,32 @@ class Pemeriksaan extends Component
     {
         $this->openModalRadiologi();
         $this->renderisPemeriksaanRadiologi();
-        // $this->findData($id);
     }
 
     public function closeModalRadiologi(): void
     {
-        $this->reset(['isOpenRadiologi', 'isOpenModeRadiologi', 'isPemeriksaanRadiologi', 'isPemeriksaanRadiologiSelected', 'isPemeriksaanRadiologiSelectedKeyHdr', 'isPemeriksaanRadiologiSelectedKeyDtl']);
+        $this->reset([
+            'isOpenRadiologi',
+            'isOpenModeRadiologi',
+            'isPemeriksaanRadiologi',
+            'isPemeriksaanRadiologiSelected',
+            'isPemeriksaanRadiologiSelectedKeyHdr',
+            'isPemeriksaanRadiologiSelectedKeyDtl'
+        ]);
     }
 
     private function renderisPemeriksaanRadiologi()
     {
         if (empty($this->isPemeriksaanRadiologi)) {
-            $isPemeriksaanRadiologi = DB::table('rsmst_radiologis ')
+            $isPemeriksaanRadiologi = DB::table('rsmst_radiologis')
                 ->select('rad_desc', 'rad_price', 'rad_id')
                 ->orderBy('rad_desc', 'asc')
                 ->get();
 
             $this->isPemeriksaanRadiologi = json_decode(
-                $isPemeriksaanRadiologi->map(function ($isPemeriksaanRadiologi) {
-                    $isPemeriksaanRadiologi->radStatus = 0;
-
-                    return $isPemeriksaanRadiologi;
+                $isPemeriksaanRadiologi->map(function ($row) {
+                    $row->radStatus = 0;
+                    return $row;
                 }),
                 true
             );
@@ -797,119 +807,125 @@ class Pemeriksaan extends Component
 
     public function PemeriksaanRadiologiIsSelectedFor($key): void
     {
-        $this->isPemeriksaanRadiologi[$key]['radStatus'] = $this->isPemeriksaanRadiologi[$key]['radStatus'] ? 0 : 1;
+        $this->isPemeriksaanRadiologi[$key]['radStatus'] =
+            $this->isPemeriksaanRadiologi[$key]['radStatus'] ? 0 : 1;
         $this->renderPemeriksaanRadiologiIsSelected($key);
     }
 
     public function RemovePemeriksaanRadiologiIsSelectedFor($key): void
     {
-        $this->isPemeriksaanRadiologi[$key]['radStatus'] = $this->isPemeriksaanRadiologi[$key]['radStatus'] ? 0 : 1;
+        $this->isPemeriksaanRadiologi[$key]['radStatus'] =
+            $this->isPemeriksaanRadiologi[$key]['radStatus'] ? 0 : 1;
         $this->renderPemeriksaanRadiologiIsSelected($key);
     }
 
     private function renderPemeriksaanRadiologiIsSelected($key): void
     {
         $this->isPemeriksaanRadiologiSelected = collect($this->isPemeriksaanRadiologi)
-            ->where('radStatus', 1);
+            ->where('radStatus', 1)
+            ->values();
     }
 
     public function kirimRadiologi()
     {
-
-        $sql = "select rj_status  from rstxn_rjhdrs where rj_no=:rjNo";
-        $checkStatusRJ = DB::scalar($sql, [
-            "rjNo" => $this->dataDaftarPoliRJ['rjNo'],
-        ]);
-
-        if ($checkStatusRJ == 'A') {
-            // hasil Key = 0 atau urutan pemeriksan lab lebih dari 1
-            $this->isPemeriksaanRadiologiSelectedKeyHdr = collect(isset($this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['rad']) ? $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['rad'] : [])->count();
-
-            // $sql = "select nvl(max(rad_dtl)+1,1) from rstxn_rjrads";
-            // $checkupNo = DB::scalar($sql);
-
-            // array Hdr
-            $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radHdrNo'] =  $this->dataDaftarPoliRJ['rjNo'];
-            $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radHdrDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
-
-
-            // insert Hdr (Radiologi tidak di insert header / ikut txn rj)
-            // DB::table('lbtxn_checkuphdrs')->insert([
-            //     'reg_no' => $this->dataDaftarPoliRJ['regNo'],
-            //     'dr_id' => $this->dataDaftarPoliRJ['drId'],
-            //     'checkup_date' => DB::raw("to_date('" . Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
-            //     'status_rjri' => 'RJ',
-            //     'checkup_status' => 'P',
-            //     'ref_no' => $this->dataDaftarPoliRJ['rjNo'],
-            //     'checkup_no' => $checkupNo,
-
-            // ]);
-
-
-            // hasil Key Dtl dari jml yang selected -1 karena array dimulai dari 0
-            $this->isPemeriksaanRadiologiSelectedKeyDtl = collect($this->isPemeriksaanRadiologiSelected)->count() - 1;
-
-
-            // array Dtl
-            $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radDtl'] =  collect($this->isPemeriksaanRadiologi)
-                ->where('radStatus', 1)
-                ->toArray();
-
-            // insert Dtl
-            foreach ($this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radDtl'] as $radDtl) {
-                $sql = "select nvl(max(rad_dtl)+1,1) from rstxn_rjrads";
-                $checkupDtl = DB::scalar($sql);
-
-                // insert Prise checkup dtl
-                DB::table('rstxn_rjrads')->insert([
-                    'rad_dtl' => $checkupDtl,
-                    'rad_id' => $radDtl['rad_id'],
-                    'rj_no' => $this->dataDaftarPoliRJ['rjNo'],
-                    'rad_price' => $radDtl['rad_price'],
-                    'dr_radiologi' => 'dr. M.A. Budi Purwito, Sp.Rad.',
-                    'waktu_entry' => DB::raw("to_date('" . Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
-                ]);
-
-
-                $this->isPemeriksaanRadiologiSelectedKeyDtl = $this->isPemeriksaanRadiologiSelectedKeyDtl + 1;
-            }
-
-
-
-            $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
-            $this->closeModalRadiologi();
-        } else {
-            $this->emit('toastr-error', "Pasien Sudah Pulang, Anda tidak bisa meneruskan pemeriksaan ini.");
+        $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor RJ kosong.');
             return;
         }
+
+        $sql = "select rj_status from rstxn_rjhdrs where rj_no=:rjNo";
+        $checkStatusRJ = DB::scalar($sql, ["rjNo" => $rjNo]);
+
+        if ($checkStatusRJ !== 'A') {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addWarning('Pasien sudah pulang. Pemeriksaan tidak dapat dilanjutkan.');
+            return;
+        }
+
+        $lockKey = "rj:{$rjNo}";
+        try {
+            // RACE-FIX
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+
+                DB::transaction(function () use ($rjNo) {
+
+                    // fresh
+                    $freshWrap = $this->findDataRJ($rjNo);
+                    $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+                    if (!is_array($fresh)) $fresh = [];
+                    if (!isset($fresh['pemeriksaan']) || !is_array($fresh['pemeriksaan'])) {
+                        $fresh['pemeriksaan'] = $this->pemeriksaan;
+                    }
+                    if (!isset($fresh['pemeriksaan']['pemeriksaanPenunjang'])) {
+                        $fresh['pemeriksaan']['pemeriksaanPenunjang'] = ['lab' => [], 'rad' => []];
+                    }
+
+                    $hdrIndex = collect($fresh['pemeriksaan']['pemeriksaanPenunjang']['rad'])->count();
+
+                    $selected = collect($this->isPemeriksaanRadiologi)->where('radStatus', 1)->values();
+
+                    // simpan JSON
+                    $fresh['pemeriksaan']['pemeriksaanPenunjang']['rad'][$hdrIndex]['radHdr'] = [
+                        'radHdrNo' => $rjNo,
+                        'radHdrDate' => Carbon::now(env('APP_TIMEZONE', 'Asia/Jakarta'))->format('d/m/Y H:i:s'),
+                        'radDtl' => $selected->toArray(),
+                    ];
+
+                    // insert dtl DB
+                    foreach ($selected as $radDtl) {
+                        $sql = "select nvl(max(rad_dtl)+1,1) from rstxn_rjrads";
+                        $checkupDtl = DB::scalar($sql);
+
+                        DB::table('rstxn_rjrads')->insert([
+                            'rad_dtl' => $checkupDtl,
+                            'rad_id' => $radDtl['rad_id'],
+                            'rj_no' => $rjNo,
+                            'rad_price' => $radDtl['rad_price'],
+                            'dr_radiologi' => 'dr. M.A. Budi Purwito, Sp.Rad.',
+                            'waktu_entry' => DB::raw("to_date('" . Carbon::now(env('APP_TIMEZONE', 'Asia/Jakarta'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
+                        ]);
+                    }
+
+                    // write JSON RJ
+                    $this->updateJsonRJ($rjNo, $fresh);
+
+                    // sinkronkan state
+                    $this->dataDaftarPoliRJ = $fresh;
+                });
+            });
+
+            $this->closeModalRadiologi();
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Permintaan radiologi berhasil dikirim.');
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sedang sibuk. Gagal memperoleh kunci data (lock). Silakan coba lagi.');
+        }
     }
-    // Rad
 
-
-
-
-    // /////////tingkatKesadaran////////////
+    // ==========================
+    // LOV Kesadaran
+    // ==========================
     public function clicktingkatKesadaranlov()
     {
         $this->tingkatKesadaranLovStatus = true;
-        // $this->tingkatKesadaranLov = $this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['tingkatKesadaranOptions'];
 
-        $getKesadaran = json_decode(DB::table('ref_bpjs_table')
-            ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper('Kesadaran'))
-            // ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper($this->dataGetKesadaranLovSearch))
-            ->first()->ref_json, true) ?? [];
+        $json = DB::table('ref_bpjs_table')
+            ->whereRaw('upper(ref_keterangan) = ?', [strtoupper('Kesadaran')])
+            ->value('ref_json');
+
+        $getKesadaran = json_decode($json ?? '[]', true);
 
         $this->tingkatKesadaranLov = collect($getKesadaran)->map(function ($item) {
-            $item['tingkatKesadaranId'] = $item['kdSadar'];
-            unset($item['kdSadar']);
-            $item['tingkatKesadaranDesc'] = $item['nmSadar'];
-            unset($item['nmSadar']);
-            return $item;
+            return [
+                'tingkatKesadaranId' => $item['kdSadar'] ?? '',
+                'tingkatKesadaranDesc' => $item['nmSadar'] ?? '',
+            ];
         })->toArray();
     }
 
-    // /////////////////////
-    // LOV selected start
     public function setMytingkatKesadaranLov($id, $desc)
     {
         $this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['tingkatKesadaran'] = $id;
@@ -918,196 +934,174 @@ class Pemeriksaan extends Component
         $this->tingkatKesadaranLovStatus = false;
         $this->tingkatKesadaranLovSearch = '';
     }
-    // LOV selected end
-    // /////////////////////
 
-
-    // ////////////////
-    // RJ Logic
-    // ////////////////
-
-
-    // validate Data RJ//////////////////////////////////////////////////
+    // ==========================
+    // Validation helpers
+    // ==========================
     private function validateDataRJ(): void
     {
-        // customErrorMessages
-        // $messages = customErrorMessagesTrait::messages();
-        $messages = [];
-
-        //Cek Usia Anak dibawah 13th tidak di cek tekanan darah
         $sql = "select birth_date from rsmst_pasiens where reg_no=:regNo";
-        $birthDate = DB::scalar($sql, [
-            "regNo" => $this->dataDaftarPoliRJ['regNo'],
-        ]);
-        $cekUsia = Carbon::createFromFormat('Y-m-d H:i:s', $birthDate)->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y');
+        $birthDate = DB::scalar($sql, ["regNo" => $this->dataDaftarPoliRJ['regNo'] ?? null]);
+        if ($birthDate) {
+            $cekUsia = Carbon::createFromFormat('Y-m-d H:i:s', $birthDate)
+                ->diff(Carbon::now(env('APP_TIMEZONE', 'Asia/Jakarta')))
+                ->format('%y');
 
-        if ($cekUsia > 13) {
-            $this->rules['dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik'] = 'required|numeric';
-            $this->rules['dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik'] = 'required|numeric';
+            if ((int)$cekUsia > 13) {
+                // (range tetap sama, hanya memastikan required)
+                $this->rules['dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik'] = 'required|numeric|min:40|max:250';
+                $this->rules['dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik'] = 'required|numeric|min:30|max:180';
+            }
         }
-        // $rules = [];
 
-
-
-        // Proses Validasi///////////////////////////////////////////
-        try {
-            $this->validate($this->rules, $this->messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-
-            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
-            $this->validate($this->rules, $this->messages);
-        }
+        $this->validate($this->rules, $this->messages);
     }
 
-
-    // insert and update record start////////////////
-    public function store()
-    {
-        // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-        $this->setDataPrimer();
-
-        // Validate RJ
-        $this->validateDataRJ();
-
-        // Logic update mode start //////////
-        $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
-        $this->emit('syncronizeAssessmentPerawatRJFindData');
-    }
-
-    private function updateDataRJ($rjNo): void
-    {
-
-        // update table trnsaksi
-        DB::table('rstxn_rjhdrs')
-            ->where('rj_no', $rjNo)
-            ->update([
-                'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
-                // 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-            ]);
-
-        $this->emit('toastr-success', "Pemeriksaan berhasil disimpan.");
-    }
-    // insert and update record end////////////////
-
-
-    private function findData($rjno): void
-    {
-
-
-        $findDataRJ = $this->findDataRJ($rjno);
-        $this->dataDaftarPoliRJ  = $findDataRJ['dataDaftarRJ'];
-
-        // jika pemeriksaan tidak ditemukan tambah variable pemeriksaan pda array
-        if (isset($this->dataDaftarPoliRJ['pemeriksaan']) == false) {
-            $this->dataDaftarPoliRJ['pemeriksaan'] = $this->pemeriksaan;
-        }
-    }
-
-
-    // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-    private function setDataPrimer(): void {}
-
-    private function scoringIMT(): void
-    {
-        $bb = (isset($this->dataDaftarPoliRJ['pemeriksaan']['nutrisi']['bb'])
-            ? ($this->dataDaftarPoliRJ['pemeriksaan']['nutrisi']['bb']
-                ? $this->dataDaftarPoliRJ['pemeriksaan']['nutrisi']['bb']
-                : 1)
-            : 1);
-        $tb = (isset($this->dataDaftarPoliRJ['pemeriksaan']['nutrisi']['tb'])
-            ? ($this->dataDaftarPoliRJ['pemeriksaan']['nutrisi']['tb']
-                ? $this->dataDaftarPoliRJ['pemeriksaan']['nutrisi']['tb']
-                : 1)
-            : 1);;
-
-
-        $this->dataDaftarPoliRJ['pemeriksaan']['nutrisi']['imt'] = round($bb / (($tb / 100) * ($tb / 100)), 2);
-    }
-
+    // ==========================
+    // Upload Hasil Penunjang
+    // ==========================
     public function uploadHasilPenunjang(): void
     {
-        // validate
-        // $this->checkRjStatus();
-        // customErrorMessages
-        $messages = [];
-        // require nik ketika pasien tidak dikenal
         $rules = [
             "filePDF" => "bail|required|mimes:pdf|max:10240",
             "descPDF" => "bail|required|max:255"
         ];
+        $this->validate($rules, []);
 
-        // Proses Validasi///////////////////////////////////////////
-        $this->validate($rules, $messages);
-        // upload photo
-        $uploadHasilPenunjangfile = $this->filePDF->store('uploadHasilPenunjang');
+        $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor RJ kosong.');
+            return;
+        }
 
-        $this->dataDaftarPoliRJ['pemeriksaan']['uploadHasilPenunjang'][] = [
-            'file' => $uploadHasilPenunjangfile,
-            'desc' => $this->descPDF,
-            'tglUpload' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
-            'penanggungJawab' => [
-                'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
-                'userLogCode' => auth()->user()->myuser_code
-            ]
-        ];
-        $this->reset(['filePDF', 'descPDF'],);
-        $this->store();
+        $lockKey = "rj:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
+
+                    $file = $this->filePDF->store('uploadHasilPenunjang');
+
+                    // fresh
+                    $freshWrap = $this->findDataRJ($rjNo);
+                    $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+                    if (!isset($fresh['pemeriksaan']) || !is_array($fresh['pemeriksaan'])) {
+                        $fresh['pemeriksaan'] = $this->pemeriksaan;
+                    }
+
+                    $fresh['pemeriksaan']['uploadHasilPenunjang'] =
+                        $fresh['pemeriksaan']['uploadHasilPenunjang'] ?? [];
+
+                    $fresh['pemeriksaan']['uploadHasilPenunjang'][] = [
+                        'file' => $file,
+                        'desc' => $this->descPDF,
+                        'tglUpload' => Carbon::now(env('APP_TIMEZONE', 'Asia/Jakarta'))->format('d/m/Y H:i:s'),
+                        'penanggungJawab' => [
+                            'userLog' => auth()->user()->myuser_name,
+                            'userLogDate' => Carbon::now(env('APP_TIMEZONE', 'Asia/Jakarta'))->format('d/m/Y H:i:s'),
+                            'userLogCode' => auth()->user()->myuser_code
+                        ]
+                    ];
+
+                    $this->updateJsonRJ($rjNo, $fresh);
+                    $this->dataDaftarPoliRJ = $fresh;
+                    $this->reset(['filePDF', 'descPDF']);
+                });
+            });
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Hasil penunjang berhasil diunggah.');
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sedang sibuk. Gagal memperoleh kunci data (lock). Silakan coba lagi.');
+        }
     }
 
     public function deleteHasilPenunjang($file): void
     {
-        // Foto/////////////////////////////////////////////////////////////////////////
-        Storage::delete($file);
-        $deleteHasilpenunjang = collect($this->dataDaftarPoliRJ['pemeriksaan']['uploadHasilPenunjang'])->where("file", '!=', $file)->toArray();
-        $this->dataDaftarPoliRJ['pemeriksaan']['uploadHasilPenunjang'] = $deleteHasilpenunjang;
-        $this->store();
-        //
-    }
-
-    public function openModalHasilPenunjang($file)
-    {
-
-        if (Storage::exists($file)) {
-            $this->isOpenRekamMedisuploadpenunjangHasil = true;
-            $this->filePDF = $file;
-        } else {
-            $this->emit('toastr-error', 'File tidak ditemukan');
+        $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor RJ kosong.');
             return;
+        }
+
+        $lockKey = "rj:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo, $file) {
+                DB::transaction(function () use ($rjNo, $file) {
+
+                    Storage::delete($file);
+
+                    $freshWrap = $this->findDataRJ($rjNo);
+                    $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+                    if (!isset($fresh['pemeriksaan']) || !is_array($fresh['pemeriksaan'])) {
+                        $fresh['pemeriksaan'] = $this->pemeriksaan;
+                    }
+
+                    $list = collect($fresh['pemeriksaan']['uploadHasilPenunjang'] ?? [])
+                        ->where('file', '!=', $file)->values()->toArray();
+
+                    $fresh['pemeriksaan']['uploadHasilPenunjang'] = $list;
+
+                    $this->updateJsonRJ($rjNo, $fresh);
+                    $this->dataDaftarPoliRJ = $fresh;
+                });
+            });
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Hasil penunjang berhasil dihapus.');
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sedang sibuk. Gagal memperoleh kunci data (lock). Silakan coba lagi.');
         }
     }
 
-    public function closeModalHasilPenunjang()
+    // ==========================
+    // Data & Helpers
+    // ==========================
+    private function findData($rjno): void
     {
-        $this->isOpenRekamMedisuploadpenunjangHasil = false;
-        $this->reset(['filePDF']);
+        $findDataRJ = $this->findDataRJ($rjno);
+        $this->dataDaftarPoliRJ  = $findDataRJ['dataDaftarRJ'] ?? [];
+
+        if (!isset($this->dataDaftarPoliRJ['pemeriksaan']) || !is_array($this->dataDaftarPoliRJ['pemeriksaan'])) {
+            $this->dataDaftarPoliRJ['pemeriksaan'] = $this->pemeriksaan;
+        }
+        if (!isset($this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang'])) {
+            $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang'] = ['lab' => [], 'rad' => []];
+        }
     }
 
+    private function setDataPrimer(): void {}
 
+    private function scoringIMT(): void
+    {
+        $bb = (float)($this->dataDaftarPoliRJ['pemeriksaan']['nutrisi']['bb'] ?? 0);
+        $tb = (float)($this->dataDaftarPoliRJ['pemeriksaan']['nutrisi']['tb'] ?? 0);
 
-    // when new form instance
-    public function mount()
+        if ($bb > 0 && $tb > 0) {
+            $this->dataDaftarPoliRJ['pemeriksaan']['nutrisi']['imt'] = round($bb / (($tb / 100) ** 2), 2);
+        }
+    }
+
+    // ==========================
+    // Lifecycle
+    // ==========================
+    public function mount(): void
     {
         $this->findData($this->rjNoRef);
     }
 
-
-
-    // select data start////////////////
     public function render()
     {
-
         return view(
             'livewire.r-j.emr-r-j.mr-r-j.pemeriksaan.pemeriksaan',
             [
-                // 'RJpasiens' => $query->paginate($this->limitPerPage),
-                'myTitle' => 'Anamnesia',
-                'mySnipt' => 'Rekam Medis Pasien',
+                'myTitle'   => 'Pemeriksaan',
+                'mySnipt'   => 'Rekam Medis Pasien',
                 'myProgram' => 'Pasien Rawat Jalan',
             ]
         );
     }
-    // select data end////////////////
-
-
 }

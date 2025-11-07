@@ -370,7 +370,10 @@ class EmrRJ extends Component
     ];
 
 
-
+    public function store()
+    {
+        $this->emit('emr:rj:store');
+    }
 
 
 

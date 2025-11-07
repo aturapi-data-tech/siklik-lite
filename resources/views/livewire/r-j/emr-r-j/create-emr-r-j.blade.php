@@ -9,7 +9,7 @@
 
         <!-- This element is to trick the browser into transition-opacity. Body-->
         <div class="fixed inset-0 transition-opacity">
-            <div class="absolute overflow-auto bg-white rounded-t-lg inset-4">
+            <div class="absolute overflow-auto bg-white rounded-t-lg inset-4" id="TransaksiEMR" x-data="{ activeTab: @entangle('activeTab') }">
 
                 {{-- Topbar --}}
                 <div
@@ -47,7 +47,7 @@
 
 
                 {{-- Transasi EMR --}}
-                <div id="TransaksiEMR" x-data="{ activeTab: @entangle('activeTab') }" class="flex">
+                <div class="flex">
 
                     <div class="px-4 mb-0 border-b border-gray-200  w-[250px] overflow-auto ">
                         <ul class="flex flex-col flex-wrap -mb-px text-sm font-medium text-gray-500 text-start ">
@@ -151,11 +151,26 @@
 
 
 
+
+
                 </div>
+
+                {{-- Tombol Simpan --}}
+                <div x-cloak class="sticky bottom-0 z-0 flex justify-end w-1/3 px-4 py-3 ml-auto"
+                    x-show="!['administrasi','rekamMedis'].includes(activeTab)">
+                    <div>
+                        <div wire:loading wire:target="store">
+                            <x-loading />
+                        </div>
+
+                        <x-green-button wire:click.prevent="store()" type="button" wire:loading.remove>
+                            Simpan
+                        </x-green-button>
+                    </div>
+                </div>
+
+
             </div>
         </div>
-
-
     </div>
-
 </div>

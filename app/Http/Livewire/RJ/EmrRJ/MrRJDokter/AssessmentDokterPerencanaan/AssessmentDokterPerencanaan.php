@@ -2,471 +2,492 @@
 
 namespace App\Http\Livewire\RJ\EmrRJ\MrRJDokter\AssessmentDokterPerencanaan;
 
-use Illuminate\Support\Facades\DB;
-
 use Livewire\Component;
 use Livewire\WithPagination;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Carbon\Carbon;
-
-use Spatie\ArrayToXml\ArrayToXml;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
-
 
 class AssessmentDokterPerencanaan extends Component
 {
     use WithPagination, EmrRJTrait;
-
-    // listener from blade////////////////
-    protected $listeners = [
-        'storeAssessmentDokterRJ' => 'store',
-        'storeAssessmentDokterRJPerencanaan' => 'store',
-        'syncronizeAssessmentDokterRJFindData' => 'mount',
-    ];
+    protected $listeners = ['emr:rj:store' => 'store'];
 
 
-    //////////////////////////////
-    // Ref on top bar
-    //////////////////////////////
     public $rjNoRef;
 
-    // dataDaftarPoliRJ RJ
     public array $dataDaftarPoliRJ = [];
 
-    // data SKDP / perencanaan=>[]
-    public array $perencanaan =
-    [
-        "terapiTab" => "Terapi",
-        "terapi" => [
-            "terapi" => ""
+    public array $perencanaan = [
+        'terapiTab' => 'Terapi',
+        'terapi' => ['terapi' => ''],
+
+        'tindakLanjutTab' => 'Tindak Lanjut',
+        'tindakLanjut' => [
+            'tindakLanjut' => '',
+            'tindakLanjutDesc' => '',
+            'keteranganTindakLanjut' => '',
         ],
 
-        "tindakLanjutTab" => "Tindak Lanjut",
-        "tindakLanjut" => [
-            "tindakLanjut" => "",
-            "tindakLanjutDesc" => "",
-            "keteranganTindakLanjut" => "",
-            // "tindakLanjutOptions" => [
-            //     ["tindakLanjut" => "MRS"],
-            //     ["tindakLanjut" => "Kontrol"],
-            //     ["tindakLanjut" => "Rujuk"],
-            //     ["tindakLanjut" => "Perawatan Selesai"],
-            //     ["tindakLanjut" => "Lain-lain"],
-            // ],
-
+        'pengkajianMedisTab' => 'Petugas Medis',
+        'pengkajianMedis' => [
+            'waktuPemeriksaan' => '',
+            'selesaiPemeriksaan' => '',
+            'drPemeriksa' => '',
         ],
 
-        "pengkajianMedisTab" => "Petugas Medis",
-        "pengkajianMedis" => [
-            "waktuPemeriksaan" => "",
-            "selesaiPemeriksaan" => "",
-            "drPemeriksa" => "",
-        ],
-        // Kontrol pakai program lama
-
-        "rawatInapTab" => "Rawat Inap",
-        "rawatInap" => [
-            "noRef" => "",
-            "tanggal" => "", //dd/mm/yyyy
-            "keterangan" => "",
+        'rawatInapTab' => 'Rawat Inap',
+        'rawatInap' => [
+            'noRef' => '',
+            'tanggal' => '',
+            'keterangan' => '',
         ],
 
-
-
-        "dischargePlanningTab" => "Discharge Planning",
-        "dischargePlanning" => [
-            "pelayananBerkelanjutan" => [
-                "pelayananBerkelanjutan" => "Tidak Ada",
-                "pelayananBerkelanjutanOption" => [
-                    ["pelayananBerkelanjutan" => "Tidak Ada"],
-                    ["pelayananBerkelanjutan" => "Ada"],
+        'dischargePlanningTab' => 'Discharge Planning',
+        'dischargePlanning' => [
+            'pelayananBerkelanjutan' => [
+                'pelayananBerkelanjutan' => 'Tidak Ada',
+                'pelayananBerkelanjutanOption' => [
+                    ['pelayananBerkelanjutan' => 'Tidak Ada'],
+                    ['pelayananBerkelanjutan' => 'Ada'],
                 ],
             ],
-            "pelayananBerkelanjutanOpsi" => [
-                "rawatLuka" => [],
-                "dm" => [],
-                "ppok" => [],
-                "hivAids" => [],
-                "dmTerapiInsulin" => [],
-                "ckd" => [],
-                "tb" => [],
-                "stroke" => [],
-                "kemoterapi" => [],
+            'pelayananBerkelanjutanOpsi' => [
+                'rawatLuka' => [],
+                'dm' => [],
+                'ppok' => [],
+                'hivAids' => [],
+                'dmTerapiInsulin' => [],
+                'ckd' => [],
+                'tb' => [],
+                'stroke' => [],
+                'kemoterapi' => [],
             ],
 
-            "penggunaanAlatBantu" => [
-                "penggunaanAlatBantu" => "Tidak Ada",
-                "penggunaanAlatBantuOption" => [
-                    ["penggunaanAlatBantu" => "Tidak Ada"],
-                    ["penggunaanAlatBantu" => "Ada"],
+            'penggunaanAlatBantu' => [
+                'penggunaanAlatBantu' => 'Tidak Ada',
+                'penggunaanAlatBantuOption' => [
+                    ['penggunaanAlatBantu' => 'Tidak Ada'],
+                    ['penggunaanAlatBantu' => 'Ada'],
                 ],
             ],
-            "penggunaanAlatBantuOpsi" => [
-                "kateterUrin" => [],
-                "ngt" => [],
-                "traechotomy" => [],
-                "colostomy" => [],
+            'penggunaanAlatBantuOpsi' => [
+                'kateterUrin' => [],
+                'ngt' => [],
+                'traechotomy' => [],
+                'colostomy' => [],
             ],
-        ]
+        ],
     ];
-    //////////////////////////////////////////////////////////////////////
 
-
+    // rules kamu
     protected $rules = [
+        // ubah sesuai kebutuhan (mis. required|in:..., atau nullable)
+        'dataDaftarPoliRJ.perencanaan.pengkajianMedis.drPemeriksa' => '',
+        // kalau kamu validasi waktu, boleh tambahkan juga:
+        'dataDaftarPoliRJ.perencanaan.pengkajianMedis.waktuPemeriksaan'   => 'date_format:d/m/Y H:i:s',
+        'dataDaftarPoliRJ.perencanaan.pengkajianMedis.selesaiPemeriksaan' => 'date_format:d/m/Y H:i:s',
+    ];
 
-        // 'dataDaftarPoliRJ.perencanaan.pengkajianMedis.waktuPemeriksaan' => 'required|date_format:d/m/Y H:i:s',
-        // 'dataDaftarPoliRJ.perencanaan.pengkajianMedis.selesaiPemeriksaan' => 'required|date_format:d/m/Y H:i:s'
-        'dataDaftarPoliRJ.perencanaan.pengkajianMedis.drPemeriksa' => ''
+    // pesan kustom
+    protected $messages = [
+        'dataDaftarPoliRJ.perencanaan.pengkajianMedis.drPemeriksa.required' => ':attribute wajib diisi.',
+        'dataDaftarPoliRJ.perencanaan.pengkajianMedis.drPemeriksa.in'       => ':attribute tidak valid.',
 
+        // kalau pakai date_format pada field waktu:
+        'dataDaftarPoliRJ.perencanaan.pengkajianMedis.waktuPemeriksaan.required'   => ':attribute wajib diisi.',
+        'dataDaftarPoliRJ.perencanaan.pengkajianMedis.waktuPemeriksaan.date_format' => ':attribute harus dengan format :format.',
+        'dataDaftarPoliRJ.perencanaan.pengkajianMedis.selesaiPemeriksaan.required' => ':attribute wajib diisi.',
+        'dataDaftarPoliRJ.perencanaan.pengkajianMedis.selesaiPemeriksaan.date_format' => ':attribute harus dengan format :format.',
+    ];
 
+    // label/atribut yang ramah
+    protected $validationAttributes = [
+        'dataDaftarPoliRJ.perencanaan.pengkajianMedis.drPemeriksa' => 'Dokter pemeriksa',
     ];
 
 
-
-    ////////////////////////////////////////////////
-    ///////////begin////////////////////////////////
-    ////////////////////////////////////////////////
     public function updated($propertyName)
     {
-        // dd($propertyName);
-        $this->validateOnly($propertyName);
-        if ($propertyName != 'activeTabRacikanNonRacikan') {
-            $this->store();
+        // RACE-FIX: jangan autosave setiap ketikan
+        if (str_starts_with($propertyName, 'dataDaftarPoliRJ.perencanaan.')) {
+            $this->validateOnly($propertyName);
         }
     }
 
-
-
-
-    // resert input private////////////////
-    private function resetInputFields(): void
-    {
-
-        // resert validation
-        $this->resetValidation();
-        // resert input kecuali
-        $this->resetExcept([
-            'rjNoRef'
-        ]);
-    }
-
-
-
-
-
-    // ////////////////
-    // RJ Logic
-    // ////////////////
-
-
-    // validate Data RJ//////////////////////////////////////////////////
     private function validateDataRJ(): void
     {
-        // customErrorMessages
-        // $messages = customErrorMessagesTrait::messages();
-        $messages = [];
-
-
-        // $rules = [];
-
-
-
-        // Proses Validasi///////////////////////////////////////////
         try {
-            $this->validate($this->rules, $messages);
+            $this->validate($this->rules, $this->messages, $this->validationAttributes);
         } catch (\Illuminate\Validation\ValidationException $e) {
-
-            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data Perencanaan." . json_encode($e->errors(), true));
-            $this->validate($this->rules, $messages);
+            $this->emit('toastr-error', 'Lakukan pengecekan kembali Input Data.');
+            $this->validate($this->rules, $this->messages, $this->validationAttributes);
         }
     }
 
-
-    // insert and update record start////////////////
-    public function store()
+    // ==========================
+    // Single-writer saver
+    // ==========================
+    public function store(): void
     {
-        // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-        $this->setDataPrimer();
+        $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor RJ kosong.');
+            return;
+        }
 
-        // Validate RJ
+        // optional: blokir bila pasien sudah pulang
+        $status = DB::scalar("select rj_status from rstxn_rjhdrs where rj_no=:rjNo", ['rjNo' => $rjNo]);
+        if ($status !== 'A') {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Pasien sudah pulang. Tidak bisa menyimpan perencanaan.');
+            return;
+        }
+
+        // validasi ringan
         $this->validateDataRJ();
 
-        // Logic update mode start //////////
-        $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
-        $this->emit('syncronizeAssessmentDokterRJFindData');
-    }
+        $lockKey = "rj:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                // FRESH first
+                $freshWrap = $this->findDataRJ($rjNo);
+                $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+                if (!is_array($fresh)) $fresh = [];
+                if (!isset($fresh['perencanaan']) || !is_array($fresh['perencanaan'])) {
+                    $fresh['perencanaan'] = $this->perencanaan;
+                }
 
-    private function updateDataRJ($rjNo): void
-    {
-        $this->updateJsonRJ($rjNo, $this->dataDaftarPoliRJ);
+                // PATCH hanya subtree 'perencanaan' dari state sekarang (UI)
+                $fresh['perencanaan'] = $this->dataDaftarPoliRJ['perencanaan'] ?? $fresh['perencanaan'];
 
-        // $this->emit('toastr-success', "Perencanaan berhasil disimpan.");
-    }
-    // insert and update record end////////////////
+                DB::transaction(function () use ($rjNo, $fresh) {
+                    // single writer JSON
+                    $this->updateJsonRJ($rjNo, $fresh);
+                });
+
+                // sinkronkan state komponen
+                $this->dataDaftarPoliRJ = $fresh;
+            });
 
 
-    private function findData($rjno): void
-    {
-
-        $findDataRJ = $this->findDataRJ($rjno);
-        $this->dataDaftarPoliRJ  = $findDataRJ['dataDaftarRJ'];
-
-        // jika perencanaan tidak ditemukan tambah variable perencanaan pda array
-        if (isset($this->dataDaftarPoliRJ['perencanaan']) == false) {
-            $this->dataDaftarPoliRJ['perencanaan'] = $this->perencanaan;
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Perencanaan berhasil disimpan.');
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk. Gagal memperoleh kunci data (lock). Silakan coba lagi.');
         }
     }
 
-    // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-    private function setDataPrimer(): void {}
-
-    public function setWaktuPemeriksaan($myTime)
+    // ==========================
+    // Helpers that also write (wrap with lock)
+    // ==========================
+    public function setWaktuPemeriksaan($myTime): void
     {
         $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['waktuPemeriksaan'] = $myTime;
+        // simpan via single-writer
+        $this->store();
     }
 
-    public function setSelesaiPemeriksaan($myTime)
+    public function setSelesaiPemeriksaan($myTime): void
     {
         $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'] = $myTime;
+        $this->store();
     }
-    private function validateDrPemeriksa()
+
+    private function validateDrPemeriksa(): void
     {
-        // Validasi dulu
-        $messages = [];
-        $myRules = [
-            // 'dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik' => 'required|numeric',
-            // 'dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik' => 'required|numeric',
-            'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi' => 'required|numeric',
+        $rules = [
+            'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi'  => 'required|numeric',
             'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas' => 'required|numeric',
-            'dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu' => 'required|numeric',
-            'dataDaftarPoliRJ.pemeriksaan.tandaVital.spo2' => 'numeric',
-            'dataDaftarPoliRJ.pemeriksaan.tandaVital.gda' => 'numeric',
+            'dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu'           => 'required|numeric',
+            'dataDaftarPoliRJ.pemeriksaan.tandaVital.spo2'           => 'numeric',
+            'dataDaftarPoliRJ.pemeriksaan.tandaVital.gda'            => 'numeric',
 
-            'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb' => 'required|numeric',
-            'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb' => 'required|numeric',
-            'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt' => 'required|numeric',
-            'dataDaftarPoliRJ.pemeriksaan.nutrisi.lk' => 'numeric',
+            'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb'   => 'required|numeric',
+            'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb'   => 'required|numeric',
+            'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt'  => 'required|numeric',
+            'dataDaftarPoliRJ.pemeriksaan.nutrisi.lk'   => 'numeric',
             'dataDaftarPoliRJ.pemeriksaan.nutrisi.lila' => 'numeric',
-
 
             'dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.jamDatang' => 'required|date_format:d/m/Y H:i:s',
         ];
-        // Proses Validasi///////////////////////////////////////////
-        try {
-            $this->validate($myRules, $messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
 
-            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena data pemeriksaan belum lengkap.");
-            $this->validate($myRules, $messages);
+        try {
+            $this->validate($rules, []);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->emit('toastr-error', 'Anda tidak dapat melakukan TTD-E karena data pemeriksaan belum lengkap.');
+            $this->validate($rules, []);
         }
-        // Validasi dulu
     }
 
-    public function setDrPemeriksa()
+    public function setDrPemeriksa(): void
     {
+        $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor RJ kosong.');
+            return;
+        }
 
-        // $myRoles = json_decode(auth()->user()->roles, true);
-        $myUserCodeActive = auth()->user()->myuser_code;
-        $myUserNameActive = auth()->user()->myuser_name;
-        // $myUserTtdActive = auth()->user()->myuser_ttd_image;
-
-        // Validasi dulu
-        // cek apakah data pemeriksaan sudah dimasukkan atau blm
         $this->validateDrPemeriksa();
 
-        if (auth()->user()->hasRole('Dokter')) {
-            if ($this->dataDaftarPoliRJ['drId'] == $myUserCodeActive) {
+        $myUserCodeActive = auth()->user()->myuser_code;
+        $myUserNameActive = auth()->user()->myuser_name;
 
-                if (isset($this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'])) {
-                    if (!$this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa']) {
-                        $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'] = (isset($this->dataDaftarPoliRJ['drDesc']) ?
-                            ($this->dataDaftarPoliRJ['drDesc'] ? $this->dataDaftarPoliRJ['drDesc']
-                                : 'Dokter pemeriksa')
-                            : 'Dokter pemeriksa-');
+        if (!auth()->user()->hasRole('Dokter')) {
+            $this->emit('toastr-error', 'Anda tidak dapat melakukan TTD-E karena User Role ' . $myUserNameActive . ' Bukan Dokter');
+            return;
+        }
+        if (($this->dataDaftarPoliRJ['drId'] ?? null) !== $myUserCodeActive) {
+            $this->emit('toastr-error', 'Anda tidak dapat melakukan TTD-E karena Bukan Pasien ' . $myUserNameActive);
+            return;
+        }
+
+        $lockKey = "rj:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
+                    // fresh
+                    $freshWrap = $this->findDataRJ($rjNo);
+                    $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+                    if (!isset($fresh['perencanaan']) || !is_array($fresh['perencanaan'])) {
+                        $fresh['perencanaan'] = $this->perencanaan;
                     }
-                } else {
 
-                    $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedisTab'] = 'Pengkajian Medis';
-                    $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'] = (isset($this->dataDaftarPoliRJ['drDesc']) ?
-                        ($this->dataDaftarPoliRJ['drDesc'] ? $this->dataDaftarPoliRJ['drDesc']
-                            : 'Dokter pemeriksa')
-                        : 'Dokter pemeriksa-');
-                }
+                    // set dr pemeriksa + set ERM status
+                    $fresh['perencanaan']['pengkajianMedis']['drPemeriksa'] =
+                        $fresh['drDesc'] ?? 'Dokter pemeriksa';
+                    $fresh['ermStatus'] = 'L';
 
-                // updateDB
-                $this->dataDaftarPoliRJ['ermStatus'] = 'L';
-                DB::table('rstxn_rjhdrs')
-                    ->where('rj_no', '=', $this->rjNoRef)
-                    ->update(['erm_status' => $this->dataDaftarPoliRJ['ermStatus']]);
+                    // update header ERM status juga
+                    DB::table('rstxn_rjhdrs')
+                        ->where('rj_no', $rjNo)
+                        ->update(['erm_status' => $fresh['ermStatus']]);
 
-                $this->store();
-            } else {
-                $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena Bukan Pasien " . $myUserNameActive);
-            }
-        } else {
-            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . " Bukan Dokter");
+                    // tulis JSON
+                    $this->updateJsonRJ($rjNo, $fresh);
+
+                    // sync
+                    $this->dataDaftarPoliRJ = $fresh;
+                });
+            });
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('TTD-E berhasil.');
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk. Gagal memperoleh kunci data (lock). Silakan coba lagi.');
         }
     }
-
-    // /////////////////eresep open////////////////////////
-    public bool $isOpenEresepRJ = false;
-    public string $isOpenModeEresepRJ = 'insert';
 
     public function openModalEresepRJ(): void
     {
         $this->isOpenEresepRJ = true;
         $this->isOpenModeEresepRJ = 'insert';
     }
-
     public function closeModalEresepRJ(): void
     {
         $this->isOpenEresepRJ = false;
         $this->isOpenModeEresepRJ = 'insert';
     }
 
-
-    public string $activeTabRacikanNonRacikan = "NonRacikan";
+    public bool $isOpenEresepRJ = false;
+    public string $isOpenModeEresepRJ = 'insert';
+    public string $activeTabRacikanNonRacikan = 'NonRacikan';
     public array $EmrMenuRacikanNonRacikan = [
-        [
-            'ermMenuId' => 'NonRacikan',
-            'ermMenuName' => 'NonRacikan'
-        ],
-        [
-            'ermMenuId' => 'Racikan',
-            'ermMenuName' => 'Racikan'
-        ],
+        ['ermMenuId' => 'NonRacikan', 'ermMenuName' => 'NonRacikan'],
+        ['ermMenuId' => 'Racikan', 'ermMenuName' => 'Racikan'],
     ];
 
     public function simpanTerapi(): void
     {
-        $eresep = '' . PHP_EOL;
-        if (isset($this->dataDaftarPoliRJ['eresep'])) {
-
-            foreach ($this->dataDaftarPoliRJ['eresep'] as $key => $value) {
-                // NonRacikan
-                $catatanKhusus = ($value['catatanKhusus']) ? ' (' . $value['catatanKhusus'] . ')' : '';
-                $eresep .=  'R/' . ' ' . $value['productName'] . ' | No. ' . $value['qty'] . ' | S ' .  $value['signaX'] . 'dd' . $value['signaHari'] . $catatanKhusus . PHP_EOL;
-            }
+        // RJ No
+        $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor RJ kosong.');
+            return;
         }
 
-        $eresepRacikan = '' . PHP_EOL;
-        if (isset($this->dataDaftarPoliRJ['eresepRacikan'])) {
-            // Racikan
-            foreach ($this->dataDaftarPoliRJ['eresepRacikan'] as $key => $value) {
-                if (isset($value['jenisKeterangan'])) {
-                    $catatan = isset($value['catatan']) ? $value['catatan'] : '';
-                    $catatanKhusus = isset($value['catatanKhusus']) ? $value['catatanKhusus'] : '';
-                    $noRacikan = isset($value['noRacikan']) ? $value['noRacikan'] : '';
-                    $productName = isset($value['productName']) ? $value['productName'] : '';
+        $lockKey = "rj:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
 
-                    $jmlRacikan = ($value['qty']) ? 'Jml Racikan ' . $value['qty'] . ' | ' . $catatan . ' | S ' . $catatanKhusus . PHP_EOL : '';
-                    $dosis = isset($value['dosis']) ? ($value['dosis'] ? $value['dosis'] : '') : '';
-                    $eresepRacikan .= $noRacikan . '/ ' . $productName . ' - ' . $dosis .  PHP_EOL . $jmlRacikan;
-                }
-            };
+                    // 1) Ambil data FRESH
+                    $freshWrap = $this->findDataRJ($rjNo);
+                    $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+
+                    // 2) Rakit terapi dari FRESH (bukan dari state lama)
+                    $eresep = $fresh['eresep'] ?? [];
+                    $eresepRacikan = $fresh['eresepRacikan'] ?? [];
+
+                    // Non-racikan
+                    $eresepStr = '';
+                    foreach ($eresep as $value) {
+                        $catatanKhusus = !empty($value['catatanKhusus']) ? ' (' . $value['catatanKhusus'] . ')' : '';
+                        $eresepStr .= 'R/ ' . ($value['productName'] ?? '') .
+                            ' | No. ' . ($value['qty'] ?? '') .
+                            ' | S ' . ($value['signaX'] ?? '') . 'dd' . ($value['signaHari'] ?? '') .
+                            $catatanKhusus . PHP_EOL;
+                    }
+
+                    // Racikan
+                    $racikanStr = '';
+                    foreach ($eresepRacikan as $value) {
+                        if (!isset($value['jenisKeterangan'])) continue;
+                        $noR   = $value['noRacikan']   ?? '';
+                        $prod  = $value['productName'] ?? '';
+                        $dosis = $value['dosis']       ?? '';
+                        $jmlR  = !empty($value['qty'])
+                            ? ('Jml Racikan ' . $value['qty'] . ' | ' . ($value['catatan'] ?? '') .
+                                ' | S ' . ($value['catatanKhusus'] ?? '') . PHP_EOL)
+                            : '';
+                        $racikanStr .= $noR . '/ ' . $prod . ' - ' . $dosis . PHP_EOL . $jmlR;
+                    }
+
+                    // 3) Siapkan subtree perencanaan di FRESH, lalu set terapi
+                    if (!isset($fresh['perencanaan']) || !is_array($fresh['perencanaan'])) {
+                        $fresh['perencanaan'] = $this->perencanaan ?? [];
+                    }
+                    if (!isset($fresh['perencanaan']['terapi']) || !is_array($fresh['perencanaan']['terapi'])) {
+                        $fresh['perencanaan']['terapi'] = [];
+                    }
+
+                    $fresh['perencanaan']['terapi']['terapi'] = trim($eresepStr . $racikanStr);
+
+                    // 4) Commit JSON + sinkron state
+                    $this->updateJsonRJ($rjNo, $fresh);
+                    $this->dataDaftarPoliRJ = $fresh;
+                });
+            });
+
+            $this->closeModalEresepRJ();
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Terapi disimpan.');
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk. Gagal memperoleh kunci data (lock). Silakan coba lagi.');
         }
-        $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] = $eresep . $eresepRacikan;
-
-        $this->store();
-        $this->closeModalEresepRJ();
     }
 
-    public function setstatusPRB()
+
+    public function setstatusPRB(): void
     {
-
-        // status PRB
-        if (isset($this->dataDaftarPoliRJ['statusPRB']['penanggungJawab']['statusPRB'])) {
-            if ($this->dataDaftarPoliRJ['statusPRB']['penanggungJawab']['statusPRB']) {
-                $statusPRB = 0;
-            } else {
-                $statusPRB = 1;
-            }
-        } else {
-            $statusPRB = 1;
+        $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor RJ kosong.');
+            return;
         }
 
-        // setStatusPRB
-        $this->dataDaftarPoliRJ['statusPRB']['penanggungJawab'] = [
-            'statusPRB' => $statusPRB,
-            'userLog' => auth()->user()->myuser_name,
-            'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
-            'userLogCode' => auth()->user()->myuser_code
-        ];
+        $lockKey = "rj:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
+                    $freshWrap = $this->findDataRJ($rjNo);
+                    $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+                    if (!isset($fresh['perencanaan']) || !is_array($fresh['perencanaan'])) {
+                        $fresh['perencanaan'] = $this->perencanaan;
+                    }
 
-        // simpan
-        $this->store();
+                    $curr = $fresh['statusPRB']['penanggungJawab']['statusPRB'] ?? 0;
+                    $statusPRB = $curr ? 0 : 1;
+
+                    $fresh['statusPRB']['penanggungJawab'] = [
+                        'statusPRB'   => $statusPRB,
+                        'userLog'     => auth()->user()->myuser_name,
+                        'userLogDate' => Carbon::now(env('APP_TIMEZONE', 'Asia/Jakarta'))->format('d/m/Y H:i:s'),
+                        'userLogCode' => auth()->user()->myuser_code,
+                    ];
+
+                    $this->updateJsonRJ($rjNo, $fresh);
+                    $this->dataDaftarPoliRJ = $fresh;
+                });
+            });
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Status PRB diperbarui.');
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk. Gagal memperoleh kunci data (lock). Silakan coba lagi.');
+        }
     }
-    // /////////////////////////////////////////
 
-    // /////////prognosa////////////
+    // ==========================
+    // LOV & bootstrap options
+    // ==========================
     public $prognosaLov = [];
     public $prognosaLovStatus = 0;
     public $prognosaLovSearch = '';
-    public function clickprognosalov()
-    {
-        $this->prognosaLovStatus = true;
-        // $this->prognosaLov = $this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['prognosaOptions'];
 
-        $getprognosa = json_decode(DB::table('ref_bpjs_table')
-            ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper('Prognosa'))
-            ->first()->ref_json ?? '{}', true);
+    public function clickprognosalov(): void
+    {
+        $this->prognosaLovStatus = 1;
+        $getprognosa = json_decode(
+            DB::table('ref_bpjs_table')
+                ->whereRaw('upper(ref_keterangan)=?', ['PROGNOSA'])
+                ->value('ref_json') ?? '[]',
+            true
+        );
 
         $this->prognosaLov = collect($getprognosa)->map(function ($item) {
-            $item['prognosaId'] = $item['kdPrognosa'];
-            unset($item['kdPrognosa']);
-            $item['prognosaDesc'] = $item['nmPrognosa'];
-            unset($item['nmPrognosa']);
-            return $item;
+            return [
+                'prognosaId' => $item['kdPrognosa'] ?? '',
+                'prognosaDesc' => $item['nmPrognosa'] ?? '',
+            ];
         })->toArray();
     }
 
-    // /////////////////////
-    // LOV selected start
-    public function setMyprognosaLov($id, $desc)
+    public function setMyprognosaLov($id, $desc): void
     {
         $this->dataDaftarPoliRJ['perencanaan']['prognosa']['prognosa'] = $id;
         $this->dataDaftarPoliRJ['perencanaan']['prognosa']['prognosaDesc'] = $desc;
-
-        $this->prognosaLovStatus = false;
+        $this->prognosaLovStatus = 0;
         $this->prognosaLovSearch = '';
+        $this->store();
     }
-    // LOV selected end
-    // /////////////////////
 
     private function setstatusPulangRJ(): void
     {
-        $getstatusPulangRJ = json_decode(DB::table('ref_bpjs_table')
-            ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper('Status Pulang RJ'))
-            ->first()->ref_json, true) ?? [];
-
         if (!isset($this->dataDaftarPoliRJ['perencanaan']['tindakLanjut']['tindakLanjutOptions'])) {
-            $this->dataDaftarPoliRJ['perencanaan']['tindakLanjut']['tindakLanjutOptions'] = collect($getstatusPulangRJ)->map(function ($item) {
-                $item['tindakLanjut'] = $item['kdStatusPulang'];
-                unset($item['kdStatusPulang']);
-                $item['tindakLanjutDesc'] = $item['nmStatusPulang'];
-                unset($item['nmStatusPulang']);
-                return $item;
-            })->values()->toArray();
+            $raw = DB::table('ref_bpjs_table')
+                ->whereRaw('upper(ref_keterangan)=?', ['STATUS PULANG RJ'])
+                ->value('ref_json');
+            $data = json_decode($raw ?? '[]', true);
+
+            $this->dataDaftarPoliRJ['perencanaan']['tindakLanjut']['tindakLanjutOptions'] =
+                collect($data)->map(function ($item) {
+                    return [
+                        'tindakLanjut' => $item['kdStatusPulang'] ?? '',
+                        'tindakLanjutDesc' => $item['nmStatusPulang'] ?? '',
+                    ];
+                })->values()->toArray();
         }
     }
 
     private function syncDataFormEntry(): void
     {
-        //  Entry ketika Mont
-        // Pasien Baru Lama di blade wire:model
         $this->setstatusPulangRJ();
     }
 
-
-    // when new form instance
-    public function mount()
+    private function findData($rjno): void
     {
-        $this->findData($this->rjNoRef);
-
-        // set dokter pemeriksa
-        // $this->setDrPemeriksa();
+        $wrap = $this->findDataRJ($rjno);
+        $this->dataDaftarPoliRJ = $wrap['dataDaftarRJ'] ?? [];
+        if (!isset($this->dataDaftarPoliRJ['perencanaan']) || !is_array($this->dataDaftarPoliRJ['perencanaan'])) {
+            $this->dataDaftarPoliRJ['perencanaan'] = $this->perencanaan;
+        }
     }
 
+    public function mount(): void
+    {
+        $this->findData($this->rjNoRef);
+    }
 
 
     // select data start////////////////

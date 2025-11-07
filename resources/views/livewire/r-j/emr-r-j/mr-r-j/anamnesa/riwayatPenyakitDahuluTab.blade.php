@@ -45,7 +45,7 @@
 
                 <x-green-button :disabled=$disabledPropertyRjStatus
                     class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
-                    wire:click.prevent="clickalergiMakananlov()">
+                    wire:click.prevent="clickAlergiMakananLov()">
                     <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path clip-rule="evenodd" fill-rule="evenodd"
@@ -67,7 +67,7 @@
 
                 <x-green-button :disabled=$disabledPropertyRjStatus
                     class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
-                    wire:click.prevent="clickalergiObatlov()">
+                    wire:click.prevent="clickAlergiObatLov()">
                     <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path clip-rule="evenodd" fill-rule="evenodd"
@@ -89,7 +89,7 @@
 
                 <x-green-button :disabled=$disabledPropertyRjStatus
                     class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
-                    wire:click.prevent="clickalergiUdaralov()">
+                    wire:click.prevent="clickAlergiUdaraLov()">
                     <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path clip-rule="evenodd" fill-rule="evenodd"

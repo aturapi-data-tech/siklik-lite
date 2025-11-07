@@ -219,21 +219,7 @@
 
 
 
-            <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6">
 
-                <div class="">
-                    {{-- null --}}
-                </div>
-                <div>
-                    <div wire:loading wire:target="store">
-                        <x-loading />
-                    </div>
-
-                    <x-green-button :disabled=false wire:click.prevent="store()" type="button" wire:loading.remove>
-                        Simpan
-                    </x-green-button>
-                </div>
-            </div>
 
 
         </div>

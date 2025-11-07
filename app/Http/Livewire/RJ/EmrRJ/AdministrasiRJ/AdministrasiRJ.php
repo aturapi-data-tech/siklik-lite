@@ -3,12 +3,13 @@
 namespace App\Http\Livewire\RJ\EmrRJ\AdministrasiRJ;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 
-// use Spatie\ArrayToXml\ArrayToXml;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
 
 
@@ -17,8 +18,7 @@ class AdministrasiRJ extends Component
     use WithPagination, EmrRJTrait;
 
     protected $listeners = [
-        'syncronizeAssessmentDokterRJFindData' => 'sumAll',
-        'syncronizeAssessmentPerawatRJFindData' => 'sumAll'
+        'rj:refresh-summary' => 'sumAll',
     ];
 
     // dataDaftarPoliRJ RJ
@@ -113,29 +113,70 @@ class AdministrasiRJ extends Component
     }
 
 
-    public function setSelesaiAdministrasiStatus($rjNo)
+    public function setSelesaiAdministrasiStatus(string $rjNo): void
     {
+        if (empty($rjNo)) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Nomor RJ kosong.');
+            return;
+        }
 
-        $dataDaftarPoliRJ = $this->findData($rjNo);
+        $lockKey = "rj:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
 
-        if (isset($dataDaftarPoliRJ['AdministrasiRj']) == false) {
-            $dataDaftarPoliRJ['AdministrasiRj'] = [
-                'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
-            ];
+                    // 1) Ambil data FRESH dari DB
+                    $freshWrap = $this->findDataRJ($rjNo);
+                    $fresh = $freshWrap['dataDaftarRJ'] ?? [];
 
-            DB::table('rstxn_rjhdrs')
-                ->where('rj_no', $rjNo)
-                ->update([
-                    'dataDaftarPoliRJ_json' => json_encode($dataDaftarPoliRJ, true),
-                    // 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($dataDaftarPoliRJ),
-                ]);
+                    // 2) Jika belum ada AdministrasiRj, set lalu simpan
+                    if (!isset($fresh['AdministrasiRj']) || !is_array($fresh['AdministrasiRj'])) {
 
-            $this->emit('toastr-success', "Administrasi berhasil disimpan.");
-            $this->emit('syncronizeAssessmentDokterRJFindData');
-            $this->emit('syncronizeAssessmentPerawatRJFindData');
-        } else {
-            $this->emit('toastr-error', "Administrasi sudah tersimpan oleh." . $dataDaftarPoliRJ['AdministrasiRj']['userLog']);
+                        $now = Carbon::now(config('app.timezone', env('APP_TIMEZONE', 'Asia/Jakarta')));
+                        $fresh['AdministrasiRj'] = [
+                            'userLog'     => optional(auth()->user())->myuser_name ?? (string) auth()->id(),
+                            'userLogDate' => $now->format('d/m/Y H:i:s'),
+                        ];
+
+                        // 3) Simpan JSON via helper agar subtree lain tidak ketimpa
+                        $this->updateJsonRJ($rjNo, $fresh);
+
+                        // 5) Notifikasi & refresh ringkasan
+                        toastr()
+                            ->closeOnHover(true)
+                            ->closeDuration(3)
+                            ->positionClass('toast-top-left')
+                            ->addSuccess('Administrasi berhasil disimpan.');
+
+                        $this->emit('rj:refresh-summary');
+                    } else {
+                        $user = $fresh['AdministrasiRj']['userLog']     ?? '-';
+                        $date = $fresh['AdministrasiRj']['userLogDate'] ?? '-';
+
+                        toastr()
+                            ->closeOnHover(true)
+                            ->closeDuration(3)
+                            ->positionClass('toast-top-left')
+                            ->addWarning("Administrasi sudah tersimpan oleh {$user} pada {$date}.");
+                    }
+                });
+            });
+        } catch (LockTimeoutException $e) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Sistem sibuk. Gagal memperoleh kunci data (lock). Silakan coba lagi.');
+        } catch (\Throwable $e) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Gagal menyimpan Administrasi: ' . $e->getMessage());
         }
     }
 

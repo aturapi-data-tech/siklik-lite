@@ -9,16 +9,11 @@ use Carbon\Carbon;
 
 class DisplayPasien extends Component
 {
-    protected $listeners = [
-        'syncronizeAssessmentDokterRJFindData' => 'mount',
-        'syncronizeAssessmentPerawatRJFindData' => 'mount'
-    ];
 
-    // public function listenerRegNo($newRegNo): void
-    // {
-    //     // $this->regNo = $newRegNo;
-    //     $this->setDataPasien($newRegNo);
-    // }
+
+
+
+
     public $rjNoRef;
     public bool $isOpen = false;
     public string $isOpenMode = 'insert';

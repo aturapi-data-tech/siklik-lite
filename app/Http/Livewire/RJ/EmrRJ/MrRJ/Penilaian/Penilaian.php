@@ -2,23 +2,21 @@
 
 namespace App\Http\Livewire\RJ\EmrRJ\MrRJ\Penilaian;
 
-use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use Carbon\Carbon;
-
-// use Spatie\ArrayToXml\ArrayToXml;
-
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Support\Facades\DB;
+use App\Http\Traits\EmrRJ\EmrRJTrait;
 
 class Penilaian extends Component
 {
-    use WithPagination;
+    use WithPagination, EmrRJTrait;
     // listener from blade////////////////
-    protected $listeners = [
-        'syncronizeAssessmentPerawatRJFindData' => 'mount'
+    protected $listeners = ['emr:rj:store' => 'store'];
 
-    ];
+
 
     //////////////////////////////
     // Ref on top bar
@@ -35,17 +33,6 @@ class Penilaian extends Component
         "fisik" => [
             "fisik" => ""
         ],
-
-        // "statusMedikTab" => "Status Medik",
-        // "statusMedik" => [
-        //     "statusMedik" => "",
-        //     "statusMedikOptions" => [
-        //         ["statusMedik" => "Emergency Trauma"],
-        //         ["statusMedik" => "Emergency Non Trauma"],
-        //         ["statusMedik" => "Non Emergency Trauma"],
-        //         ["statusMedik" => "Non Emergency Non Trauma"],
-        //     ]
-        // ],
 
         "nyeriTab" => "Nyeri",
         "nyeri" => [
@@ -358,11 +345,13 @@ class Penilaian extends Component
 
     public function updated($propertyName)
     {
-        // dd($propertyName);
-        // $this->validateOnly($propertyName);
-        $this->scoringSkalaMorse();
-        $this->scoringSkalaHumptyDumpty();
-        $this->store();
+        if (str_starts_with($propertyName, 'dataDaftarPoliRJ.penilaian.')) {
+            // kalau ada rules, pakai validateOnly di sini
+            // $this->validateOnly($propertyName);
+
+            $this->scoringSkalaMorse();
+            $this->scoringSkalaHumptyDumpty();
+        }
     }
 
 
@@ -398,170 +387,69 @@ class Penilaian extends Component
 
 
     // insert and update record start////////////////
-    public function store()
+    public function store(): void
     {
-        // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-        $this->setDataPrimer();
+        // pastikan RJ
+        $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor RJ kosong.');
+            return;
+        }
 
-        // Validate RJ
-        $this->validateDataRJ();
+        // (opsional) $this->validateDataRJ();
 
-        // Logic update mode start //////////
-        $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
-        $this->emit('syncronizeAssessmentPerawatRJFindData');
+        $lockKey = "rj:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                // FRESH state dari DB (jangan pakai state di memori)
+                $freshWrap = $this->findDataRJ($rjNo); // fungsi helper di bawah
+                $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+                if (!is_array($fresh)) $fresh = [];
+
+                // pastikan subtree ada
+                if (!isset($fresh['penilaian']) || !is_array($fresh['penilaian'])) {
+                    $fresh['penilaian'] = $this->penilaian;
+                }
+
+                // PATCH: replace hanya subtree 'penilaian' dari form sekarang
+                $fresh['penilaian'] = $this->dataDaftarPoliRJ['penilaian'];
+
+                DB::transaction(function () use ($rjNo, $fresh) {
+                    // single writer JSON
+                    $this->updateJsonRJ($rjNo, $fresh);
+                });
+
+                // sinkronkan state komponen
+                $this->dataDaftarPoliRJ = $fresh;
+            });
+
+            // broadcast ke modul lain
+
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Penilaian Fisik berhasil disimpan.');
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk. Gagal memperoleh kunci data (lock). Silakan coba lagi.');
+        }
     }
 
-    private function updateDataRJ($rjNo): void
-    {
 
-        // update table trnsaksi
-        DB::table('rstxn_rjhdrs')
-            ->where('rj_no', $rjNo)
-            ->update([
-                'dataDaftarPoliRJ_json' => json_encode($this->dataDaftarPoliRJ, true),
-                // 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-            ]);
-
-        $this->emit('toastr-success', "Penilaian Fisik berhasil disimpan.");
-    }
     // insert and update record end////////////////
 
 
     private function findData($rjno): void
     {
+        $wrap = $this->findDataRJ($rjno);
+        $this->dataDaftarPoliRJ = $wrap['dataDaftarRJ'] ?? [];
 
-
-        $findData = DB::table('rsview_rjkasir')
-            ->select('datadaftarpolirj_json', 'vno_sep')
-            ->where('rj_no', $rjno)
-            ->first();
-
-        $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json   : null;
-        // if meta_data_pasien_json = null
-        // then cari Data Pasien By Key Collection (exception when no data found)
-        //
-        // else json_decode
-        if ($dataDaftarPoliRJ_json) {
-            $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
-
-            // jika penilaian tidak ditemukan tambah variable penilaian pda array
-            if (isset($this->dataDaftarPoliRJ['penilaian']) == false) {
-                $this->dataDaftarPoliRJ['penilaian'] = $this->penilaian;
-            }
-        } else {
-
-            $this->emit('toastr-error', "Data tidak dapat di proses json.");
-            $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
-                ->select(
-                    DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
-                    DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
-                    'rj_no',
-                    'reg_no',
-                    'reg_name',
-                    'sex',
-                    'address',
-                    'thn',
-                    DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
-                    'poli_id',
-                    'poli_desc',
-                    'dr_id',
-                    'dr_name',
-                    'klaim_id',
-                    // 'entry_id',
-                    'shift',
-                    'vno_sep',
-                    'no_antrian',
-
-                    'nobooking',
-                    // 'push_antrian_bpjs_status',
-                    // 'push_antrian_bpjs_json',
-                    'kd_dr_bpjs',
-                    'kd_poli_bpjs',
-                    'rj_status',
-                    'txn_status',
-                    'erm_status',
-                )
-                ->where('rj_no', '=', $rjno)
-                ->first();
-
-            $this->dataDaftarPoliRJ = [
-                "regNo" =>  $dataDaftarPoliRJ->reg_no,
-
-                "drId" =>  $dataDaftarPoliRJ->dr_id,
-                "drDesc" =>  $dataDaftarPoliRJ->dr_name,
-
-                "poliId" =>  $dataDaftarPoliRJ->poli_id,
-                "klaimId" => $dataDaftarPoliRJ->klaim_id,
-                "poliDesc" =>  $dataDaftarPoliRJ->poli_desc,
-
-                "kddrbpjs" =>  $dataDaftarPoliRJ->kd_dr_bpjs,
-                "kdpolibpjs" =>  $dataDaftarPoliRJ->kd_poli_bpjs,
-
-                "rjDate" =>  $dataDaftarPoliRJ->rj_date,
-                "rjNo" =>  $dataDaftarPoliRJ->rj_no,
-                "shift" =>  $dataDaftarPoliRJ->shift,
-                "noAntrian" =>  $dataDaftarPoliRJ->no_antrian,
-                "noBooking" =>  $dataDaftarPoliRJ->nobooking,
-                "slCodeFrom" => "02",
-                "passStatus" => "",
-                "rjStatus" =>  $dataDaftarPoliRJ->rj_status,
-                "txnStatus" =>  $dataDaftarPoliRJ->txn_status,
-                "ermStatus" =>  $dataDaftarPoliRJ->erm_status,
-                "cekLab" => "0",
-                "kunjunganInternalStatus" => "0",
-                "noReferensi" =>  $dataDaftarPoliRJ->reg_no,
-                "postInap" => [],
-                "internal12" => "1",
-                "internal12Desc" => "Faskes Tingkat 1",
-                "internal12Options" => [
-                    [
-                        "internal12" => "1",
-                        "internal12Desc" => "Faskes Tingkat 1"
-                    ],
-                    [
-                        "internal12" => "2",
-                        "internal12Desc" => "Faskes Tingkat 2 RS"
-                    ]
-                ],
-                "kontrol12" => "1",
-                "kontrol12Desc" => "Faskes Tingkat 1",
-                "kontrol12Options" => [
-                    [
-                        "kontrol12" => "1",
-                        "kontrol12Desc" => "Faskes Tingkat 1"
-                    ],
-                    [
-                        "kontrol12" => "2",
-                        "kontrol12Desc" => "Faskes Tingkat 2 RS"
-                    ],
-                ],
-                "taskIdPelayanan" => [
-                    "taskId1" => "",
-                    "taskId2" => "",
-                    "taskId3" =>  $dataDaftarPoliRJ->rj_date,
-                    "taskId4" => "",
-                    "taskId5" => "",
-                    "taskId6" => "",
-                    "taskId7" => "",
-                    "taskId99" => "",
-                ],
-                'sep' => [
-                    "noSep" =>  $dataDaftarPoliRJ->vno_sep,
-                    "reqSep" => [],
-                    "resSep" => [],
-                ]
-            ];
-
-
-            // jika penilaian tidak ditemukan tambah variable penilaian pda array
-            if (isset($this->dataDaftarPoliRJ['penilaian']) == false) {
-                $this->dataDaftarPoliRJ['penilaian'] = $this->penilaian;
-            }
+        // bootstrap subtree 'penilaian' kalau belum ada
+        if (!isset($this->dataDaftarPoliRJ['penilaian']) || !is_array($this->dataDaftarPoliRJ['penilaian'])) {
+            $this->dataDaftarPoliRJ['penilaian'] = $this->penilaian;
         }
     }
 
-    // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-    private function setDataPrimer(): void {}
 
     private function scoringSkalaMorse(): void
     {

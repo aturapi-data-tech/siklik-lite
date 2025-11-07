@@ -2,16 +2,16 @@
 
 namespace App\Http\Livewire\RJ\EmrRJ\MrRJDokter\AssessmentDokterDiagnosis;
 
-use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 use Livewire\WithPagination;
 
 use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 
-// use Spatie\ArrayToXml\ArrayToXml;
-use Exception;
 
 
 
@@ -21,10 +21,8 @@ class AssessmentDokterDiagnosis extends Component
 
 
     // listener from blade////////////////
-    protected $listeners = [
-        'storeAssessmentDokterRJ' => 'store',
-        'syncronizeAssessmentDokterRJFindData' => 'mount'
-    ];
+    protected $listeners = ['emr:rj:store' => 'store'];
+
 
 
     //////////////////////////////
@@ -65,13 +63,12 @@ class AssessmentDokterDiagnosis extends Component
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
-    public function updated($propertyName)
-    {
-        // dd($propertyName);
-        // $this->validateOnly($propertyName);
-        // $this->store();
-    }
 
+
+
+    // ////////////////
+    // RJ Logic
+    // ////////////////
 
     /////////////////////////////////////////////////
     // Lov dataDiagnosaICD10Lov //////////////////////
@@ -82,7 +79,7 @@ class AssessmentDokterDiagnosis extends Component
         $this->dataDiagnosaICD10Lov = [];
     }
 
-    public function updateddataDiagnosaICD10Lovsearch()
+    public function updatedDataDiagnosaICD10LovSearch()
     {
 
         // Reset index of LoV
@@ -91,7 +88,7 @@ class AssessmentDokterDiagnosis extends Component
         $search = $this->dataDiagnosaICD10LovSearch;
 
         // check LOV by dr_id rs id
-        $dataDiagnosaICD10Lovs = DB::table('rsmst_mstdiags ')->select(
+        $dataDiagnosaICD10Lovs = DB::table('rsmst_mstdiags')->select(
             'diag_id',
             'diag_desc',
             'icdx'
@@ -191,7 +188,8 @@ class AssessmentDokterDiagnosis extends Component
             $this->addDiagnosaICD10($this->dataDiagnosaICD10Lov[$id]['diag_id'], $this->dataDiagnosaICD10Lov[$id]['diag_desc'], $this->dataDiagnosaICD10Lov[$id]['icdx']);
             $this->resetdataDiagnosaICD10Lov();
         } else {
-            $this->emit('toastr-error', "Kode Diagnosa belum tersedia.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Kode Diagnosa belum tersedia.');
         }
     }
 
@@ -209,104 +207,132 @@ class AssessmentDokterDiagnosis extends Component
 
     private function insertDiagnosaICD10(): void
     {
-
-        // validate
-        // $this->checkRjStatus();
-        // customErrorMessages
         $messages = customErrorMessagesTrait::messages();
-        // require nik ketika pasien tidak dikenal
         $rules = [
-            "collectingMyDiagnosaICD10.DiagnosaICD10Id" => 'bail|required|exists:rsmst_mstdiags,diag_id',
-            "collectingMyDiagnosaICD10.DiagnosaICD10Desc" => 'bail|required|',
-            "collectingMyDiagnosaICD10.DiagnosaICD10icdx" => 'bail|required|',
-
+            "collectingMyDiagnosaICD10.DiagnosaICD10Id"   => 'bail|required|exists:rsmst_mstdiags,diag_id',
+            "collectingMyDiagnosaICD10.DiagnosaICD10Desc" => 'bail|required',
+            "collectingMyDiagnosaICD10.DiagnosaICD10icdx" => 'bail|required',
         ];
-
-        // Proses Validasi///////////////////////////////////////////
         $this->validate($rules, $messages);
 
-        // validate
-
-
-        // pengganti race condition
-        // start:
-        try {
-
-            $lastInserted = DB::table('rstxn_rjdtls')
-                ->select(DB::raw("nvl(max(rjdtl_dtl)+1,1) as rjdtl_dtl_max"))
-                ->first();
-            // insert into table transaksi
-            DB::table('rstxn_rjdtls')
-                ->insert([
-                    'rjdtl_dtl' => $lastInserted->rjdtl_dtl_max,
-                    'rj_no' => $this->rjNoRef,
-                    'diag_id' => $this->collectingMyDiagnosaICD10['DiagnosaICD10Id'],
-                ]);
-
-            // update status diagnosa rstxn_rjhdrs
-            DB::table('rstxn_rjhdrs')
-                ->where('rj_no',  $this->rjNoRef)
-                ->update([
-                    'rj_diagnosa' => 'D',
-                ]);
-
-            $checkDiagnosaCount = collect($this->dataDaftarPoliRJ['diagnosis'])->count();
-            $kategoriDiagnosa = $checkDiagnosaCount ? 'Secondary' : 'Primary';
-
-            $this->dataDaftarPoliRJ['diagnosis'][] = [
-                'diagId' => $this->collectingMyDiagnosaICD10['DiagnosaICD10Id'],
-                'diagDesc' => $this->collectingMyDiagnosaICD10['DiagnosaICD10Desc'],
-                'icdX' => $this->collectingMyDiagnosaICD10['DiagnosaICD10icdx'],
-                'ketdiagnosa' => 'Keterangan Diagnosa',
-                'kategoriDiagnosa' => $kategoriDiagnosa,
-                'rjDtlDtl' => $lastInserted->rjdtl_dtl_max,
-                'rjNo' => $this->rjNoRef,
-            ];
-
-            $this->store();
-            $this->reset(['collectingMyDiagnosaICD10']);
-
-
-            //
-        } catch (Exception $e) {
-            // display an error to user
-            dd($e->getMessage());
+        $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor RJ kosong.');
+            return;
         }
-        // goto start;
+
+        $lockKey = "rj:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
+                    // lock list + next detail
+                    $last = DB::table('rstxn_rjdtls')
+                        ->select(DB::raw("nvl(max(rjdtl_dtl)+1,1) as next_dtl"))
+                        ->first();
+                    // CEK DUPLIKASI
+                    $dup = DB::table('rstxn_rjdtls')
+                        ->where('rj_no', $rjNo)
+                        ->where('diag_id', $this->collectingMyDiagnosaICD10['DiagnosaICD10Id'])
+                        ->exists();
+
+                    if ($dup) {
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addError('Diagnosa sudah ada pada kunjungan ini.');
+                        return; // batalkan transaksi
+                    }
+
+                    $nextDtl = (int)($last->next_dtl ?? 1);
+
+                    try {
+                        DB::table('rstxn_rjdtls')->insert([
+                            'rjdtl_dtl' => $nextDtl,
+                            'rj_no'     => $rjNo,
+                            'diag_id'   => $this->collectingMyDiagnosaICD10['DiagnosaICD10Id'],
+                        ]);
+                    } catch (\Illuminate\Database\QueryException $e) {
+                        // ini error SQL
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addError("Gagal insert data RJDTL: " . $e->getMessage());
+                        return;
+                    } catch (\Exception $e) {
+                        // error non-SQL (misalnya koneksi putus)
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addError("Terjadi kesalahan: " . $e->getMessage());
+                        return;
+                    }
+
+                    // flag diagnosa di header (bila perlu)
+                    DB::table('rstxn_rjhdrs')->where('rj_no', $rjNo)->update(['rj_diagnosa' => 'D']);
+
+                    // fresh JSON dari DB lalu patch subtree diagnosis
+                    $freshWrap = $this->findDataRJ($rjNo);
+                    $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+                    if (!isset($fresh['diagnosis']) || !is_array($fresh['diagnosis'])) $fresh['diagnosis'] = [];
+
+                    $kategori = collect($fresh['diagnosis'])->count() ? 'Secondary' : 'Primary';
+
+                    $fresh['diagnosis'][] = [
+                        'diagId'         => $this->collectingMyDiagnosaICD10['DiagnosaICD10Id'],
+                        'diagDesc'       => $this->collectingMyDiagnosaICD10['DiagnosaICD10Desc'],
+                        'icdX'           => $this->collectingMyDiagnosaICD10['DiagnosaICD10icdx'],
+                        'ketdiagnosa'    => 'Keterangan Diagnosa',
+                        'kategoriDiagnosa' => $kategori,
+                        'rjDtlDtl'       => $nextDtl,
+                        'rjNo'           => $rjNo,
+                    ];
+
+                    $this->updateJsonRJ($rjNo, $fresh);
+                    $this->dataDaftarPoliRJ = $fresh;
+                    $this->reset(['collectingMyDiagnosaICD10']);
+                });
+            });
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Diagnosa berhasil ditambahkan.');
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Lock timeout. Coba lagi.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menambah diagnosa.');
+        }
     }
 
-    public function removeDiagnosaICD10($rjDtlDtl)
+    public function removeDiagnosaICD10($rjDtlDtl): void
     {
-
-        // $this->checkRjStatus();
-
-
-        // pengganti race condition
-        // start:
-        try {
-
-
-            // remove into table transaksi
-            DB::table('rstxn_rjdtls')
-                ->where('rjdtl_dtl', $rjDtlDtl)
-                ->delete();
-
-
-            $DiagnosaICD10 = collect($this->dataDaftarPoliRJ['diagnosis'])->where("rjDtlDtl", '!=', $rjDtlDtl)->toArray();
-            $this->dataDaftarPoliRJ['diagnosis'] = $DiagnosaICD10;
-
-
-            $this->store();
-
-
-            //
-        } catch (Exception $e) {
-            // display an error to user
-            dd($e->getMessage());
+        $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor RJ kosong.');
+            return;
         }
-        // goto start;
 
+        $lockKey = "rj:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo, $rjDtlDtl) {
+                DB::transaction(function () use ($rjNo, $rjDtlDtl) {
+                    DB::table('rstxn_rjdtls')
+                        ->where('rj_no', $rjNo)
+                        ->where('rjdtl_dtl', $rjDtlDtl)
+                        ->delete();
 
+                    $freshWrap = $this->findDataRJ($rjNo);
+                    $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+                    $fresh['diagnosis'] = collect($fresh['diagnosis'] ?? [])
+                        ->where('rjDtlDtl', '!=', $rjDtlDtl)->values()->toArray();
+
+                    $this->updateJsonRJ($rjNo, $fresh);
+                    $this->dataDaftarPoliRJ = $fresh;
+                });
+            });
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Diagnosa dihapus.');
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Lock timeout. Coba lagi.');
+        }
     }
     // LOV selected end
     /////////////////////////////////////////////////
@@ -323,7 +349,7 @@ class AssessmentDokterDiagnosis extends Component
         $this->dataProcedureICD9CmLov = [];
     }
 
-    public function updateddataProcedureICD9CmLovsearch()
+    public function updatedDataProcedureICD9CmLovSearch()
     {
 
         // Reset index of LoV
@@ -332,7 +358,7 @@ class AssessmentDokterDiagnosis extends Component
         $search = $this->dataProcedureICD9CmLovSearch;
 
         // check LOV by dr_id rs id
-        $dataProcedureICD9CmLovs = DB::table('rsmst_mstprocedures ')->select(
+        $dataProcedureICD9CmLovs = DB::table('rsmst_mstprocedures')->select(
             'proc_id',
             'proc_desc',
 
@@ -431,7 +457,9 @@ class AssessmentDokterDiagnosis extends Component
             $this->addProcedureICD9Cm($this->dataProcedureICD9CmLov[$id]['proc_id'], $this->dataProcedureICD9CmLov[$id]['proc_desc']);
             $this->resetdataProcedureICD9CmLov();
         } else {
-            $this->emit('toastr-error', "Kode Diagnosa belum tersedia.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Kode Prosedur belum tersedia.');
+            return;
         }
     }
 
@@ -448,50 +476,90 @@ class AssessmentDokterDiagnosis extends Component
 
     private function insertProcedureICD9Cm(): void
     {
-
-        // validate
-        // $this->checkRjStatus();
-        // customErrorMessages
         $messages = customErrorMessagesTrait::messages();
-        // require nik ketika pasien tidak dikenal
         $rules = [
-            "collectingMyProcedureICD9Cm.ProcedureICD9CmId" => 'bail|required|exists:rsmst_mstprocedures,proc_id',
-            "collectingMyProcedureICD9Cm.ProcedureICD9CmDesc" => 'bail|required|',
+            "collectingMyProcedureICD9Cm.ProcedureICD9CmId"   => 'bail|required|exists:rsmst_mstprocedures,proc_id',
+            "collectingMyProcedureICD9Cm.ProcedureICD9CmDesc" => 'bail|required',
         ];
-
-        // Proses Validasi///////////////////////////////////////////
         $this->validate($rules, $messages);
 
-        // validate
+        $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor RJ kosong.');
+            return;
+        }
 
+        $lockKey = "rj:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
+                    $freshWrap = $this->findDataRJ($rjNo);
+                    $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+                    if (!isset($fresh['procedure']) || !is_array($fresh['procedure'])) $fresh['procedure'] = [];
 
-        // pengganti race condition
+                    $procId = $this->collectingMyProcedureICD9Cm['ProcedureICD9CmId'];
 
-        $this->dataDaftarPoliRJ['procedure'][] = [
-            'procedureId' => $this->collectingMyProcedureICD9Cm['ProcedureICD9CmId'],
-            'procedureDesc' => $this->collectingMyProcedureICD9Cm['ProcedureICD9CmDesc'],
-            'ketProcedure' => 'Keterangan Procedure',
-            'rjNo' => $this->rjNoRef,
-        ];
+                    // CEK DUPLIKASI
+                    $dup = collect($fresh['procedure'])->contains(function ($row) use ($procId) {
+                        return ($row['procedureId'] ?? null) === $procId;
+                    });
+                    if ($dup) {
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addError('Prosedur sudah ada pada kunjungan ini.');
+                        return;
+                    }
 
-        $this->store();
-        $this->reset(['collectingMyProcedureICD9Cm']);
+                    $fresh['procedure'][] = [
+                        'procedureId'   => $procId,
+                        'procedureDesc' => $this->collectingMyProcedureICD9Cm['ProcedureICD9CmDesc'],
+                        'ketProcedure'  => 'Keterangan Procedure',
+                        'rjNo'          => $rjNo,
+                    ];
 
+                    $this->updateJsonRJ($rjNo, $fresh);
+                    $this->dataDaftarPoliRJ = $fresh;
+                    $this->reset(['collectingMyProcedureICD9Cm']);
+                });
+            });
 
-        //
-
-        // goto start;
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Prosedur berhasil ditambahkan.');
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Lock timeout. Coba lagi.');
+        }
     }
 
-    public function removeProcedureICD9Cm($procedureId)
+    public function removeProcedureICD9Cm($procedureId): void
     {
+        $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor RJ kosong.');
+            return;
+        }
 
-        // $this->checkRjStatus();
+        $lockKey = "rj:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo, $procedureId) {
+                DB::transaction(function () use ($rjNo, $procedureId) {
+                    $freshWrap = $this->findDataRJ($rjNo);
+                    $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+                    $fresh['procedure'] = collect($fresh['procedure'] ?? [])
+                        ->where('procedureId', '!=', $procedureId)->values()->toArray();
 
+                    $this->updateJsonRJ($rjNo, $fresh);
+                    $this->dataDaftarPoliRJ = $fresh;
+                });
+            });
 
-        $ProcedureICD9Cm = collect($this->dataDaftarPoliRJ['procedure'])->where("procedureId", '!=', $procedureId)->toArray();
-        $this->dataDaftarPoliRJ['procedure'] = $ProcedureICD9Cm;
-        $this->store();
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Prosedur dihapus.');
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Lock timeout. Coba lagi.');
+        }
     }
     // LOV selected end
     /////////////////////////////////////////////////
@@ -500,41 +568,73 @@ class AssessmentDokterDiagnosis extends Component
 
 
     // insert and update record start////////////////
-    public function store()
+    public function store(): void
     {
-        // Logic update mode start //////////
-        $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
-        $this->emit('syncronizeAssessmentDokterRJFindData');
+        $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor RJ kosong.');
+            return;
+        }
+
+        // (opsional) blokir bila RJ sudah pulang
+        $status = DB::scalar("select rj_status from rstxn_rjhdrs where rj_no=:rjNo", ['rjNo' => $rjNo]);
+        if ($status !== 'A') {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Pasien sudah pulang. Tidak bisa menyimpan diagnosis/procedure.');
+            return;
+        }
+
+        $lockKey = "rj:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                $freshWrap = $this->findDataRJ($rjNo);
+                $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+                if (!is_array($fresh)) $fresh = [];
+
+                // bootstrap
+                if (!isset($fresh['diagnosis']) || !is_array($fresh['diagnosis'])) $fresh['diagnosis'] = [];
+                if (!isset($fresh['procedure']) || !is_array($fresh['procedure'])) $fresh['procedure'] = [];
+
+                // PATCH subtree dari state saat ini
+                $fresh['diagnosis'] = $this->dataDaftarPoliRJ['diagnosis'] ?? [];
+                $fresh['procedure'] = $this->dataDaftarPoliRJ['procedure'] ?? [];
+
+                DB::transaction(function () use ($rjNo, $fresh) {
+                    $this->updateJsonRJ($rjNo, $fresh); // single-writer
+                });
+
+                // sync komponen
+                $this->dataDaftarPoliRJ = $fresh;
+            });
+
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Diagnosa/Prosedur berhasil disimpan.');
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk. Gagal memperoleh kunci data (lock). Silakan coba lagi.');
+        }
     }
 
-    private function updateDataRJ($rjNo): void
-    {
-        $this->updateJsonRJ($rjNo, $this->dataDaftarPoliRJ);
-
-        // $this->emit('toastr-success', "Diagnosa berhasil disimpan.");
-    }
     // insert and update record end////////////////
 
 
     private function findData($rjno): void
     {
+        $wrap = $this->findDataRJ($rjno);
+        $this->dataDaftarPoliRJ = $wrap['dataDaftarRJ'] ?? [];
 
-
-        $findDataRJ = $this->findDataRJ($rjno);
-        $this->dataDaftarPoliRJ  = $findDataRJ['dataDaftarRJ'];
-
-
-        // jika diagnosis tidak ditemukan tambah variable diagnosis pda array
-        if (isset($this->dataDaftarPoliRJ['diagnosis']) == false) {
-            $this->dataDaftarPoliRJ['diagnosis'] = $this->diagnosis;
+        if (!isset($this->dataDaftarPoliRJ['diagnosis']) || !is_array($this->dataDaftarPoliRJ['diagnosis'])) {
+            $this->dataDaftarPoliRJ['diagnosis'] = [];
         }
-
-        // jika procedure tidak ditemukan tambah variable procedure pda array
-        if (isset($this->dataDaftarPoliRJ['procedure']) == false) {
-            $this->dataDaftarPoliRJ['procedure'] = $this->procedure;
+        if (!isset($this->dataDaftarPoliRJ['procedure']) || !is_array($this->dataDaftarPoliRJ['procedure'])) {
+            $this->dataDaftarPoliRJ['procedure'] = [];
         }
     }
 
+
+    private function setDataPrimer(): void {}
 
 
 
@@ -542,27 +642,20 @@ class AssessmentDokterDiagnosis extends Component
     public function mount()
     {
         $this->findData($this->rjNoRef);
-        // set data dokter ref
-        // $this->store();
     }
 
 
 
-    // select data start////////////////
     public function render()
     {
 
         return view(
             'livewire.r-j.emr-r-j.mr-r-j-dokter.assessment-dokter-diagnosis.assessment-dokter-diagnosis',
             [
-                // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Data Pasien Rawat Jalan',
                 'mySnipt' => 'Rekam Medis Pasien',
                 'myProgram' => 'ICD 10',
             ]
         );
     }
-    // select data end////////////////
-
-
 }

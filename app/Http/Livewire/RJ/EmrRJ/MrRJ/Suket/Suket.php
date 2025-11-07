@@ -5,21 +5,20 @@ namespace App\Http\Livewire\RJ\EmrRJ\MrRJ\Suket;
 use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
-use Livewire\WithPagination;
 
-
-// use Spatie\ArrayToXml\ArrayToXml;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use App\Http\Traits\EmrRJ\EmrRJTrait;
 
 
 class Suket extends Component
 {
-    use WithPagination;
+    use EmrRJTrait;
 
     // listener from blade////////////////
-    protected $listeners = [
-        'syncronizeAssessmentPerawatRJFindData' => 'mount'
+    protected $listeners = ['emr:rj:store' => 'store'];
 
-    ];
+
 
     //////////////////////////////
     // Ref on top bar
@@ -47,13 +46,28 @@ class Suket extends Component
 
 
     protected $rules = [
+        // angka hari istirahat, boleh kosong tapi kalau diisi harus number wajar
+        'dataDaftarPoliRJ.suket.suketIstirahat.suketIstirahatHari' => 'nullable|numeric|min:1|max:60',
 
-        // 'dataDaftarPoliRJ.suket.pengkajianMedis.waktuPemeriksaan' => 'required|date_format:d/m/Y H:i:s',
-        // 'dataDaftarPoliRJ.suket.pengkajianMedis.selesaiPemeriksaan' => 'required|date_format:d/m/Y H:i:s'
-        'dataDaftarPoliRJ.suket.suketIstirahat.suketIstirahatHari' => 'numeric'
-
-
+        // tambahkan bila mau:
+        'dataDaftarPoliRJ.suket.suketSehat.suketSehat'             => 'nullable|string|max:2000',
+        'dataDaftarPoliRJ.suket.suketIstirahat.suketIstirahat'     => 'nullable|string|max:2000',
     ];
+
+    protected $messages = [
+        'dataDaftarPoliRJ.suket.suketIstirahat.suketIstirahatHari.numeric' => ':attribute harus berupa angka.',
+        'dataDaftarPoliRJ.suket.suketIstirahat.suketIstirahatHari.min'     => ':attribute minimal :min hari.',
+        'dataDaftarPoliRJ.suket.suketIstirahat.suketIstirahatHari.max'     => ':attribute maksimal :max hari.',
+        'dataDaftarPoliRJ.suket.suketSehat.suketSehat.max'                  => ':attribute maksimal :max karakter.',
+        'dataDaftarPoliRJ.suket.suketIstirahat.suketIstirahat.max'          => ':attribute maksimal :max karakter.',
+    ];
+
+    protected $validationAttributes = [
+        'dataDaftarPoliRJ.suket.suketIstirahat.suketIstirahatHari' => 'Lama istirahat',
+        'dataDaftarPoliRJ.suket.suketSehat.suketSehat'             => 'Isi Surat Keterangan Sehat',
+        'dataDaftarPoliRJ.suket.suketIstirahat.suketIstirahat'     => 'Isi Surat Istirahat',
+    ];
+
 
 
 
@@ -62,9 +76,9 @@ class Suket extends Component
     ////////////////////////////////////////////////
     public function updated($propertyName)
     {
-        // dd($propertyName);
-        $this->validateOnly($propertyName);
-        $this->store();
+        if (str_starts_with($propertyName, 'dataDaftarPoliRJ.suket.')) {
+            $this->validateOnly($propertyName);
+        }
     }
 
 
@@ -91,197 +105,88 @@ class Suket extends Component
     // ////////////////
 
 
-    // validate Data RJ//////////////////////////////////////////////////
-    private function validateDataRJ(): void
+    // insert and update record start////////////////
+    public function store(): void
     {
-        // customErrorMessages
-        // $messages = customErrorMessagesTrait::messages();
-        $messages = [];
+        $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Nomor RJ kosong.');
+            return;
+        }
 
-
-        // $rules = [];
-
-
-
-        // Proses Validasi///////////////////////////////////////////
+        // Validasi form (opsional: cukup subtree yang berubah)
         try {
-            $this->validate($this->rules, $messages);
+            $this->validate(
+                $this->rules,
+                $this->messages,
+                $this->validationAttributes
+            );
         } catch (\Illuminate\Validation\ValidationException $e) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Lakukan pengecekan kembali input data.');
+            throw $e;
+        }
 
-            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
-            $this->validate($this->rules, $messages);
+        $lockKey = "rj:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                // 1) Baca fresh dari DB (pakai helper di trait)
+                $wrap  = $this->findDataRJ($rjNo);            // EmrRJTrait
+                $fresh = $wrap['dataDaftarRJ'] ?? [];
+                if (!is_array($fresh)) $fresh = [];
+
+                // 2) Bootstrap subtree jika belum ada
+                if (!isset($fresh['suket']) || !is_array($fresh['suket'])) {
+                    $fresh['suket'] = $this->suket;
+                }
+
+                // 3) PATCH hanya subtree suket dari state komponen
+                $fresh['suket'] = $this->dataDaftarPoliRJ['suket'] ?? $this->suket;
+
+                // 4) Commit via single-writer
+                DB::transaction(function () use ($rjNo, $fresh) {
+                    $this->updateJsonRJ($rjNo, $fresh);       // EmrRJTrait: update rstxn_rjhdrs.dataDaftarPoliRJ_json
+                });
+
+                // 5) Sync state komponen
+                $this->dataDaftarPoliRJ = $fresh;
+            });
+
+
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess('Suket berhasil disimpan.');
+        } catch (LockTimeoutException $e) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Sistem sibuk. Gagal memperoleh kunci data (lock). Silakan coba lagi.');
         }
     }
 
 
-    // insert and update record start////////////////
-    public function store()
-    {
-        // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-        $this->setDataPrimer();
-
-        // Validate RJ
-        $this->validateDataRJ();
-
-        // Logic update mode start //////////
-        $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
-        $this->emit('syncronizeAssessmentPerawatRJFindData');
-    }
-
-    private function updateDataRJ($rjNo): void
-    {
-
-        // update table trnsaksi
-        DB::table('rstxn_rjhdrs')
-            ->where('rj_no', $rjNo)
-            ->update([
-                'dataDaftarPoliRJ_json' => json_encode($this->dataDaftarPoliRJ, true),
-                // 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-
-            ]);
-
-        $this->emit('toastr-success', "suket berhasil disimpan.");
-    }
     // insert and update record end////////////////
 
 
-    private function findData($rjno): void
+    private function findData($rjNo): void
     {
+        $wrap = $this->findDataRJ($rjNo); // dari EmrRJTrait
+        $this->dataDaftarPoliRJ = $wrap['dataDaftarRJ'] ?? [];
 
-
-        $findData = DB::table('rsview_rjkasir')
-            ->select('datadaftarpolirj_json', 'vno_sep')
-            ->where('rj_no', $rjno)
-            ->first();
-
-        $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json   : null;
-        // if meta_data_pasien_json = null
-        // then cari Data Pasien By Key Collection (exception when no data found)
-        //
-        // else json_decode
-        if ($dataDaftarPoliRJ_json) {
-            $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
-
-            // jika suket tidak ditemukan tambah variable suket pda array
-            if (isset($this->dataDaftarPoliRJ['suket']) == false) {
-                $this->dataDaftarPoliRJ['suket'] = $this->suket;
-            }
-        } else {
-
-            $this->emit('toastr-error', "Data tidak dapat di proses json.");
-            $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
-                ->select(
-                    DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
-                    DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
-                    'rj_no',
-                    'reg_no',
-                    'reg_name',
-                    'sex',
-                    'address',
-                    'thn',
-                    DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
-                    'poli_id',
-                    'poli_desc',
-                    'dr_id',
-                    'dr_name',
-                    'klaim_id',
-                    // 'entry_id',
-                    'shift',
-                    'vno_sep',
-                    'no_antrian',
-
-                    'nobooking',
-                    // 'push_antrian_bpjs_status',
-                    // 'push_antrian_bpjs_json',
-                    'kd_dr_bpjs',
-                    'kd_poli_bpjs',
-                    'rj_status',
-                    'txn_status',
-                    'erm_status',
-                )
-                ->where('rj_no', '=', $rjno)
-                ->first();
-
-            $this->dataDaftarPoliRJ = [
-                "regNo" =>  $dataDaftarPoliRJ->reg_no,
-
-                "drId" =>  $dataDaftarPoliRJ->dr_id,
-                "drDesc" =>  $dataDaftarPoliRJ->dr_name,
-
-                "poliId" =>  $dataDaftarPoliRJ->poli_id,
-                "klaimId" => $dataDaftarPoliRJ->klaim_id,
-                "poliDesc" =>  $dataDaftarPoliRJ->poli_desc,
-
-                "kddrbpjs" =>  $dataDaftarPoliRJ->kd_dr_bpjs,
-                "kdpolibpjs" =>  $dataDaftarPoliRJ->kd_poli_bpjs,
-
-                "rjDate" =>  $dataDaftarPoliRJ->rj_date,
-                "rjNo" =>  $dataDaftarPoliRJ->rj_no,
-                "shift" =>  $dataDaftarPoliRJ->shift,
-                "noAntrian" =>  $dataDaftarPoliRJ->no_antrian,
-                "noBooking" =>  $dataDaftarPoliRJ->nobooking,
-                "slCodeFrom" => "02",
-                "passStatus" => "",
-                "rjStatus" =>  $dataDaftarPoliRJ->rj_status,
-                "txnStatus" =>  $dataDaftarPoliRJ->txn_status,
-                "ermStatus" =>  $dataDaftarPoliRJ->erm_status,
-                "cekLab" => "0",
-                "kunjunganInternalStatus" => "0",
-                "noReferensi" =>  $dataDaftarPoliRJ->reg_no,
-                "postInap" => [],
-                "internal12" => "1",
-                "internal12Desc" => "Faskes Tingkat 1",
-                "internal12Options" => [
-                    [
-                        "internal12" => "1",
-                        "internal12Desc" => "Faskes Tingkat 1"
-                    ],
-                    [
-                        "internal12" => "2",
-                        "internal12Desc" => "Faskes Tingkat 2 RS"
-                    ]
-                ],
-                "kontrol12" => "1",
-                "kontrol12Desc" => "Faskes Tingkat 1",
-                "kontrol12Options" => [
-                    [
-                        "kontrol12" => "1",
-                        "kontrol12Desc" => "Faskes Tingkat 1"
-                    ],
-                    [
-                        "kontrol12" => "2",
-                        "kontrol12Desc" => "Faskes Tingkat 2 RS"
-                    ],
-                ],
-                "taskIdPelayanan" => [
-                    "taskId1" => "",
-                    "taskId2" => "",
-                    "taskId3" =>  $dataDaftarPoliRJ->rj_date,
-                    "taskId4" => "",
-                    "taskId5" => "",
-                    "taskId6" => "",
-                    "taskId7" => "",
-                    "taskId99" => "",
-                ],
-                'sep' => [
-                    "noSep" =>  $dataDaftarPoliRJ->vno_sep,
-                    "reqSep" => [],
-                    "resSep" => [],
-                ]
-            ];
-
-
-            // jika suket tidak ditemukan tambah variable suket pda array
-            if (isset($this->dataDaftarPoliRJ['suket']) == false) {
-                $this->dataDaftarPoliRJ['suket'] = $this->suket;
-            }
+        if (!isset($this->dataDaftarPoliRJ['suket']) || !is_array($this->dataDaftarPoliRJ['suket'])) {
+            $this->dataDaftarPoliRJ['suket'] = $this->suket;
         }
     }
-
-    // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-    private function setDataPrimer(): void {}
-
-
 
 
 
@@ -300,14 +205,10 @@ class Suket extends Component
         return view(
             'livewire.r-j.emr-r-j.mr-r-j.suket.suket',
             [
-                // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'suket',
                 'mySnipt' => 'Rekam Medis Pasien',
                 'myProgram' => 'Pasien Rawat Jalan',
             ]
         );
     }
-    // select data end////////////////
-
-
 }

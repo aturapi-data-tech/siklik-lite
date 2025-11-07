@@ -12,7 +12,7 @@
                 @foreach ($alergiUdaraLov as $lov)
                     <li wire:key='alergiUdaraLov{{ $lov['alergiUdaraId'] }}'>
                         <x-dropdown-link
-                            wire:click="setMyalergiUdaraLov('{{ $lov['alergiUdaraId'] }}','{{ $lov['alergiUdaraDesc'] }}')">
+                            wire:click="setMyAlergiUdaraLov('{{ $lov['alergiUdaraId'] }}','{{ $lov['alergiUdaraDesc'] }}')">
                             {{ $lov['alergiUdaraId'] . ' / ' . $lov['alergiUdaraDesc'] }}
                         </x-dropdown-link>
                     </li>

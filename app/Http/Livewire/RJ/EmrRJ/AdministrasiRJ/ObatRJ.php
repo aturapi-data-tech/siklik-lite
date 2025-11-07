@@ -22,12 +22,9 @@ class ObatRJ extends Component
     use WithPagination;
 
 
-    // listener from blade////////////////
-    protected $listeners = [
-        // 'storeAssessmentDokterRJ' => 'store',
-        'syncronizeAssessmentDokterRJFindData' => 'mount',
-        'syncronizeAssessmentPerawatRJFindData' => 'mount'
-    ];
+
+
+
 
 
     //////////////////////////////z

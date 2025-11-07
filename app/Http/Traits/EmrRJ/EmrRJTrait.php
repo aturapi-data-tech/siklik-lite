@@ -3,10 +3,8 @@
 namespace App\Http\Traits\EmrRJ;
 
 
-// use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Exception;
-// use Spatie\ArrayToXml\ArrayToXml;
 
 trait EmrRJTrait
 {
@@ -264,13 +262,49 @@ trait EmrRJTrait
         return false;
     }
 
-    public static function updateJsonRJ($rjNo, array $rjArr): void
+    public static function updateJsonRJ(string $rjNo, array $rjArr): void
     {
+        // Ambil rjNo dari array JSON
+        $rjNoJson = $rjArr['rjNo'] ?? null;
+
+        // Cek apakah field rjNo ada
+        if (is_null($rjNoJson)) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Field 'rjNo' tidak ditemukan pada data JSON.");
+            return;
+        }
+
+        // Cek kesesuaian nomor RJ
+        if ((int) $rjNo !== (int) $rjNoJson) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Nomor RJ tidak sesuai. Parameter: {$rjNo} / JSON: {$rjNoJson}");
+            return;
+        }
+
+        // Cek apakah record-nya benar-benar ada di DB
+        $exists = DB::table('rstxn_rjhdrs')->where('rj_no', $rjNo)->exists();
+        if (!$exists) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Data RJ dengan nomor {$rjNo} tidak ditemukan di tabel rstxn_rjhdrs.");
+            return;
+        }
+
+
+
+        // Update ke tabel
         DB::table('rstxn_rjhdrs')
             ->where('rj_no', $rjNo)
             ->update([
-                'datadaftarpolirj_json' => json_encode($rjArr, true),
-                // 'datadaftarpolirj_xml' => ArrayToXml::convert($rjArr),
+                'datadaftarpolirj_json' => json_encode($rjArr, JSON_UNESCAPED_UNICODE),
             ]);
     }
 }

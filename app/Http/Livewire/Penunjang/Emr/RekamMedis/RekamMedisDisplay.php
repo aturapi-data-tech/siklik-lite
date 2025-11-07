@@ -19,11 +19,8 @@ class RekamMedisDisplay extends Component
     use WithPagination, iCareTrait;
 
 
-    // listener from blade////////////////
-    protected $listeners = [
-        'syncronizeAssessmentDokterRJFindData' => 'mount',
-        'syncronizeAssessmentDokterUGDFindData' => 'mount'
-    ];
+
+
 
     // primitive Variable
     public string $myTitle = 'Resume Medis Pasien';
@@ -222,9 +219,7 @@ class RekamMedisDisplay extends Component
 
             // Jika array perencanaan belum terbentuk
             if (!isset($to['perencanaan'])) {
-                $this->emit('storeAssessmentDokterRJPerencanaan');
-                $this->emit('syncronizeAssessmentDokterRJFindData');
-                $this->emit('syncronizeAssessmentPerawatRJFindData');
+
                 $to = $this->cariResepRJ($this->rjNoRefCopyTo);
             }
 
@@ -285,8 +280,7 @@ class RekamMedisDisplay extends Component
                 // 'datadaftarpolirj_xml' => ArrayToXml::convert($dataDaftarPoliRJArr),
             ]);
 
-        $this->emit('syncronizeAssessmentDokterRJFindData');
-        $this->emit('syncronizeAssessmentPerawatRJFindData');
+
         $this->emit('toastr-success', "Data Resep berhasil disimpan.");
     }
 

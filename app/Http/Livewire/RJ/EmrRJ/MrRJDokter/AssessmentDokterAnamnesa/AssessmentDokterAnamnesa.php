@@ -2,151 +2,39 @@
 
 namespace App\Http\Livewire\RJ\EmrRJ\MrRJDokter\AssessmentDokterAnamnesa;
 
-use Illuminate\Support\Facades\DB;
-
 use Livewire\Component;
 use Livewire\WithPagination;
+
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 
 use App\Http\Traits\EmrRJ\EmrRJTrait;
+use App\Http\Traits\MasterPasien\MasterPasienTrait;
 
 
 class AssessmentDokterAnamnesa extends Component
 {
-    use WithPagination, EmrRJTrait;
+    use WithPagination, EmrRJTrait, MasterPasienTrait;
 
-    // listener from blade////////////////
-    protected $listeners = [
-        'storeAssessmentDokterRJ' => 'store',
-        'syncronizeAssessmentDokterRJFindData' => 'mount'
-    ];
-
-
-
-    //////////////////////////////
-    // Ref on top bar
-    //////////////////////////////
+    // ==========================
+    // Listeners
+    // ==========================
+    protected $listeners = ['emr:rj:store' => 'store'];
 
 
 
-    // dataDaftarPoliRJ RJ
+
+    // ==========================
+    // Refs & state
+    // ==========================
     public $rjNoRef;
 
     public array $dataDaftarPoliRJ = [];
 
-    public  array $dataPasien =
-    [
-        "pasien" => [
-            "pasientidakdikenal" => [],  //status pasien tdak dikenal 0 false 1 true
-            "regNo" => '', //harus diisi
-            "gelarDepan" => '',
-            "regName" => '', //harus diisi / (Sesuai KTP)
-            "gelarBelakang" => '',
-            "namaPanggilan" => '',
-            "tempatLahir" => '', //harus diisi
-            "tglLahir" => '', //harus diisi / (dd/mm/yyyy)
-            "thn" => '',
-            "bln" => '',
-            "hari" => '',
-            "jenisKelamin" => [ //harus diisi (saveid)
-                "jenisKelaminId" => 1,
-                "jenisKelaminDesc" => "Laki-laki",
-
-            ],
-            "agama" => [ //harus diisi (save id+nama)
-                "agamaId" => "1",
-                "agamaDesc" => "Islam",
-
-            ],
-            "statusPerkawinan" => [ //harus diisi (save id)
-                "statusPerkawinanId" => "1",
-                "statusPerkawinanDesc" => "Belum Kawin",
-
-            ],
-            "pendidikan" =>  [ //harus diisi (save id)
-                "pendidikanId" => "3",
-                "pendidikanDesc" => "SLTA Sederajat",
-
-            ],
-            "pekerjaan" => [ //harus diisi (save id)
-                "pekerjaanId" => "4",
-                "pekerjaanDesc" => "Pegawai Swasta/ Wiraswasta",
-
-            ],
-            "golonganDarah" => [ //harus diisi (save id+nama) (default Tidak Tahu)
-                "golonganDarahId" => "13",
-                "golonganDarahDesc" => "Tidak Tahu",
-
-            ],
-
-            "kewarganegaraan" => 'INDONESIA', //Free text (defult INDONESIA)
-            "suku" => 'Jawa', //Free text (defult Jawa)
-            "bahasa" => 'Indonesia / Jawa', //Free text (defult Indonesia / Jawa)
-            "status" => [
-                "statusId" => "1",
-                "statusDesc" => "Aktif / Hidup",
-
-            ],
-            "domisil" => [
-                "samadgnidentitas" => [], //status samadgn domisil 0 false 1 true (auto entry = domisil)
-                "alamat" => '', //harus diisi
-                "rt" => '', //harus diisi
-                "rw" => '', //harus diisi
-                "kodepos" => '', //harus diisi
-                "desaId" => '', //harus diisi (Kode data Kemendagri)
-                "kecamatanId" => '', //harus diisi (Kode data Kemendagri)
-                "kotaId" => "3504", //harus diisi (Kode data Kemendagri)
-                "propinsiId" => "35", //harus diisi (Kode data Kemendagri)
-                "desaName" => '', //harus diisi (Kode data Kemendagri)
-                "kecamatanName" => '', //harus diisi (Kode data Kemendagri)
-                "kotaName" => "TULUNGAGUNG", //harus diisi (Kode data Kemendagri)
-                "propinsiName" => "JAWA TIMUR", //harus diisi (Kode data Kemendagri)
-
-            ],
-            "identitas" => [
-                "nik" => '', //harus diisi
-                "idbpjs" => '',
-                "pasport" => '', //untuk WNA / WNI yang memiliki passport
-                "alamat" => '', //harus diisi
-                "rt" => '', //harus diisi
-                "rw" => '', //harus diisi
-                "kodepos" => '', //harus diisi
-                "desaId" => '', //harus diisi (Kode data Kemendagri)
-                "kecamatanId" => '', //harus diisi (Kode data Kemendagri)
-                "kotaId" => "3504", //harus diisi (Kode data Kemendagri)
-                "propinsiId" => "35", //harus diisi (Kode data Kemendagri)
-                "desaName" => '', //harus diisi (Kode data Kemendagri)
-                "kecamatanName" => '', //harus diisi (Kode data Kemendagri)
-                "kotaName" => "TULUNGAGUNG", //harus diisi (Kode data Kemendagri)
-                "propinsiName" => "JAWA TIMUR", //harus diisi (Kode data Kemendagri)
-                "negara" => "ID" //harus diisi (ISO 3166) ID 	IDN 	360 	ISO 3166-2:ID 	.id
-            ],
-            "kontak" => [
-                "kodenegara" => "62", //+(62) Indonesia
-                "nomerTelponSelulerPasien" => '', //+(kode negara) no telp
-                "nomerTelponLain" => '' //+(kode negara) no telp
-            ],
-            "hubungan" => [
-                "namaAyah" => '', //
-                "kodenegaraAyah" => "62", //+(62) Indonesia
-                "nomerTelponSelulerAyah" => '', //+(kode negara) no telp
-                "namaIbu" => '', //
-                "kodenegaraIbu" => "62", //+(62) Indonesia
-                "nomerTelponSelulerIbu" => '', //+(kode negara) no telp
-
-                "namaPenanggungJawab" => '', // di isi untuk pasien (Tidak dikenal / Hal Lain)
-                "kodenegaraPenanggungJawab" => "62", //+(62) Indonesia
-                "nomerTelponSelulerPenanggungJawab" => '', //+(kode negara) no telp
-                "hubunganDgnPasien" => [
-                    "hubunganDgnPasienId" => 5, //Default 5 Kerabat / Saudara
-                    "hubunganDgnPasienDesc" => "Kerabat / Saudara",
-
-                ]
-            ],
-
-        ],
-
-    ];
+    public array $dataPasien = [];
 
     public array $rekonsiliasiObat = ["namaObat" => "", "dosis" => "", "rute" => ""];
 
@@ -156,21 +44,6 @@ class AssessmentDokterAnamnesa extends Component
         "pengkajianPerawatan" => [
             "perawatPenerima" => "",
             "jamDatang" => "",
-            // "caraMasukRj" => "",
-            // "caraMasukRjDesc" => "",
-            // "caraMasukRjOption" => [
-            //     ["caraMasukRj" => "Sendiri"],
-            //     ["caraMasukRj" => "Rujuk"],
-            //     ["caraMasukRj" => "Kasus Polisi"],
-            // ],
-
-            // "tingkatKegawatan" => "",
-            // "tingkatKegawatanOption" => [
-            //     ["tingkatKegawatan" => "P1"],
-            //     ["tingkatKegawatan" => "P2"],
-            //     ["tingkatKegawatan" => "P3"],
-            //     ["tingkatKegawatan" => "P0"],
-            // ],
         ],
 
         "keluhanUtamaTab" => "Keluhan Utama",
@@ -213,7 +86,6 @@ class AssessmentDokterAnamnesa extends Component
         "lainLain" => [
             "merokok" => [],
             "terpaparRokok" => []
-
         ],
 
         "faktorResikoTab" => "Faktor Resiko",
@@ -295,7 +167,6 @@ class AssessmentDokterAnamnesa extends Component
                 ["tempatTinggal" => "Lain-lain"],
             ],
             "keteranganTempatTinggal" => ""
-
         ],
 
         "spiritualTab" => "Spiritual",
@@ -306,15 +177,12 @@ class AssessmentDokterAnamnesa extends Component
                 ["ibadahTeratur" => "Ya"],
                 ["ibadahTeratur" => "Tidak"],
             ],
-
             "nilaiKepercayaan" => "",
             "nilaiKepercayaanOptions" => [
                 ["nilaiKepercayaan" => "Ya"],
                 ["nilaiKepercayaan" => "Tidak"],
             ],
-
             "keteranganSpiritual" => ""
-
         ],
 
         "ekonomiTab" => "Ekonomi",
@@ -326,10 +194,8 @@ class AssessmentDokterAnamnesa extends Component
                 ["penghasilanBln" => "< 5Jt"],
                 ["penghasilanBln" => "5Jt - 10Jt"],
                 ["penghasilanBln" => ">10Jt"],
-
             ],
             "keteranganEkonomi" => ""
-
         ],
 
         "edukasiTab" => "Edukasi",
@@ -364,7 +230,7 @@ class AssessmentDokterAnamnesa extends Component
 
             "edukasiFollowUp" => "",
             "segeraKembaliRjjika" => "",
-            "informedConsent" => "", //uploadfile pdf dll
+            "informedConsent" => "",
             "keteranganEdukasi" => ""
         ],
 
@@ -375,7 +241,6 @@ class AssessmentDokterAnamnesa extends Component
             "perubahanBB3BlnOptions" => [
                 ["perubahanBB3Bln" => "Ya (1)"],
                 ["perubahanBB3Bln" => "Tidak (0)"],
-
             ],
 
             "jmlPerubahabBB" => "",
@@ -392,7 +257,6 @@ class AssessmentDokterAnamnesa extends Component
             "intakeMakananOptions" => [
                 ["intakeMakanan" => "Ya (1)"],
                 ["intakeMakanan" => "Tidak (0)"],
-
             ],
             "keteranganScreeningGizi" => "",
             "scoreTotalScreeningGizi" => "0",
@@ -403,565 +267,442 @@ class AssessmentDokterAnamnesa extends Component
         "batuk" => [
             "riwayatDemam" => [],
             "keteranganRiwayatDemam" => "",
-
             "berkeringatMlmHari" => [],
             "keteranganBerkeringatMlmHari" => "",
-
             "bepergianDaerahWabah" => [],
             "keteranganBepergianDaerahWabah" => "",
-
             "riwayatPakaiObatJangkaPanjangan" => [],
             "keteranganRiwayatPakaiObatJangkaPanjangan" => "",
-
             "BBTurunTanpaSebab" => [],
             "keteranganBBTurunTanpaSebab" => "",
-
             "pembesaranGetahBening" => [],
             "keteranganPembesaranGetahBening" => "",
-
         ],
     ];
-    //////////////////////////////////////////////////////////////////////
 
 
+
+    // ==========================
+    // Validation
+    // ==========================
     protected $rules = [
-
         'dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.jamDatang' => 'required|date_format:d/m/Y H:i:s',
+    ];
 
+    protected $messages = [
+        'dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.jamDatang.required' => 'Kolom :attribute wajib diisi.',
+        'dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.jamDatang.date_format' => 'Format :attribute harus d/m/Y H:i:s (contoh: 05/11/2025 08:30:00).',
+    ];
+
+    protected $attributes = [
+        'dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.jamDatang' => 'Jam Kedatangan Pasien',
     ];
 
 
 
-    ////////////////////////////////////////////////
-    ///////////begin////////////////////////////////
-    ////////////////////////////////////////////////
-    public function updated($propertyName)
+    // ==========================
+    // PUBLIC API (no autosave)
+    // ==========================
+    public function store(): void
     {
-        $this->validateOnly($propertyName);
-        $this->store();
+        // 1) Validasi form
+        $this->validateDataAnamnesaRj();
+
+        // 2) Pastikan kunci
+        $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Nomor RJ kosong.");
+            return;
+        }
+
+        $lockKey = "rj:{$rjNo}";
+
+        // 3) Mutex + Transaction + Patch subtree
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+
+                // Ambil FRESH state dari DB
+                $freshWrap = $this->findDataRJ($rjNo);
+                $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+                if (!is_array($fresh)) $fresh = [];
+
+                // Bootstrap subtree
+                if (!isset($fresh['anamnesa']) || !is_array($fresh['anamnesa'])) {
+                    $fresh['anamnesa'] = $this->anamnesa;
+                }
+
+                // PATCH: replace hanya subtree 'anamnesa' dari form saat ini
+                $fresh['anamnesa'] = $this->dataDaftarPoliRJ['anamnesa'];
+
+                // Tulis dalam transaksi
+                DB::transaction(function () use ($rjNo, $fresh) {
+                    $this->updateJsonRJ($rjNo, $fresh);
+
+                    // sinkron alergi / riwayat ke master pasien jika perlu
+                    $regNo = $fresh['regNo'] ?? ($this->dataDaftarPoliRJ['regNo'] ?? null);
+                    if ($regNo) {
+                        $this->dataPasien = $this->findDataMasterPasien($regNo);
+                        $this->updateDataPasien($regNo);
+                    }
+                });
+
+                // Sinkronkan state komponen
+                $this->dataDaftarPoliRJ = $fresh;
+            });
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk. Gagal memperoleh kunci data (lock). Silakan coba lagi.');
+            return;
+        }
+
+        // 4) Broadcast ke modul lain
+
+        toastr()
+            ->closeOnHover(true)
+            ->closeDuration(3)
+            ->positionClass('toast-top-left')
+            ->addSuccess("Anamnesa berhasil disimpan.");
     }
 
-
-
-
-    // resert input private////////////////
-    private function resetInputFields(): void
-    {
-
-        // resert validation
-        $this->resetValidation();
-        // resert input kecuali
-        $this->reset(['']);
-    }
-
-
-
-
-
-    // ////////////////
-    // RJ Logic
-    // ////////////////
-
-
-    // validate Data RJ//////////////////////////////////////////////////
+    // ==========================
+    // Private helpers
+    // ==========================
     private function validateDataAnamnesaRj(): void
     {
-        // customErrorMessages
-        // $messages = customErrorMessagesTrait::messages();
-        $messages = [];
-
-
-        // $rules = [];
-
-
-
-        // Proses Validasi///////////////////////////////////////////
         try {
-            $this->validate($this->rules, $messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-
-            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data Anamnesa." .  json_encode($e->errors(), true));
-            $this->validate($this->rules, $messages);
+            $this->validate($this->rules, $this->messages, $this->attributes);
+        } catch (ValidationException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Periksa kembali input data Anda.");
+            throw $e;
         }
     }
 
-
-    // insert and update record start////////////////
-    public function store()
+    private function findData($rjNo): void
     {
-        // Validate RJ
-        $this->validateDataAnamnesaRj();
+        $findDataRJ = $this->findDataRJ($rjNo);
+        $this->dataDaftarPoliRJ = $findDataRJ['dataDaftarRJ'] ?? [];
 
-        // Logic update mode start //////////
-        $this->updateDataRj($this->dataDaftarPoliRJ['rjNo']);
-
-        // Update data Alergi ke master Pasien
-        $this->updateDataPasien($this->dataDaftarPoliRJ['regNo']);
-
-
-        $this->emit('syncronizeAssessmentDokterRJFindData');
-    }
-
-    private function updateDataRj($rjNo): void
-    {
-        $this->updateJsonRJ($rjNo, $this->dataDaftarPoliRJ);
-
-        // $this->emit('toastr-success', "Anamnesa berhasil disimpan.");
-    }
-    // insert and update record end////////////////
-
-
-    private function findData($rjno): void
-    {
-        $findDataRJ = $this->findDataRJ($rjno);
-        $this->dataDaftarPoliRJ  = $findDataRJ['dataDaftarRJ'];
-
-        // jika anamnesa tidak ditemukan tambah variable anamnesa pda array
-        if (isset($this->dataDaftarPoliRJ['anamnesa']) == false) {
+        if (!isset($this->dataDaftarPoliRJ['anamnesa']) || !is_array($this->dataDaftarPoliRJ['anamnesa'])) {
             $this->dataDaftarPoliRJ['anamnesa'] = $this->anamnesa;
         }
 
-        // menyamakan Variabel
+        // Mirror dari master pasien (alergi/riwayat) bila kosong di form
         $this->matchingMyVariable();
     }
 
-
-
-    public function addRekonsiliasiObat()
+    private function matchingMyVariable(): void
     {
-        if ($this->rekonsiliasiObat['namaObat']) {
-
-            // check exist
-            $cekRekonsiliasiObat = collect($this->dataDaftarPoliRJ['anamnesa']['rekonsiliasiObat'])
-                ->where("namaObat", '=', $this->rekonsiliasiObat['namaObat'])
-                ->count();
-
-            if (!$cekRekonsiliasiObat) {
-                $this->dataDaftarPoliRJ['anamnesa']['rekonsiliasiObat'][] = [
-                    "namaObat" => $this->rekonsiliasiObat['namaObat'],
-                    "dosis" => $this->rekonsiliasiObat['dosis'],
-                    "rute" => $this->rekonsiliasiObat['rute']
-                ];
-
-                $this->store();
-                // reset rekonsiliasiObat
-                $this->reset(['rekonsiliasiObat']);
-            } else {
-                $this->emit('toastr-error', "Nama Obat Sudah ada.");
+        // ---------- 1) Keluhan Utama: fallback dari screening jika kosong ----------
+        $keluhanSaatIni = (string) data_get($this->dataDaftarPoliRJ, 'anamnesa.keluhanUtama.keluhanUtama', '');
+        if ($keluhanSaatIni === '') {
+            $keluhanScreening = (string) data_get($this->dataDaftarPoliRJ, 'screening.keluhanUtama', '');
+            if ($keluhanScreening !== '') {
+                data_set($this->dataDaftarPoliRJ, 'anamnesa.keluhanUtama.keluhanUtama', $keluhanScreening);
             }
-        } else {
-            $this->emit('toastr-error', "Nama Obat Kosong.");
         }
-    }
 
-    public function removeRekonsiliasiObat($namaObat)
-    {
+        // ---------- 2) Ambil data master pasien (read-only) ----------
+        $regNo = data_get($this->dataDaftarPoliRJ, 'regNo');
+        if ($regNo) {
+            $this->dataPasien = $this->findDataMasterPasien($regNo) ?: [];
+        }
 
-        $rekonsiliasiObat = collect($this->dataDaftarPoliRJ['anamnesa']['rekonsiliasiObat'])->where("namaObat", '!=', $namaObat)->toArray();
-        $this->dataDaftarPoliRJ['anamnesa']['rekonsiliasiObat'] = $rekonsiliasiObat;
-        $this->store();
-    }
-
-
-    private function matchingMyVariable()
-    {
-
-        // keluhanUtama
-        $this->dataDaftarPoliRJ['anamnesa']['keluhanUtama']['keluhanUtama'] =
-            ($this->dataDaftarPoliRJ['anamnesa']['keluhanUtama']['keluhanUtama'])
-            ? $this->dataDaftarPoliRJ['anamnesa']['keluhanUtama']['keluhanUtama']
-            : ((isset($this->dataDaftarPoliRJ['screening']['keluhanUtama']) && !$this->dataDaftarPoliRJ['anamnesa']['keluhanUtama']['keluhanUtama'])
-                ? $this->dataDaftarPoliRJ['screening']['keluhanUtama']
-                : "");
-
-        // Alergi from master Pasien
-        $this->setDataPasien($this->dataDaftarPoliRJ['regNo']);
-        // Alergi from master Pasien dan update data alergi ketika ada update terbaru pada funct updateDataPasien
-        $this->updateDataPasien($this->dataDaftarPoliRJ['regNo']);
-
-
-        $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergi'] =
-            ($this->dataDaftarPoliRJ['anamnesa']['alergi']['alergi'])
-            ? $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergi']
-            : (($this->dataPasien['pasien']['alergi'] != $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergi'])
-                ? $this->dataPasien['pasien']['alergi']
-                : $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergi']);
-        // Alergi from master Pasien
-
-    }
-
-
-    public function setJamDatang($myTime)
-    {
-        $this->dataDaftarPoliRJ['anamnesa']['pengkajianPerawatan']['jamDatang'] = $myTime;
-    }
-
-
-    private function setDataPasien($value): void
-    {
-        $findData = DB::table('rsmst_pasiens')
-            ->select('meta_data_pasien_json')
-            ->where('reg_no', $value)
-            ->first();
-
-
-        $meta_data_pasien_json = isset($findData->meta_data_pasien_json) ? $findData->meta_data_pasien_json : null;
-        // if meta_data_pasien_json = null
-        // then cari Data Pasien By Key Collection (exception when no data found)
-        //
-        // else json_decode
-        if ($meta_data_pasien_json == null) {
-
-            $findData = $this->cariDataPasienByKeyCollection('reg_no', $value);
-            if ($findData) {
-                $this->dataPasien['pasien']['regDate'] = $findData->reg_date;
-                $this->dataPasien['pasien']['regNo'] = $findData->reg_no;
-                $this->dataPasien['pasien']['regName'] = $findData->reg_name;
-                $this->dataPasien['pasien']['identitas']['idbpjs'] = $findData->nokartu_bpjs;
-                $this->dataPasien['pasien']['identitas']['nik'] = $findData->nik_bpjs;
-                $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = ($findData->sex == 'L') ? 1 : 2;
-                $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($findData->sex == 'L') ? 'Laki-laki' : 'Perempuan';
-                $this->dataPasien['pasien']['tglLahir'] = $findData->birth_date;
-                $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $findData->birth_date)->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
-                $this->dataPasien['pasien']['bln'] = $findData->bln;
-                $this->dataPasien['pasien']['hari'] = $findData->hari;
-                $this->dataPasien['pasien']['tempatLahir'] = $findData->birth_place;
-                $this->dataPasien['pasien']['golonganDarah']['golonganDarahId'] = '13';
-                $this->dataPasien['pasien']['golonganDarah']['golonganDarahDesc'] = 'Tidak Tahu';
-                $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanId'] = '1';
-                $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanDesc'] = 'Belum Kawin';
-
-                $this->dataPasien['pasien']['agama']['agamaId'] = $findData->rel_id;
-                $this->dataPasien['pasien']['agama']['agamaDesc'] = $findData->rel_desc;
-
-                $this->dataPasien['pasien']['pendidikan']['pendidikanId'] = $findData->edu_id;
-                $this->dataPasien['pasien']['pendidikan']['pendidikanDesc'] = $findData->edu_desc;
-
-                $this->dataPasien['pasien']['pekerjaan']['pekerjaanId'] = $findData->job_id;
-                $this->dataPasien['pasien']['pekerjaan']['pekerjaanDesc'] = $findData->job_name;
-
-
-                $this->dataPasien['pasien']['hubungan']['namaPenanggungJawab'] = $findData->reg_no;
-                $this->dataPasien['pasien']['hubungan']['namaIbu'] = $findData->reg_no;
-
-                $this->dataPasien['pasien']['identitas']['nik'] = $findData->nik_bpjs;
-                $this->dataPasien['pasien']['identitas']['idBpjs'] = $findData->nokartu_bpjs;
-
-
-                $this->dataPasien['pasien']['identitas']['alamat'] = $findData->address;
-
-                $this->dataPasien['pasien']['identitas']['desaId'] = $findData->des_id;
-                $this->dataPasien['pasien']['identitas']['desaName'] = $findData->des_name;
-
-                $this->dataPasien['pasien']['identitas']['rt'] = $findData->rt;
-                $this->dataPasien['pasien']['identitas']['rw'] = $findData->rw;
-                $this->dataPasien['pasien']['identitas']['kecamatanId'] = $findData->kec_id;
-                $this->dataPasien['pasien']['identitas']['kecamatanName'] = $findData->kec_name;
-
-                $this->dataPasien['pasien']['identitas']['kotaId'] = $findData->kab_id;
-                $this->dataPasien['pasien']['identitas']['kotaName'] = $findData->kab_name;
-
-                $this->dataPasien['pasien']['identitas']['propinsiId'] = $findData->prop_id;
-                $this->dataPasien['pasien']['identitas']['propinsiName'] = $findData->prop_name;
-
-                $this->dataPasien['pasien']['kontak']['nomerTelponSelulerPasien'] = $findData->phone;
-
-                $this->dataPasien['pasien']['hubungan']['namaPenanggungJawab'] = $findData->kk;
-                $this->dataPasien['pasien']['hubungan']['namaIbu'] = $findData->nyonya;
-                // $this->dataPasien['pasien']['hubungan']['noPenanggungJawab'] = $findData->no_kk;
-            } else {
-                // when no data found
-                $this->dataPasien['pasien']['regDate'] = '-';
-                $this->dataPasien['pasien']['regNo'] = '-';
-                $this->dataPasien['pasien']['regName'] = '-';
-                $this->dataPasien['pasien']['identitas']['idbpjs'] = '-';
-                $this->dataPasien['pasien']['identitas']['nik'] = '-';
-                $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = '-';
-                $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = '-';
-                $this->dataPasien['pasien']['tglLahir'] = '-';
-                $this->dataPasien['pasien']['thn'] = '-';
-                $this->dataPasien['pasien']['bln'] = '-';
-                $this->dataPasien['pasien']['hari'] = '-';
-                $this->dataPasien['pasien']['tempatLahir'] = '-';
-                $this->dataPasien['pasien']['golonganDarah']['golonganDarahId'] = '-';
-                $this->dataPasien['pasien']['golonganDarah']['golonganDarahDesc'] = '-';
-                $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanId'] = '-';
-                $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanDesc'] = '-';
-
-                $this->dataPasien['pasien']['agama']['agamaId'] = '-';
-                $this->dataPasien['pasien']['agama']['agamaDesc'] = '-';
-
-                $this->dataPasien['pasien']['pendidikan']['pendidikanId'] = '-';
-                $this->dataPasien['pasien']['pendidikan']['pendidikanDesc'] = '-';
-
-                $this->dataPasien['pasien']['pekerjaan']['pekerjaanId'] = '-';
-                $this->dataPasien['pasien']['pekerjaan']['pekerjaanDesc'] = '-';
-
-
-                $this->dataPasien['pasien']['hubungan']['namaPenanggungJawab'] = '-';
-                $this->dataPasien['pasien']['hubungan']['namaIbu'] = '-';
-
-                $this->dataPasien['pasien']['identitas']['nik'] = '-';
-                $this->dataPasien['pasien']['identitas']['idBpjs'] = '-';
-
-
-                $this->dataPasien['pasien']['identitas']['alamat'] = '-';
-
-                $this->dataPasien['pasien']['identitas']['desaId'] = '-';
-                $this->dataPasien['pasien']['identitas']['desaName'] = '-';
-
-                $this->dataPasien['pasien']['identitas']['rt'] = '-';
-                $this->dataPasien['pasien']['identitas']['rw'] = '-';
-                $this->dataPasien['pasien']['identitas']['kecamatanId'] = '-';
-                $this->dataPasien['pasien']['identitas']['kecamatanName'] = '-';
-
-                $this->dataPasien['pasien']['identitas']['kotaId'] = '-';
-                $this->dataPasien['pasien']['identitas']['kotaName'] = '-';
-
-                $this->dataPasien['pasien']['identitas']['propinsiId'] = '-';
-                $this->dataPasien['pasien']['identitas']['propinsiName'] = '-';
-
-                $this->dataPasien['pasien']['kontak']['nomerTelponSelulerPasien'] = '-';
-
-                $this->dataPasien['pasien']['hubungan']['namaPenanggungJawab'] = '-';
-                $this->dataPasien['pasien']['hubungan']['namaIbu'] = '-';
+        // ---------- 3) Alergi: isi dari master pasien jika kosong ----------
+        $alergiForm = (string) data_get($this->dataDaftarPoliRJ, 'anamnesa.alergi.alergi', '');
+        if ($alergiForm === '') {
+            $alergiMaster = (string) data_get($this->dataPasien, 'pasien.alergi', '');
+            if ($alergiMaster !== '') {
+                data_set($this->dataDaftarPoliRJ, 'anamnesa.alergi.alergi', $alergiMaster);
             }
-        } else {
-            // ubah data Pasien
-            $this->dataPasien = json_decode($findData->meta_data_pasien_json, true);
-            // replace thn to age
-            $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $this->dataPasien['pasien']['tglLahir'])->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
         }
+
+        // ---------- 4) Riwayat Penyakit Dahulu: isi dari master pasien jika kosong ----------
+        $rpdForm = (string) data_get($this->dataDaftarPoliRJ, 'anamnesa.riwayatPenyakitDahulu.riwayatPenyakitDahulu', '');
+        if ($rpdForm === '') {
+            $rpdMaster = (string) data_get($this->dataPasien, 'pasien.riwayatPenyakitDahulu', '');
+            if ($rpdMaster !== '') {
+                data_set($this->dataDaftarPoliRJ, 'anamnesa.riwayatPenyakitDahulu.riwayatPenyakitDahulu', $rpdMaster);
+            }
+        }
+
+        // Catatan:
+        // - Tidak ada pemanggilan updateDataPasien() di sini agar fungsi ini tidak melakukan write.
+        // - Sinkron tulis balik ke master pasien (jika perlu) lakukan di proses save (store) dalam transaction+lock.
     }
 
-    private function cariDataPasienByKeyCollection($key, $search)
+
+    public function setJamDatang($myTime = null): void
     {
-        $findData = DB::table('rsmst_pasiens')
-            ->select(
-                DB::raw("to_char(reg_date,'dd/mm/yyyy hh24:mi:ss') as reg_date"),
-                DB::raw("to_char(reg_date,'yyyymmddhh24miss') as reg_date1"),
-                'reg_no',
-                'reg_name',
-                DB::raw("nvl(nokartu_bpjs,'-') as nokartu_bpjs"),
-                DB::raw("nvl(nik_bpjs,'-') as nik_bpjs"),
-                'sex',
-                DB::raw("to_char(birth_date,'dd/mm/yyyy') as birth_date"),
-                DB::raw("(select trunc( months_between( sysdate, birth_date ) /12 ) from dual) as thn"),
-                'bln',
-                'hari',
-                'birth_place',
-                'blood',
-                'marital_status',
-                'rsmst_religions.rel_id as rel_id',
-                'rel_desc',
-                'rsmst_educations.edu_id as edu_id',
-                'edu_desc',
-                'rsmst_jobs.job_id as job_id',
-                'job_name',
-                'kk',
-                'nyonya',
-                'no_kk',
-                'address',
-                'rsmst_desas.des_id as des_id',
-                'des_name',
-                'rt',
-                'rw',
-                'rsmst_kecamatans.kec_id as kec_id',
-                'kec_name',
-                'rsmst_kabupatens.kab_id as kab_id',
-                'kab_name',
-                'rsmst_propinsis.prop_id as prop_id',
-                'prop_name',
-                'phone'
-            )->join('rsmst_religions', 'rsmst_religions.rel_id', 'rsmst_pasiens.rel_id')
-            ->join('rsmst_educations', 'rsmst_educations.edu_id', 'rsmst_pasiens.edu_id')
-            ->join('rsmst_jobs', 'rsmst_jobs.job_id', 'rsmst_pasiens.job_id')
-            ->join('rsmst_desas', 'rsmst_desas.des_id', 'rsmst_pasiens.des_id')
-            ->join('rsmst_kecamatans', 'rsmst_kecamatans.kec_id', 'rsmst_pasiens.kec_id')
-            ->join('rsmst_kabupatens', 'rsmst_kabupatens.kab_id', 'rsmst_pasiens.kab_id')
-            ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_pasiens.prop_id')
-            ->where($key, $search)
-            ->first();
-        return $findData;
+        $jam = $myTime ?: Carbon::now('Asia/Jakarta')->format('d/m/Y H:i:s');
+        $this->dataDaftarPoliRJ['anamnesa']['pengkajianPerawatan']['jamDatang'] = $jam;
     }
 
     private function updateDataPasien($regNo): void
     {
-        // Jika Alergi belum ada pada master Pasien
+        if (!$regNo) return;
+
         if (!isset($this->dataPasien['pasien']['alergi'])) {
             $this->dataPasien['pasien']['alergi'] = "";
         }
-
         if (!isset($this->dataPasien['pasien']['riwayatPenyakitDahulu'])) {
             $this->dataPasien['pasien']['riwayatPenyakitDahulu'] = "";
         }
 
-        // Update data Alergi ke master Pasien
-        if (($this->dataPasien['pasien']['alergi']) != $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergi']) {
-            $this->dataPasien['pasien']['alergi'] = $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergi'];
+        $changed = false;
 
-            DB::table('rsmst_pasiens')->where('reg_no', $regNo)
-                ->update([
-                    'meta_data_pasien_json' => json_encode($this->dataPasien, true),
-                    // 'meta_data_pasien_xml' => ArrayToXml::convert($this->dataPasien)
-                ]);
-
-            $this->emit('toastr-success', "Data Alergi " . $this->dataPasien['pasien']['regName'] . " berhasil diupdate.");
+        // sinkron alergi
+        $formAlergi = $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergi'] ?? '';
+        if (($this->dataPasien['pasien']['alergi'] ?? '') !== $formAlergi) {
+            $this->dataPasien['pasien']['alergi'] = $formAlergi;
+            $changed = true;
         }
 
-        // Update data riwayatPenyakitDahulu ke master Pasien
-        if (($this->dataPasien['pasien']['riwayatPenyakitDahulu']) != $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitDahulu']['riwayatPenyakitDahulu']) {
-            $this->dataPasien['pasien']['riwayatPenyakitDahulu'] = $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitDahulu']['riwayatPenyakitDahulu'];
+        // sinkron riwayatPenyakitDahulu
+        $formRPD = $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitDahulu']['riwayatPenyakitDahulu'] ?? '';
+        if (($this->dataPasien['pasien']['riwayatPenyakitDahulu'] ?? '') !== $formRPD) {
+            $this->dataPasien['pasien']['riwayatPenyakitDahulu'] = $formRPD;
+            $changed = true;
+        }
 
-            DB::table('rsmst_pasiens')->where('reg_no', $regNo)
+        if ($changed) {
+            DB::table('rsmst_pasiens')
+                ->where('reg_no', $regNo)
                 ->update([
-                    'meta_data_pasien_json' => json_encode($this->dataPasien, true),
-                    // 'meta_data_pasien_xml' => ArrayToXml::convert($this->dataPasien)
+                    'meta_data_pasien_json' => json_encode($this->dataPasien, JSON_UNESCAPED_UNICODE)
                 ]);
-
-            // $this->emit('toastr-success', "Data riwayatPenyakitDahulu " . $this->dataPasien['pasien']['regName'] . " berhasil diupdate.");
         }
     }
 
+    public function setPerawatPenerima(): void
+    {
+        $myUserCodeActive = auth()->user()->myuser_code;
+        $myUserNameActive = auth()->user()->myuser_name;
 
-    // /////////alergiMakanan////////////
-    public $alergiMakananLov = [];
-    public $alergiMakananLovStatus = 0;
-    public $alergiMakananLovSearch = '';
-    public function clickalergiMakananlov()
+        $this->validatePerawatPenerima();
+
+        if (auth()->user()->hasRole('Perawat')) {
+            $this->dataDaftarPoliRJ['anamnesa']['pengkajianPerawatan']['perawatPenerima'] = $myUserNameActive;
+            $this->dataDaftarPoliRJ['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'] = $myUserCodeActive;
+            $this->store();
+        } else {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Maaf {$myUserNameActive}, Anda tidak memiliki hak akses untuk TTD-E. Fitur ini hanya untuk peran Perawat.");
+        }
+    }
+
+    private function validatePerawatPenerima(): void
+    {
+        // Isi sesuai kebutuhanmu; contoh minimal guard:
+        try {
+            $this->validate([
+                // contoh: 'dataDaftarPoliRJ.pemeriksaan.tandaVital.gda' => 'required'
+            ], []);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Data pemeriksaan belum lengkap. TTD-E tidak dapat dilakukan.");
+            throw $e;
+        }
+    }
+
+    // ==========================
+    // Rekonsiliasi Obat
+    // ==========================
+    public function addRekonsiliasiObat(): void
+    {
+        if (empty($this->rekonsiliasiObat['namaObat'])) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Nama obat wajib diisi.");
+            return;
+        }
+
+        $exists = collect($this->dataDaftarPoliRJ['anamnesa']['rekonsiliasiObat'] ?? [])
+            ->where('namaObat', $this->rekonsiliasiObat['namaObat'])
+            ->count();
+
+        if ($exists) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Nama obat sudah ada.");
+            return;
+        }
+
+        $this->dataDaftarPoliRJ['anamnesa']['rekonsiliasiObat'][] = [
+            "namaObat" => $this->rekonsiliasiObat['namaObat'],
+            "dosis"    => $this->rekonsiliasiObat['dosis'],
+            "rute"     => $this->rekonsiliasiObat['rute']
+        ];
+
+        $this->store();
+        $this->reset(['rekonsiliasiObat']);
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("Obat berhasil ditambahkan.");
+    }
+
+    public function removeRekonsiliasiObat(string $namaObat): void
+    {
+        $list = collect($this->dataDaftarPoliRJ['anamnesa']['rekonsiliasiObat'] ?? [])
+            ->reject(fn($i) => ($i['namaObat'] ?? '') === $namaObat)
+            ->values()
+            ->toArray();
+
+        $this->dataDaftarPoliRJ['anamnesa']['rekonsiliasiObat'] = $list;
+
+        $this->store();
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("Obat berhasil dihapus.");
+    }
+
+
+
+
+    // ======== PROPERTIES ========
+    // Alergi Makanan
+    public array $alergiMakananLov = [];
+    public bool  $alergiMakananLovStatus = false;
+    public string $alergiMakananLovSearch = '';
+
+    // Alergi Obat
+    public array $alergiObatLov = [];
+    public bool  $alergiObatLovStatus = false;
+    public string $alergiObatLovSearch = '';
+
+    // Alergi Udara
+    public array $alergiUdaraLov = [];
+    public bool  $alergiUdaraLovStatus = false;
+    public string $alergiUdaraLovSearch = '';
+
+
+    // ======== PRIVATE HELPER (DRY) ========
+    /**
+     * Ambil LOV dari ref_bpjs_table berdasarkan kategori (ref_keterangan),
+     * lalu mapping ke id/desc yang diminta. Bisa difilter dengan keyword (case-insensitive).
+     *
+     * @param string      $kategori   e.g. 'Alergi Makanan'
+     * @param string      $idField    kolom id pada output (e.g. 'alergiMakananId')
+     * @param string      $descField  kolom desc pada output (e.g. 'alergiMakananDesc')
+     * @param string|null $keyword    filter contains pada nama alergi (nmAlergi)
+     * @return array
+     */
+    private function loadLov(string $kategori, string $idField, string $descField, ?string $keyword = null): array
+    {
+        // Ambil ref_json langsung dengan value() → null-safe
+        $json = DB::table('ref_bpjs_table')
+            ->whereRaw('upper(ref_keterangan) = ?', [mb_strtoupper($kategori)])
+            ->value('ref_json');
+
+        $data = json_decode($json ?? '[]', true);
+        if (!is_array($data)) $data = [];
+
+        // Optional search (contains, case-insensitive)
+        if ($keyword !== null && $keyword !== '') {
+            $kw = mb_strtolower($keyword);
+            $data = array_values(array_filter($data, function ($row) use ($kw) {
+                $nm = mb_strtolower((string)($row['nmAlergi'] ?? ''));
+                return $nm !== '' && str_contains($nm, $kw);
+            }));
+        }
+
+        // Mapping ke bentuk uniform {idField, descField}
+        return collect($data)->map(function ($item) use ($idField, $descField) {
+            return [
+                $idField   => $item['kdAlergi'] ?? '',
+                $descField => $item['nmAlergi'] ?? '',
+            ];
+        })->values()->toArray();
+    }
+
+
+    // ======== ALERGI MAKANAN ========
+    public function clickAlergiMakananLov(): void
     {
         $this->alergiMakananLovStatus = true;
-        // $this->alergiMakananLov = $this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['alergiMakananOptions'];
-
-        $getAlergiMakanan = json_decode(DB::table('ref_bpjs_table')
-            ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper('Alergi Makanan'))
-            ->first()->ref_json ?? '{}', true);
-
-        $this->alergiMakananLov = collect($getAlergiMakanan)->map(function ($item) {
-            $item['alergiMakananId'] = $item['kdAlergi'];
-            unset($item['kdAlergi']);
-            $item['alergiMakananDesc'] = $item['nmAlergi'];
-            unset($item['nmAlergi']);
-            return $item;
-        })->toArray();
+        $this->alergiMakananLov = $this->loadLov(
+            'Alergi Makanan',
+            'alergiMakananId',
+            'alergiMakananDesc',
+            $this->alergiMakananLovSearch
+        );
     }
 
-    // /////////////////////
-    // LOV selected start
-    public function setMyalergiMakananLov($id, $desc)
+    public function setMyAlergiMakananLov($id, $desc): void
     {
-        $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergiMakanan'] = $id;
-        $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergiMakananDesc'] = $desc;
+        data_set($this->dataDaftarPoliRJ, 'anamnesa.alergi.alergiMakanan', $id);
+        data_set($this->dataDaftarPoliRJ, 'anamnesa.alergi.alergiMakananDesc', $desc);
 
         $this->alergiMakananLovStatus = false;
         $this->alergiMakananLovSearch = '';
-        $this->store();
+        // Opsional: auto-save
+        // $this->store();
     }
-    // LOV selected end
-    // /////////////////////
 
 
-
-    // /////////alergiObat////////////
-    public $alergiObatLov = [];
-    public $alergiObatLovStatus = 0;
-    public $alergiObatLovSearch = '';
-    public function clickalergiObatlov()
+    // ======== ALERGI OBAT ========
+    public function clickAlergiObatLov(): void
     {
         $this->alergiObatLovStatus = true;
-        // $this->alergiObatLov = $this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['alergiObatOptions'];
-
-        $getAlergiObat = json_decode(DB::table('ref_bpjs_table')
-            ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper('Alergi Obat'))
-            // ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper($this->dataGetAlergiObatLovSearch))
-            ->first()->ref_json, true) ?? [];
-
-        $this->alergiObatLov = collect($getAlergiObat)->map(function ($item) {
-            $item['alergiObatId'] = $item['kdAlergi'];
-            unset($item['kdAlergi']);
-            $item['alergiObatDesc'] = $item['nmAlergi'];
-            unset($item['nmAlergi']);
-            return $item;
-        })->toArray();
+        $this->alergiObatLov = $this->loadLov(
+            'Alergi Obat',
+            'alergiObatId',
+            'alergiObatDesc',
+            $this->alergiObatLovSearch
+        );
     }
 
-    // /////////////////////
-    // LOV selected start
-    public function setMyalergiObatLov($id, $desc)
+    public function setMyAlergiObatLov($id, $desc): void
     {
-        $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergiObat'] = $id;
-        $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergiObatDesc'] = $desc;
+        data_set($this->dataDaftarPoliRJ, 'anamnesa.alergi.alergiObat', $id);
+        data_set($this->dataDaftarPoliRJ, 'anamnesa.alergi.alergiObatDesc', $desc);
 
         $this->alergiObatLovStatus = false;
         $this->alergiObatLovSearch = '';
-        $this->store();
+        // Opsional: auto-save
+        // $this->store();
     }
-    // LOV selected end
-    // /////////////////////
 
-    // /////////alergiUdara////////////
-    public $alergiUdaraLov = [];
-    public $alergiUdaraLovStatus = 0;
-    public $alergiUdaraLovSearch = '';
-    public function clickalergiUdaralov()
+
+    // ======== ALERGI UDARA ========
+    public function clickAlergiUdaraLov(): void
     {
         $this->alergiUdaraLovStatus = true;
-        // $this->alergiUdaraLov = $this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['alergiUdaraOptions'];
-
-        $getAlergiUdara = json_decode(DB::table('ref_bpjs_table')
-            ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper('Alergi Udara'))
-            // ->Where(DB::raw('upper(ref_keterangan)'), '=', strtoupper($this->dataGetAlergiUdaraLovSearch))
-            ->first()->ref_json, true) ?? [];
-
-        $this->alergiUdaraLov = collect($getAlergiUdara)->map(function ($item) {
-            $item['alergiUdaraId'] = $item['kdAlergi'];
-            unset($item['kdAlergi']);
-            $item['alergiUdaraDesc'] = $item['nmAlergi'];
-            unset($item['nmAlergi']);
-            return $item;
-        })->toArray();
+        $this->alergiUdaraLov = $this->loadLov(
+            'Alergi Udara',
+            'alergiUdaraId',
+            'alergiUdaraDesc',
+            $this->alergiUdaraLovSearch
+        );
     }
 
-    // /////////////////////
-    // LOV selected start
-    public function setMyalergiUdaraLov($id, $desc)
+    public function setMyAlergiUdaraLov($id, $desc): void
     {
-        $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergiUdara'] = $id;
-        $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergiUdaraDesc'] = $desc;
+        data_set($this->dataDaftarPoliRJ, 'anamnesa.alergi.alergiUdara', $id);
+        data_set($this->dataDaftarPoliRJ, 'anamnesa.alergi.alergiUdaraDesc', $desc);
 
         $this->alergiUdaraLovStatus = false;
         $this->alergiUdaraLovSearch = '';
-        $this->store();
+        // Opsional: auto-save
+        // $this->store();
     }
-    // LOV selected end
-    // /////////////////////
 
 
-
-    // when new form instance
-    public function mount()
+    // ==========================
+    // Lifecycle
+    // ==========================
+    public function mount(): void
     {
-
         $this->findData($this->rjNoRef);
     }
 
-
-
-    // select data start////////////////
     public function render()
     {
 
         return view(
             'livewire.r-j.emr-r-j.mr-r-j-dokter.assessment-dokter-anamnesa.assessment-dokter-anamnesa',
             [
-                // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Anamnesa',
                 'mySnipt' => 'Rekam Medis Pasien',
                 'myProgram' => 'Pasien Rawat Jalan',
             ]
         );
     }
-    // select data end////////////////
-
-
 }

@@ -15,10 +15,10 @@ class CetakSuratRujukan extends Component
 {
     use EmrRJTrait, MasterPasienTrait;
 
-    protected $listeners = [
-        'syncronizeAssessmentDokterRJFindData' => 'mount',
-        'syncronizeAssessmentPerawatRJFindData' => 'mount'
-    ];
+
+
+
+
 
     public $rjNoRef;
 

@@ -141,11 +141,11 @@
 
                 <x-input-label for="" :value="__('Resiko Rendah | Tidak ada tindakan')" :required="__(false)" class="px-2" />
 
-                <div class="mb-2 ">
+                {{-- <div class="mb-2 ">
 
                     <x-text-input id="" placeholder="" class="mt-1 ml-2" :errorshas="__($errors->has(''))" :disabled=true
                         wire:model.debounce.500ms="" />
-                </div>
+                </div> --}}
 
                 {{-- <div class="mb-2 ">
                     <x-text-input id="" placeholder="" class="mt-1 ml-2" :errorshas="__($errors->has(''))" :disabled=true

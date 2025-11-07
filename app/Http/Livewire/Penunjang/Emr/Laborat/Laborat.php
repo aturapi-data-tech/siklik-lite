@@ -10,7 +10,6 @@ use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 
-use Spatie\ArrayToXml\ArrayToXml;
 
 
 class Laborat extends Component
