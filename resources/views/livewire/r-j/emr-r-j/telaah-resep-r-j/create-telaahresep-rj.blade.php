@@ -5,6 +5,7 @@
         $disabledPropertyRjStatusObat = isset($dataDaftarPoliRJ['telaahObat']['penanggungJawab']) ? true : false;
 
     @endphp
+
     <div class="">
 
         <!-- This element is to trick the browser into transition-opacity. -->

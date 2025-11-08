@@ -319,7 +319,6 @@ class TelaahResepRJ extends Component
     public function editAdministrasi($rjNo, $regNoRef)
     {
         $this->openModalEditAdministrasi($rjNo, $regNoRef);
-        // $this->findData($id);
     }
 
 
@@ -479,7 +478,7 @@ class TelaahResepRJ extends Component
 
                     // 2) Pastikan struktur ada
                     if (!isset($fresh['telaahResep']) || !is_array($fresh['telaahResep'])) {
-                        $fresh['telaahResep'] = [];
+                        $fresh['telaahResep'] = $this->telaahResep;
                     }
 
                     // 3) Idempotent
@@ -501,6 +500,7 @@ class TelaahResepRJ extends Component
 
                     // 5) Simpan
                     $this->updateJsonRJ($rjNo, $fresh);
+                    $this->dataDaftarPoliRJ = $fresh;
 
                     // 6) Toast + refresh
                     toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
@@ -542,10 +542,9 @@ class TelaahResepRJ extends Component
                     // 1) Read-fresh setelah lock
                     $freshWrap = $this->findDataRJ($rjNo);
                     $fresh = $freshWrap['dataDaftarRJ'] ?? [];
-
                     // 2) Pastikan struktur ada
                     if (!isset($fresh['telaahObat']) || !is_array($fresh['telaahObat'])) {
-                        $fresh['telaahObat'] = [];
+                        $fresh['telaahObat'] = $this->telaahObat;
                     }
 
                     // 3) Idempotent
@@ -565,8 +564,11 @@ class TelaahResepRJ extends Component
                         'userLogCode' => $user->myuser_code,
                     ];
 
+
+
                     // 5) Simpan
                     $this->updateJsonRJ($rjNo, $fresh);
+                    $this->dataDaftarPoliRJ = $fresh;
 
                     // 6) Toast + refresh
                     toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
@@ -590,8 +592,6 @@ class TelaahResepRJ extends Component
 
         $findDataRJ = $this->findDataRJ($rjNo);
         $dataRawatJalan  = $findDataRJ['dataDaftarRJ'];
-
-
 
         $rsAdmin = DB::table('rstxn_rjhdrs')
             ->select('rs_admin', 'rj_admin', 'poli_price', 'klaim_id', 'pass_status')
@@ -689,14 +689,9 @@ class TelaahResepRJ extends Component
         $dataRawatJalan['rjLab'] = json_decode(json_encode($rsLab, true), true);
         $dataRawatJalan['rjRad'] = json_decode(json_encode($rsRad, true), true);
 
+        $this->telaahResep = $dataRawatJalan['telaahResep'] ?? $this->telaahResep;
+        $this->telaahObat = $dataRawatJalan['telaahObat'] ?? $this->telaahObat;
 
-        if (!isset($dataRawatJalan['telaahResep'])) {
-            $dataRawatJalan['telaahResep'] = $this->telaahResep;
-        }
-
-        if (!isset($dataRawatJalan['telaahObat'])) {
-            $dataRawatJalan['telaahObat'] = $this->telaahObat;
-        }
         $this->dataDaftarPoliRJ = $dataRawatJalan;
         return ($dataRawatJalan);
     }
