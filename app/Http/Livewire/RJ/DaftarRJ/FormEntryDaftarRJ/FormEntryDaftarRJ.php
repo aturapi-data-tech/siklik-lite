@@ -2,15 +2,13 @@
 
 namespace App\Http\Livewire\RJ\DaftarRJ\FormEntryDaftarRJ;
 
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Facades\DB;
 use Exception;
-use App\Http\Traits\customErrorMessagesTrait;
 use Carbon\Carbon;
 use App\Http\Traits\BPJS\PcareTrait;
 
-
-// use App\Http\Livewire\SatuSehat\Location\Location;
-// use App\Http\Traits\BPJS\SatuSehatTrait;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
 use App\Http\Traits\MasterPasien\MasterPasienTrait;
 
@@ -189,6 +187,17 @@ class FormEntryDaftarRJ extends Component
 
 
 
+    private function generateSafeRjNo(): int
+    {
+        // 2) Fallback aman: hitung MAX di dalam lockForUpdate
+        return Cache::lock('rj:seq', 5)->block(3, function () {
+            $maxRow = DB::table('rstxn_rjhdrs')
+                ->select(DB::raw('MAX(rj_no) AS max_rj_no'))
+                ->first();
+            return (int) ($maxRow->max_rj_no ?? 0) + 1;
+        });
+    }
+
 
 
     public function closeModal(): void
@@ -204,102 +213,167 @@ class FormEntryDaftarRJ extends Component
 
     private function findData($id): void
     {
+        if (empty($id)) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addWarning('ID Rawat Jalan tidak valid.');
+            $this->emit('CloseModal');
+            return;
+        }
+
         try {
-            $findData = $this->findDataRJ($id);
-            if (isset($findData['errorMessages'])) {
-                // dd($findData['errorMessages']);
-                $this->emit('toastr-error', $findData['errorMessages']);
+            $res = $this->findDataRJ($id);
+
+            if (!is_array($res) || empty($res)) {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addError('Data Rawat Jalan tidak ditemukan.');
                 $this->emit('CloseModal');
-                // return;
+                return;
             }
 
+            if (!empty($res['errorMessages'])) {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addError($res['errorMessages']);
+                $this->emit('CloseModal');
+                return;
+            }
 
-            $this->FormEntry  = $findData['dataDaftarRJ'];
+            if (empty($res['dataDaftarRJ'])) {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addWarning('Data pendaftaran tidak tersedia.');
+                $this->emit('CloseModal');
+                return;
+            }
+
+            $this->FormEntry = $res['dataDaftarRJ'];
             $this->syncDataPrimer();
-            $this->rjStatusRef = $this->checkRJStatus($id);
-        } catch (Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            $this->rjStatusRef = (bool) $this->checkRJStatus($id);
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal memuat data: ' . $e->getMessage());
             $this->emit('CloseModal');
             return;
         }
     }
 
 
+
     private function update($rjNo): void
     {
-        // update table trnsaksi
         DB::table('rstxn_rjhdrs')
             ->where('rj_no', '=', $rjNo)
             ->update([
-                // 'rj_no' => $this->FormEntry['rjNo'],
-                'rj_date' => DB::raw("to_date('" . $this->FormEntry['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')"),
-                'reg_no' => $this->FormEntry['regNo'],
-                'nobooking' => $this->FormEntry['noBooking'],
+                'rj_date'    => DB::raw("to_date('" . $this->FormEntry['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')"),
+                'reg_no'     => $this->FormEntry['regNo'],
+                'nobooking'  => $this->FormEntry['noBooking'],
                 'no_antrian' => $this->FormEntry['noAntrian'],
-
-                'klaim_id' => $this->FormEntry['klaimId'],
-                'poli_id' => $this->FormEntry['poliId'],
-                'dr_id' => $this->FormEntry['drId'],
-
+                'klaim_id'   => $this->FormEntry['klaimId'],
+                'poli_id'    => $this->FormEntry['poliId'],
+                'dr_id'      => $this->FormEntry['drId'],
                 'txn_status' => $this->FormEntry['txnStatus'],
-                'rj_status' => $this->FormEntry['rjStatus'],
+                'rj_status'  => $this->FormEntry['rjStatus'],
                 'erm_status' => $this->FormEntry['ermStatus'],
-
                 'pass_status' => $this->FormEntry['passStatus'],
             ]);
-
-
-        $this->emit('toastr-success', "Data berhasil diupdate.");
     }
 
     private function insert(): void
     {
-        //insert
-        DB::table('rstxn_rjhdrs')
-            ->insert([
-                'rj_no' => $this->FormEntry['rjNo'],
-                'rj_date' => DB::raw("to_date('" . $this->FormEntry['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')"),
-                'reg_no' => $this->FormEntry['regNo'],
-                'nobooking' => $this->FormEntry['noBooking'],
-                'no_antrian' => $this->FormEntry['noAntrian'],
-
-                'klaim_id' => $this->FormEntry['klaimId'],
-                'poli_id' => $this->FormEntry['poliId'],
-                'dr_id' => $this->FormEntry['drId'],
-
-                'txn_status' => $this->FormEntry['txnStatus'],
-                'rj_status' => $this->FormEntry['rjStatus'],
-                'erm_status' => $this->FormEntry['ermStatus'],
-
-                'pass_status' => $this->FormEntry['passStatus'],
-            ]);
-
-        $this->emit('toastr-success', "Data berhasil dimasukkan.");
+        DB::table('rstxn_rjhdrs')->insert([
+            'rj_no'      => $this->FormEntry['rjNo'],
+            'rj_date'    => DB::raw("to_date('" . $this->FormEntry['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')"),
+            'reg_no'     => $this->FormEntry['regNo'],
+            'nobooking'  => $this->FormEntry['noBooking'],
+            'no_antrian' => $this->FormEntry['noAntrian'],
+            'klaim_id'   => $this->FormEntry['klaimId'],
+            'poli_id'    => $this->FormEntry['poliId'],
+            'dr_id'      => $this->FormEntry['drId'],
+            'txn_status' => $this->FormEntry['txnStatus'],
+            'rj_status'  => $this->FormEntry['rjStatus'],
+            'erm_status' => $this->FormEntry['ermStatus'],
+            'pass_status' => $this->FormEntry['passStatus'],
+        ]);
     }
+
 
     public function store(): void
     {
-        // validate
-        $this->setDataPrimer();
-        $this->validateData();
-        $this->checkJnsKlaimPasien($this->FormEntry['klaimId'], $this->FormEntry['regNo']);
 
-        // Jika mode data //insert
-        if ($this->isOpenMode == 'insert') {
-            $this->insert();
-            $this->isOpenMode = 'update';
-        } else {
-            // Jika mode data //update
-            $this->update($this->rjNoRef);
+        // Lock per konteks pendaftaran untuk cegah submit paralel
+        $rjDateRaw = $this->FormEntry['rjDate'] ?? Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
+        $dateKey   = Carbon::createFromFormat('d/m/Y H:i:s', $rjDateRaw, env('APP_TIMEZONE'))->format('Ymd');
+
+        // 3 placeholder: tanggal, dokter, poli
+        $lockKey = sprintf(
+            "rj:entry:%s:%s:%s",
+            $dateKey,
+            $this->FormEntry['drId']   ?? 'DR',
+            $this->FormEntry['poliId'] ?? 'POLI'
+        );
+
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () {
+                DB::transaction(function () {
+                    // 1) Set data primer DI DALAM transaksi (rjNo & antrian aman)
+                    $this->setDataPrimer();
+
+                    // 2) Validasi setelah auto-fill
+                    $this->validateData();
+
+                    // 3) Cek duplikasi khusus BPJS dengan noUrut
+                    if (($this->FormEntry['klaimId'] ?? '') === 'JM' && !empty($this->FormEntry['noUrutBpjs'])) {
+                        $date = Carbon::createFromFormat('d/m/Y H:i:s', $this->FormEntry['rjDate'])->format('d/m/Y');
+
+                        $exists = DB::table('rstxn_rjhdrs')
+                            ->where('reg_no', $this->FormEntry['regNo'])
+                            ->where('dr_id',   $this->FormEntry['drId'] ?? '')
+                            ->where('poli_id', $this->FormEntry['poliId'] ?? '')
+                            ->where('klaim_id', $this->FormEntry['klaimId'] ?? '')
+                            ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), $date)
+                            ->exists();
+
+                        if ($exists) {
+                            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                                ->addWarning('Pendaftaran dengan poli yang sama dalam satu hari sudah ada.');
+                            return; // stop tanpa menulis
+                        }
+                    }
+
+                    // 4) Tulis data atomik
+                    if ($this->isOpenMode === 'insert') {
+                        $this->insert();
+                        $this->isOpenMode = 'update';
+                    } else {
+                        $this->update($this->rjNoRef);
+                    }
+
+                    // 5) Simpan JSON konsisten dengan transaksi
+                    $this->updateJsonRJ($this->FormEntry['rjNo'], $this->FormEntry);
+
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                        ->addSuccess($this->isOpenMode === 'update' ? 'Data berhasil diupdate.' : 'Data berhasil dimasukkan.');
+                });
+
+                // 6) Setelah COMMIT baru panggil PCare (hindari nahan lock/txn)
+                DB::afterCommit(function () {
+                    try {
+                        $this->checkJnsKlaimPasien($this->FormEntry['klaimId'], $this->FormEntry['regNo']);
+                        $this->addPedaftaranBPJS($this->FormEntry['klaimId']);
+                    } catch (\Throwable $e) {
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addError('Registrasi tersimpan, namun integrasi PCare gagal: ' . $e->getMessage());
+                    }
+                });
+            });
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk. Gagal memperoleh lock. Coba lagi.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menyimpan pendaftaran: ' . $e->getMessage());
         }
-
-        $this->addPedaftaranBPJS($this->FormEntry['klaimId'],);
-        $this->updateJsonRJ($this->FormEntry['rjNo'], $this->FormEntry);
-        // ///////////////////////////
-
-
-        // $this->closeModal();
     }
+
+
 
     private function addPedaftaranBPJS($statusPasien): void
     {
@@ -309,7 +383,8 @@ class FormEntryDaftarRJ extends Component
                 : '';
 
             if ($kdProvider !== env('PCARE_PROVIDER')) {
-                $this->emit('toastr-error', 'Kode Provider Peserta dari faskes lain /' . $kdProvider);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addWarning('Kode Provider Peserta dari faskes lain / ' . $kdProvider);
             }
 
             try {
@@ -333,14 +408,25 @@ class FormEntryDaftarRJ extends Component
                 ];
                 $addPedaftaran = $this->addPedaftaran($dataPedaftaran)->getOriginalContent();
             } catch (Exception $e) {
-                $this->emit('toastr-error', $e->getMessage());
+                toastr()->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Gagal menambahkan pendaftaran BPJS: ' . $e->getMessage());
                 return;
             }
 
-            if ($addPedaftaran['metadata']['code'] == 201) {
-                $this->FormEntry['noUrutBpjs'] = $addPedaftaran['response']['message'];
+            if (isset($addPedaftaran['metadata']['code']) && $addPedaftaran['metadata']['code'] == 201) {
+                $this->FormEntry['noUrutBpjs'] = $addPedaftaran['response']['message'] ?? '';
+                toastr()->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addSuccess('Pendaftaran BPJS berhasil ditambahkan.');
             } else {
-                $this->emit('toastr-error', $addPedaftaran['metadata']['message']);
+                $msg = $addPedaftaran['metadata']['message'] ?? 'Terjadi kesalahan pada server BPJS.';
+                toastr()->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError($msg);
             }
         }
     }
@@ -357,7 +443,11 @@ class FormEntryDaftarRJ extends Component
             $displayPasien = $this->findDataMasterPasien($this->FormEntry['regNo']);
             $noKartu       = $displayPasien['pasien']['identitas']['idBpjs'] ?? '';
         } catch (Exception $e) {
-            $this->emit('toastr-error', 'Gagal ambil data peserta: ' . $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Gagal mengambil data peserta: ' . $e->getMessage());
             return;
         }
 
@@ -370,9 +460,14 @@ class FormEntryDaftarRJ extends Component
                 env('APP_TIMEZONE')
             )->format('d-m-Y');
         } catch (Exception $e) {
-            $this->emit('toastr-error', 'Format tanggal pendaftaran tidak valid.');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Format tanggal pendaftaran tidak valid.');
             return;
         }
+
 
         $noUrut = $this->FormEntry['noUrutBpjs'] ?? '';
         $kdPoli = $this->FormEntry['kdpolibpjs'] ?? '';
@@ -383,47 +478,68 @@ class FormEntryDaftarRJ extends Component
                 ->deletePedaftaran($noKartu, $tglDaftar, $noUrut, $kdPoli)
                 ->getOriginalContent();
         } catch (Exception $e) {
-            $this->emit('toastr-error', 'Error saat hapus pendaftaran: ' . $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Error saat menghapus pendaftaran: ' . $e->getMessage());
             return;
         }
+
 
         // 4. Tangani response dari PCare
         if (isset($result['metadata']['code']) && $result['metadata']['code'] == 200) {
             // sukses: reset noUrutBpjs di formEntry
             $this->FormEntry['noUrutBpjs'] = null;
-            $this->emit('toastr-success', 'Pendaftaran BPJS berhasil dihapus.');
+
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess('Pendaftaran BPJS berhasil dihapus.');
             return;
         } else {
             $msgResponse = $result['response']['message'] ?? 'x';
-            $msg = $result['metadata']['message'] . '  ' . $msgResponse
+            $msg = $result['metadata']['message'] . ' ' . $msgResponse
                 ?? 'Gagal menghapus pendaftaran.';
-            $this->emit('toastr-error', $msg);
+
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($msg);
             return;
         }
     }
 
     public function checkPendaftaranPasienBPJSbyNomorUrut(string $noUrut, string $tglDaftar): void
     {
-        // Pastikan input tidak kosong
         if (empty($noUrut) || empty($tglDaftar)) {
-            $this->emit('toastr-error', 'Nomor urut atau tanggal daftar tidak boleh kosong');
-            $this->emit('dataPendaftaranPasienUpdated', $this->dataPendaftaranPasien);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor urut atau tanggal daftar tidak boleh kosong.');
             return;
         }
 
-        // Konversi format tanggal dari: 28/07/2025 18:51:33 → 28-07-2025
         try {
             $tglDaftarFormatted = Carbon::createFromFormat('d/m/Y H:i:s', $tglDaftar)->format('d-m-Y');
         } catch (\Exception $e) {
-            $this->emit('toastr-error', 'Format tanggal tidak valid. Gunakan format dd/mm/yyyy hh:mm:ss');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Format tanggal tidak valid. Gunakan format dd/mm/yyyy hh:mm:ss');
             return;
         }
 
-        // Panggil API PCare untuk ambil data pendaftaran berdasarkan no urut dan tgl
-        $getPendaftaran = $this->getPendaftaranbyNomorUrut($noUrut, $tglDaftarFormatted);
-        dd($getPendaftaran->getData(true));
-        return;
+        try {
+            $resp = $this->getPendaftaranbyNomorUrut($noUrut, $tglDaftarFormatted)->getData(true);
+            // kirim ke front-end bila perlu:
+            $this->emit('dataPendaftaranPasienUpdated', $resp);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Data pendaftaran BPJS ditemukan.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal mengambil data pendaftaran: ' . $e->getMessage());
+        }
     }
+
 
 
     private function checkJnsKlaimPasien($statusPasien = 'UM', $regNo = ''): void
@@ -443,7 +559,11 @@ class FormEntryDaftarRJ extends Component
                 // Get BPJS peserta by nik jika noka kosong
                 $getpeserta = $this->getPesertabyJenisKartu('nik', $nik);
             } else {
-                $this->emit('toastr-error', 'Noka dan NIK kosong');
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Noka dan NIK kosong.');
                 return;
             }
 
@@ -475,89 +595,97 @@ class FormEntryDaftarRJ extends Component
                 $displayPasienArry['pasien']['identitas']['idBpjs'] = $nokaDataBpjs;
                 $displayPasienArry['pasien']['identitas']['nik'] = $nikDataBpjs;
                 $this->updateJsonMasterPasien($regNo, $displayPasienArry);
-                $this->emit('toastr-error', 'Ada perbedaan data pasien di RS dan data pasien di BPJS, data pasien akan diupdate');
-                $this->emit('toastr-success', "Update data pasien dari NIK " . $nikDataRs . " ke NIK " . $nikDataBpjs . " berhasil diupdate.");
-                $this->emit('toastr-success', "Update data pasien dari Noka " . $nokaDataRs . " ke Noka " . $nokaDataBpjs . " berhasil diupdate.");
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addWarning('Ada perbedaan data pasien di RS dan data pasien di BPJS, data pasien akan diupdate.');
+
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addSuccess("Update data pasien dari NIK {$nikDataRs} ke NIK {$nikDataBpjs} berhasil diupdate.");
+
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addSuccess("Update data pasien dari Noka {$nokaDataRs} ke Noka {$nokaDataBpjs} berhasil diupdate.");
                 $this->emit('syncronizeDataDisplayPasien');
             }
         }
     }
     private function setDataPrimer(): void
     {
-        // set data primer dilakukan ketika insert
         if ($this->isOpenMode == 'insert') {
-            // rjNoMax
-            if (!$this->FormEntry['rjNo']) {
-                $sql = "select nvl(max(rj_no)+1,1) rjno_max from rstxn_rjhdrs";
-                $this->FormEntry['rjNo'] = DB::scalar($sql);
+
+            // rjNo aman → di-generate dalam transaksi
+            if (empty($this->FormEntry['rjNo'])) {
+                $this->FormEntry['rjNo'] = $this->generateSafeRjNo();
             }
 
+            // Klaim & Kunjungan (default)
+            $this->FormEntry['klaimId']   = $this->jenisKlaim['JenisKlaimId'] ?? 'UM';
+            $this->FormEntry['kunjSakit'] = $this->kunjSakit['kunjSakitId']   ?? '1';
+            $this->FormEntry['kdTkp']     = $this->refTkp['refTkpId']         ?? '10';
 
-            // Klaim & Kunjungan
-            $this->FormEntry['klaimId'] = $this->jenisKlaim['JenisKlaimId'] ?? 'UM';
-            $this->FormEntry['kunjSakit'] = $this->kunjSakit['kunjSakitId'] ?? '1';
-            $this->FormEntry['kdTkp'] =  $this->refTkp['refTkpId'] ?? '10';
-            // noBooking
-            if (!$this->FormEntry['noBooking']) {
+            // noBooking default
+            if (empty($this->FormEntry['noBooking'])) {
                 $this->FormEntry['noBooking'] = Carbon::now(env('APP_TIMEZONE'))->format('YmdHis') . 'KLIKM';
             }
 
+            // Antrian: hitung di dalam trx + lock agar tidak salip
+            if (empty($this->FormEntry['noAntrian'])) {
+                if (($this->FormEntry['klaimId'] ?? '') !== 'KR') {
+                    $tgl = Carbon::createFromFormat('d/m/Y H:i:s', $this->FormEntry['rjDate'], env('APP_TIMEZONE'))->format('dmY');
 
-
-
-            // Antrian ketika data antrian kosong
-            if (!$this->FormEntry['noAntrian']) {
-                // proses antrian
-                if ($this->FormEntry['klaimId'] != 'KR') {
-                    // noUrutAntrian (count all kecuali KRonis) if KR 999
                     $noUrutAntrian = DB::table('rstxn_rjhdrs')
                         ->where('dr_id', '=', $this->FormEntry['drId'])
-                        ->where(DB::raw("to_char(rj_date, 'ddmmyyyy')"), '=', Carbon::createFromFormat('d/m/Y H:i:s', $this->FormEntry['rjDate'], env('APP_TIMEZONE'))->format('dmY'))
+                        ->where(DB::raw("to_char(rj_date, 'ddmmyyyy')"), '=', $tgl)
                         ->where('klaim_id', '!=', 'KR')
+
                         ->count();
 
-                    $noAntrian = $noUrutAntrian + 1;
+                    $this->FormEntry['noAntrian'] = $noUrutAntrian + 1;
                 } else {
-                    // Kronis
-                    $noAntrian = 999;
+                    $this->FormEntry['noAntrian'] = 999; // Kronis
                 }
-
-                $this->FormEntry['noAntrian'] = $noAntrian;
             }
 
-            // Convert Pasien Baru Lama
-            $this->FormEntry['passStatus'] = $this->FormEntry['passStatus'] == 'N' ? 'N' : 'O';
-            $this->FormEntry['txnStatus'] = $this->FormEntry['txnStatus'] ? $this->FormEntry['txnStatus'] : 'A';
-            $this->FormEntry['rjStatus'] = $this->FormEntry['rjStatus'] ? $this->FormEntry['rjStatus'] : 'A';
-            $this->FormEntry['ermStatus'] = $this->FormEntry['ermStatus'] ? $this->FormEntry['ermStatus'] : 'A';
-            $this->FormEntry['userLogs'][] =
-                [
-                    'userLogDesc' => 'Form Entry Daftar RJ (Insert Data)',
-                    'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
-                ];
+            // Normalisasi flag/status
+            $this->FormEntry['passStatus'] = ($this->FormEntry['passStatus'] == 'N') ? 'N' : 'O';
+
+            $this->FormEntry['txnStatus']  = $this->FormEntry['txnStatus'] ?? 'A';
+            $this->FormEntry['rjStatus']   = $this->FormEntry['rjStatus']  ?? 'A';
+            $this->FormEntry['ermStatus']  = $this->FormEntry['ermStatus'] ?? 'A';
+
+            $this->FormEntry['userLogs'][] = [
+                'userLogDesc' => 'Form Entry Daftar RJ (Insert Data)',
+                'userLog'     => auth()->user()->myuser_name,
+                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
+            ];
 
             $this->FormEntry['taskIdPelayanan']['taskId3'] = $this->FormEntry['rjDate'];
         } else {
-            // Klaim & Kunjungan
-            // noBooking kosong maka buat
-            if (!$this->FormEntry['noBooking']) {
+            // UPDATE mode (tetap seperti semula, boleh tambahkan default booking)
+            if (empty($this->FormEntry['noBooking'])) {
                 $this->FormEntry['noBooking'] = Carbon::now(env('APP_TIMEZONE'))->format('YmdHis') . 'KLIKM';
             }
 
-            $this->FormEntry['klaimId'] = $this->jenisKlaim['JenisKlaimId'];
+            $this->FormEntry['klaimId']    = $this->jenisKlaim['JenisKlaimId'];
             $this->FormEntry['passStatus'] = $this->FormEntry['passStatus'] ? 'N' : 'O';
 
-            $this->FormEntry['userLogs'][] =
-                [
-                    'userLogDesc' => 'Form Entry Daftar RJ (Update Data)',
-                    'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
-                ];
+            $this->FormEntry['userLogs'][] = [
+                'userLogDesc' => 'Form Entry Daftar RJ (Update Data)',
+                'userLog'     => auth()->user()->myuser_name,
+                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
+            ];
 
             $this->FormEntry['taskIdPelayanan']['taskId3'] = $this->FormEntry['rjDate'];
         }
     }
+
 
     private function syncDataPrimer(): void
     {
@@ -641,7 +769,8 @@ class FormEntryDaftarRJ extends Component
 
             $this->validate($this->rules, $this->messages, $this->validationAttributes);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError($e->getMessage());
             $this->validate($this->rules, $this->messages, $this->validationAttributes);
         }
         $this->resetValidation();

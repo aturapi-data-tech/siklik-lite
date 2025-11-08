@@ -152,30 +152,7 @@ class DaftarRJ extends Component
         $this->rjNoRef = $id;
     }
 
-    public function delete($poliId, $poliDesc): void
-    {
-        // Proses Validasi///////////////////////////////////////////
-        $r = ['poliId' => $poliId];
-        $rules = ['poliId' => 'required|numeric|unique:rstxn_rjhdrs,poli_id|unique:rsmst_doctors,poli_id'];
-        $customErrorMessagesTrait = customErrorMessagesTrait::messages();
-        $customErrorMessagesTrait['unique'] = 'Data :attribute sudah dipakai pada transaksi Rawat Jalan.';
-        $attribute = ['poliId' => 'Poliklinik'];
 
-        $validator = Validator::make($r, $rules, $customErrorMessagesTrait, $attribute);
-
-        if ($validator->fails()) {
-            $this->emit('toastr-error', $validator->messages()->all());
-            return;
-        }
-        // Proses Validasi///////////////////////////////////////////
-
-        // delete table trnsaksi
-        DB::table('rsmst_polis')
-            ->where('poli_id', $poliId)
-            ->delete();
-
-        $this->emit('toastr-success', "Data " . $poliDesc . " berhasil dihapus.");
-    }
     // open and close modal start////////////////
 
 
