@@ -497,7 +497,7 @@ class Anamnesa extends Component
         // Isi sesuai kebutuhanmu; contoh minimal guard:
         try {
             $this->validate([
-                // contoh: 'dataDaftarPoliRJ.pemeriksaan.tandaVital.gda' => 'required'
+                'dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.perawatPenerima' => ''
             ], []);
         } catch (\Illuminate\Validation\ValidationException $e) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
