@@ -307,4 +307,9 @@ class EresepRJRacikan extends Component
         }
         return true;
     }
+
+    public function resetformEntryRacikan()
+    {
+        $this->reset(['formEntryRacikan', 'collectingMyProduct']);
+    }
 }

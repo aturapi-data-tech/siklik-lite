@@ -19,7 +19,7 @@
                             </div>
                         @else
                             {{-- Form entry (pakai formEntryRacikan) --}}
-                            <div class="flex items-baseline space-x-2" x-data x-init="$nextTick(() => { $el.querySelector('[data-scope=&quot;entry-racikan&quot;] [data-seq=&quot;2&quot;]')?.focus() })">
+                            <div class="grid items-end grid-cols-12 gap-2" x-data x-init="$nextTick(() => { $el.querySelector('[data-scope=&quot;entry-racikan&quot;] [data-seq=&quot;2&quot;]')?.focus() })">
 
                                 {{-- Scope untuk enter navigation --}}
                                 <div class="hidden" data-scope="entry-racikan"></div>
@@ -34,18 +34,8 @@
                                     @enderror
                                 </div>
 
-                                {{-- Nama Obat --}}
-                                <div class="basis-3/6">
-                                    <x-input-label for="formEntryRacikan.productName" :value="__('Nama Obat')" :required="true" />
-                                    <x-text-input id="formEntryRacikan.productName" class="mt-1 ml-2" :disabled="true"
-                                        wire:model="formEntryRacikan.productName" />
-                                    @error('formEntryRacikan.productName')
-                                        <x-input-error :messages="$message" />
-                                    @enderror
-                                </div>
-
-                                {{-- No Racikan --}}
-                                <div class="basis-1/12">
+                                {{-- No Racikan (1) --}}
+                                <div class="col-span-6 md:col-span-1">
                                     <x-input-label for="formEntryRacikan.noRacikan" :value="__('Racikan')" :required="true" />
                                     <x-text-input id="formEntryRacikan.noRacikan" class="w-24 mt-1 ml-2" :disabled="$disabledPropertyRjStatus"
                                         wire:model="formEntryRacikan.noRacikan" data-seq="1"
@@ -55,8 +45,21 @@
                                     @enderror
                                 </div>
 
-                                {{-- Dosis --}}
-                                <div class="basis-2/12">
+                                {{-- Nama Obat (col-span-4) --}}
+                                <div class="col-span-12 md:col-span-4">
+                                    <x-input-label for="formEntryRacikan.productName" :value="__('Nama Obat')"
+                                        :required="true" />
+                                    <x-text-input id="formEntryRacikan.productName" class="mt-1 ml-2" :disabled="true"
+                                        wire:model="formEntryRacikan.productName" />
+                                    @error('formEntryRacikan.productName')
+                                        <x-input-error :messages="$message" />
+                                    @enderror
+                                </div>
+
+
+
+                                {{-- Dosis (2) --}}
+                                <div class="col-span-6 md:col-span-2">
                                     <x-input-label for="formEntryRacikan.dosis" :value="__('Dosis')" :required="true" />
                                     <x-text-input id="formEntryRacikan.dosis" class="mt-1 ml-2" :disabled="$disabledPropertyRjStatus"
                                         wire:model="formEntryRacikan.dosis" data-seq="2"
@@ -66,8 +69,8 @@
                                     @enderror
                                 </div>
 
-                                {{-- Qty --}}
-                                <div class="basis-1/12">
+                                {{-- Qty (1) --}}
+                                <div class="col-span-6 md:col-span-1">
                                     <x-input-label for="formEntryRacikan.qty" :value="__('Jml Racikan')" />
                                     <x-text-input id="formEntryRacikan.qty" class="w-24 mt-1 ml-2" :disabled="$disabledPropertyRjStatus"
                                         wire:model="formEntryRacikan.qty" data-seq="3"
@@ -77,8 +80,8 @@
                                     @enderror
                                 </div>
 
-                                {{-- Catatan --}}
-                                <div class="basis-2/12">
+                                {{-- Catatan (2) --}}
+                                <div class="col-span-6 md:col-span-2">
                                     <x-input-label for="formEntryRacikan.catatan" :value="__('Catatan')" />
                                     <x-text-input id="formEntryRacikan.catatan" class="mt-1 ml-2" :disabled="$disabledPropertyRjStatus"
                                         wire:model="formEntryRacikan.catatan" data-seq="4"
@@ -88,24 +91,24 @@
                                     @enderror
                                 </div>
 
-                                {{-- Signa (catatanKhusus) --}}
-                                <div class="basis-3/6">
+                                {{-- Signa (1) --}}
+                                <div class="col-span-6 md:col-span-1">
                                     <x-input-label for="formEntryRacikan.catatanKhusus" :value="__('Signa')" />
                                     <x-text-input id="formEntryRacikan.catatanKhusus" class="mt-1 ml-2" :disabled="$disabledPropertyRjStatus"
                                         wire:model="formEntryRacikan.catatanKhusus" data-seq="5"
                                         x-on:keydown.enter.prevent="
-                                                 $wire.insertProduct();
-                                                 $nextTick(() => {
-                                                     $el.closest('[x-data]')?.querySelector('[data-seq=&quot;3&quot;]')?.focus()
-                                                 })
-                                             " />
+                                                                        $wire.insertProduct();
+                                                                        $nextTick(() => {
+                                                                        $el.closest('[x-data]')?.querySelector('[data-seq=&quot;3&quot;]')?.focus()
+                                                                        })
+                                                                    " />
                                     @error('formEntryRacikan.catatanKhusus')
                                         <x-input-error :messages="$message" />
                                     @enderror
                                 </div>
 
-                                {{-- Reset --}}
-                                <div class="basis-1/6">
+                                {{-- Reset (1) --}}
+                                <div class="col-span-6 md:col-span-1">
                                     <x-input-label :value="__('Hapus')" />
                                     <x-alternative-button class="inline-flex ml-2"
                                         wire:click.prevent="resetformEntryRacikan()"
