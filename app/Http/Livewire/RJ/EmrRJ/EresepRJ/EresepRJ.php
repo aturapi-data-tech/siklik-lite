@@ -437,9 +437,9 @@ class EresepRJ extends Component
             $this->formEntryResepNonRacikan['qty'] = 1;
         }
 
-        // price default: ambil dari immst_products berdasarkan productId (lowercase)
+        // price default: ambil dari tkmst_products berdasarkan productId (lowercase)
         if (empty($this->formEntryResepNonRacikan['productPrice']) && !empty($this->formEntryResepNonRacikan['productId'])) {
-            $productPrice = DB::table('immst_products')
+            $productPrice = DB::table('tkmst_products')
                 ->where('product_id', $this->formEntryResepNonRacikan['productId'])
                 ->value('sales_price');
 
