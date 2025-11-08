@@ -70,7 +70,7 @@ class EresepRJRacikan extends Component
         $this->formEntryRacikan['noRacikan']   = $this->noRacikan;
 
         if (empty($this->formEntryRacikan['productPrice']) && !empty($this->formEntryRacikan['productId'])) {
-            $price = DB::table('immst_products')
+            $price = DB::table('tkmst_products')
                 ->where('product_id', $this->formEntryRacikan['productId'])
                 ->value('sales_price');
             $this->formEntryRacikan['productPrice'] = $price ?? 0;
