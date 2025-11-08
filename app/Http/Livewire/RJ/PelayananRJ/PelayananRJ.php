@@ -8,7 +8,8 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
-
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Support\Facades\Cache;
 
 class PelayananRJ extends Component
 {
@@ -179,116 +180,223 @@ class PelayananRJ extends Component
 
 
 
-    public function masukPoli($rjNo)
+
+    public function masukPoli($rjNo): void
     {
+        $lockKey = "rj:{$rjNo}:task";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
 
-        $findDataRJ = $this->findDataRJ($rjNo);
-        $dataDaftarPoliRJ  = $findDataRJ['dataDaftarRJ'];
+                    // 1) Guard via DB row + lockForUpdate
+                    $row = DB::table('rstxn_rjhdrs')
+                        ->where('rj_no', $rjNo)
+                        ->lockForUpdate()
+                        ->first();
 
-        if (!$dataDaftarPoliRJ['taskIdPelayanan']['taskId4']) {
-            $waktuMasukPoli = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
-            $dataDaftarPoliRJ['taskIdPelayanan']['taskId4'] = $waktuMasukPoli;
-            // update DB
+                    if (!$row) {
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addError('Data RJ tidak ditemukan.');
+                        return;
+                    }
+                    if (!empty($row->waktu_masuk_poli)) {
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addError('Masuk Poli sudah terisi.');
+                        return;
+                    }
 
-            DB::table('rstxn_rjhdrs')
-                ->where('rj_no', $rjNo)
-                ->update([
-                    'waktu_masuk_poli' => DB::raw("to_date('" . $waktuMasukPoli . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
-                ]);
+                    // 2) Timestamp
+                    $waktu = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
-            $dataDaftarPoliRJ['userLogs'][] =
-                [
-                    'userLogDesc' => 'Masuk Poli',
-                    'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
-                ];
+                    // 3) Update kolom DB dengan guard (idempotent)
+                    $affected = DB::table('rstxn_rjhdrs')
+                        ->where('rj_no', $rjNo)
+                        ->whereNull('waktu_masuk_poli')
+                        ->update([
+                            'waktu_masuk_poli' => DB::raw("to_date('{$waktu}','dd/mm/yyyy hh24:mi:ss')")
+                        ]);
 
-            $this->updateJsonRJ($rjNo, $dataDaftarPoliRJ);
+                    if ($affected === 0) {
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addError('Masuk Poli gagal karena sudah terisi oleh proses lain.');
+                        return;
+                    }
 
-            $this->emit('toastr-success', "Masuk Poli " . $dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
-        } else {
-            $this->emit('toastr-error', "Masuk Poli " . $dataDaftarPoliRJ['taskIdPelayanan']['taskId4'] . " Sudah Terisi");
-        }
-    }
+                    // 4) Ambil FRESH JSON → patch subtree → simpan
+                    $freshWrap = $this->findDataRJ($rjNo);
+                    $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+                    if (!is_array($fresh)) $fresh = [];
+                    if (!isset($fresh['taskIdPelayanan']) || !is_array($fresh['taskIdPelayanan'])) {
+                        $fresh['taskIdPelayanan'] = [];
+                    }
+                    if (!isset($fresh['userLogs']) || !is_array($fresh['userLogs'])) {
+                        $fresh['userLogs'] = [];
+                    }
 
-
-    public function keluarPoli($rjNo)
-    {
-        $findDataRJ = $this->findDataRJ($rjNo);
-        $dataDaftarPoliRJ  = $findDataRJ['dataDaftarRJ'];
-
-        // cek taskId sebelumnya
-        if ($dataDaftarPoliRJ['taskIdPelayanan']['taskId4']) {
-
-            // isi taskId5
-            if (!$dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
-                $waktuKeluarPoli = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
-                $dataDaftarPoliRJ['taskIdPelayanan']['taskId5'] = $waktuKeluarPoli;
-
-                // update DB
-                DB::table('rstxn_rjhdrs')
-                    ->where('rj_no', $rjNo)
-                    ->update([
-                        'waktu_masuk_apt' => DB::raw("to_date('" . $waktuKeluarPoli . "','dd/mm/yyyy hh24:mi:ss')"), //waktu keluar = rjdate
-                    ]);
-
-                $dataDaftarPoliRJ['userLogs'][] =
-                    [
-                        'userLogDesc' => 'Keluar Poli',
-                        'userLog' => auth()->user()->myuser_name,
-                        'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
+                    $fresh['taskIdPelayanan']['taskId4'] = $waktu;
+                    $fresh['userLogs'][] = [
+                        'userLogDesc' => 'Masuk Poli',
+                        'userLog'     => auth()->user()->myuser_name,
+                        'userLogDate' => $waktu,
                     ];
 
-                $this->updateJsonRJ($rjNo, $dataDaftarPoliRJ);
+                    $this->updateJsonRJ($rjNo, $fresh);
 
-                $this->emit('toastr-success', "Keluar Poli " . $dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
-            } else {
-                $this->emit('toastr-error', "Keluar Poli " . $dataDaftarPoliRJ['taskIdPelayanan']['taskId5'] . " Sudah Terisi");
-            }
-        } else {
-            $this->emit('toastr-error', "Satus Pasien Belum melalui pelayanan Poli");
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                        ->addSuccess("Masuk Poli {$waktu}");
+                });
+            });
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk. Gagal memperoleh lock. Coba lagi.');
         }
     }
 
+    public function keluarPoli($rjNo): void
+    {
+        $lockKey = "rj:{$rjNo}:task";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
+
+                    $row = DB::table('rstxn_rjhdrs')
+                        ->where('rj_no', $rjNo)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if (!$row) {
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addError('Data RJ tidak ditemukan.');
+                        return;
+                    }
+                    if (empty($row->waktu_masuk_poli)) {
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addError('Status pasien belum Masuk Poli.');
+                        return;
+                    }
+                    if (!empty($row->waktu_masuk_apt)) {
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addError('Keluar Poli sudah terisi.');
+                        return;
+                    }
+
+                    $waktu = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
+
+                    $affected = DB::table('rstxn_rjhdrs')
+                        ->where('rj_no', $rjNo)
+                        ->whereNull('waktu_masuk_apt')
+                        ->update([
+                            // (mengikuti skema kamu: kolom ini dipakai utk waktu keluar poli)
+                            'waktu_masuk_apt' => DB::raw("to_date('{$waktu}','dd/mm/yyyy hh24:mi:ss')")
+                        ]);
+
+                    if ($affected === 0) {
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addError('Keluar Poli gagal karena sudah terisi oleh proses lain.');
+                        return;
+                    }
+
+                    $freshWrap = $this->findDataRJ($rjNo);
+                    $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+                    if (!is_array($fresh)) $fresh = [];
+                    if (!isset($fresh['taskIdPelayanan']) || !is_array($fresh['taskIdPelayanan'])) {
+                        $fresh['taskIdPelayanan'] = [];
+                    }
+                    if (!isset($fresh['userLogs']) || !is_array($fresh['userLogs'])) {
+                        $fresh['userLogs'] = [];
+                    }
+
+                    $fresh['taskIdPelayanan']['taskId5'] = $waktu;
+                    $fresh['userLogs'][] = [
+                        'userLogDesc' => 'Keluar Poli',
+                        'userLog'     => auth()->user()->myuser_name,
+                        'userLogDate' => $waktu,
+                    ];
+
+                    $this->updateJsonRJ($rjNo, $fresh);
+
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                        ->addSuccess("Keluar Poli {$waktu}");
+                });
+            });
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk. Gagal memperoleh lock. Coba lagi.');
+        }
+    }
 
     public function batalPoli($rjNo, $regName): void
     {
-        $findDataRJ = $this->findDataRJ($rjNo);
-        $dataDaftarPoliRJ  = $findDataRJ['dataDaftarRJ'];
+        $lockKey = "rj:{$rjNo}:task";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo, $regName) {
+                DB::transaction(function () use ($rjNo, $regName) {
 
-        // cek taskId sebelumnya
-        if (!$dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
+                    $row = DB::table('rstxn_rjhdrs')
+                        ->where('rj_no', $rjNo)
+                        ->lockForUpdate()
+                        ->first();
 
-            // isi taskId99 Pembatalan
-            if (!$dataDaftarPoliRJ['taskIdPelayanan']['taskId99']) {
-                $waktuBatalPoli = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
-                $dataDaftarPoliRJ['taskIdPelayanan']['taskId99'] = $waktuBatalPoli;
+                    if (!$row) {
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addError('Data RJ tidak ditemukan.');
+                        return;
+                    }
+                    if (!empty($row->waktu_masuk_apt)) {
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addError("Pembatalan tidak dapat dilakukan, {$regName} sudah melakukan pelayanan Poli.");
+                        return;
+                    }
+                    if ($row->rj_status === 'F') {
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addError('Pembatalan sudah tercatat.');
+                        return;
+                    }
 
-                // update DB
-                DB::table('rstxn_rjhdrs')
-                    ->where('rj_no', $rjNo)
-                    ->update([
-                        'rj_status' => 'F',
-                    ]);
+                    // set F dengan guard supaya idempotent
+                    $affected = DB::table('rstxn_rjhdrs')
+                        ->where('rj_no', $rjNo)
+                        ->where('rj_status', '!=', 'F')
+                        ->update(['rj_status' => 'F']);
 
-                $dataDaftarPoliRJ['userLogs'][] =
-                    [
+                    if ($affected === 0) {
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addError('Pembatalan gagal karena status sudah berubah.');
+                        return;
+                    }
+
+                    $waktu = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
+
+                    // patch JSON FRESH
+                    $freshWrap = $this->findDataRJ($rjNo);
+                    $fresh = $freshWrap['dataDaftarRJ'] ?? [];
+                    if (!is_array($fresh)) $fresh = [];
+                    if (!isset($fresh['taskIdPelayanan']) || !is_array($fresh['taskIdPelayanan'])) {
+                        $fresh['taskIdPelayanan'] = [];
+                    }
+                    if (!isset($fresh['userLogs']) || !is_array($fresh['userLogs'])) {
+                        $fresh['userLogs'] = [];
+                    }
+
+                    $fresh['taskIdPelayanan']['taskId99'] = $waktu;
+                    $fresh['userLogs'][] = [
                         'userLogDesc' => 'Batal Poli',
-                        'userLog' => auth()->user()->myuser_name,
-                        'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
+                        'userLog'     => auth()->user()->myuser_name,
+                        'userLogDate' => $waktu,
                     ];
 
+                    $this->updateJsonRJ($rjNo, $fresh);
 
-                $this->updateJsonRJ($rjNo, $dataDaftarPoliRJ);
-
-                $this->emit('toastr-success', "Batal Poli " . $dataDaftarPoliRJ['taskIdPelayanan']['taskId99']);
-            } else {
-                $this->emit('toastr-error', "Batal Poli " . $dataDaftarPoliRJ['taskIdPelayanan']['taskId99'] . " Sudah Terisi");
-            }
-        } else {
-            $this->emit('toastr-error', "Pembatalan tidak dapat dilakukan, " . $regName . " sudak melakukan pelayanan Poli.");
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                        ->addSuccess("Batal Poli {$waktu}");
+                });
+            });
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk. Gagal memperoleh lock. Coba lagi.');
         }
     }
+
 
 
     public function getListTaskId($noBooking): void

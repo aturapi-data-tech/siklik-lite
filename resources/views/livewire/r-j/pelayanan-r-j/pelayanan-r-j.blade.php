@@ -232,21 +232,35 @@
                                                         </div>
 
                                                         @if ($RJp->datadaftarpolirj_json)
+                                                            @php
+                                                                $jj =
+                                                                    json_decode($RJp->datadaftarpolirj_json, true) ?:
+                                                                    [];
+                                                                $task3 = data_get($jj, 'taskIdPelayanan.taskId3');
+                                                                $task4 = data_get($jj, 'taskIdPelayanan.taskId4');
+                                                                $task5 = data_get($jj, 'taskIdPelayanan.taskId5');
+                                                                $task99 = data_get($jj, 'taskIdPelayanan.taskId99');
+                                                            @endphp
+
                                                             <div class="font-normal text-gray-900">
-                                                                {{ '' . $RJp->nobooking }}
-                                                            </div>
-                                                            <div class="italic font-normal text-gray-900">
-                                                                {{ 'TaskId3 ' . json_decode($RJp->datadaftarpolirj_json)->taskIdPelayanan->taskId3 }}
-                                                            </div>
-                                                            <div class="italic font-normal text-gray-900">
-                                                                {{ 'TaskId4 ' . json_decode($RJp->datadaftarpolirj_json)->taskIdPelayanan->taskId4 }}
-                                                            </div>
-                                                            <div class="italic font-normal text-gray-900">
-                                                                {{ 'TaskId5 ' . json_decode($RJp->datadaftarpolirj_json)->taskIdPelayanan->taskId5 }}
-                                                            </div>
-                                                            <div class="italic font-normal text-gray-900">
-                                                                {{ 'TaskId99 ' . json_decode($RJp->datadaftarpolirj_json)->taskIdPelayanan->taskId99 }}
-                                                            </div>
+                                                                {{ $RJp->nobooking }}</div>
+
+                                                            @if ($task3)
+                                                                <div class="italic font-normal text-gray-900">
+                                                                    {{ 'TaskId3 ' . $task3 }}</div>
+                                                            @endif
+                                                            @if ($task4)
+                                                                <div class="italic font-normal text-gray-900">
+                                                                    {{ 'TaskId4 ' . $task4 }}</div>
+                                                            @endif
+                                                            @if ($task5)
+                                                                <div class="italic font-normal text-gray-900">
+                                                                    {{ 'TaskId5 ' . $task5 }}</div>
+                                                            @endif
+                                                            @if ($task99)
+                                                                <div class="italic font-normal text-gray-900">
+                                                                    {{ 'TaskId99 ' . $task99 }}</div>
+                                                            @endif
                                                         @endif
 
                                                     </div>
@@ -260,7 +274,7 @@
                                                     <div class="inline-flex">
 
                                                         <x-yellow-button
-                                                            wire:click="masukPoli('{{ addslashes($RJp->rj_no) }}')"
+                                                            wire:click="masukPoli({{ json_encode($RJp->rj_no) }})"
                                                             wire:loading.remove>
                                                             Masuk Poli
                                                         </x-yellow-button>
@@ -269,13 +283,15 @@
                                                         </div>
 
                                                         <x-green-button
-                                                            wire:click="keluarPoli('{{ addslashes($RJp->rj_no) }}')"
+                                                            wire:click="keluarPoli({{ json_encode($RJp->rj_no) }})"
                                                             wire:loading.remove>
                                                             Keluar Poli
                                                         </x-green-button>
                                                         <div wire:loading wire:target="keluarPoli">
                                                             <x-loading />
                                                         </div>
+
+
 
                                                         {{-- delete Modal --}}
                                                         @include('livewire.r-j.pelayanan-r-j.delete-confirmation')
@@ -284,7 +300,7 @@
                                                     </div>
                                                     <div>
                                                         <x-primary-button
-                                                            wire:click="getListTaskId('{{ addslashes($RJp->nobooking) }}')"
+                                                            wire:click="getListTaskId({{ json_encode($RJp->nobooking) }})"
                                                             wire:loading.remove>
                                                             Get List Task Id BPJS
                                                         </x-primary-button>
