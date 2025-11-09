@@ -258,6 +258,8 @@ class Perencanaan extends Component
                         $fresh['perencanaan'] = $this->perencanaan;
                     }
 
+                    // PATCH hanya subtree 'perencanaan ketika ada perubahan terakhir' dari state sekarang (UI)
+                    $fresh['perencanaan'] = $this->dataDaftarPoliRJ['perencanaan'] ?? $fresh['perencanaan'];
                     // set dr pemeriksa + set ERM status
                     $fresh['perencanaan']['pengkajianMedis']['drPemeriksa'] =
                         $fresh['drDesc'] ?? 'Dokter pemeriksa';
