@@ -50,16 +50,9 @@
 
                 </div>
 
-                {{-- Display Pasien Componen --}}
                 <div class="">
-                    {{-- Display Pasien --}}
-                    {{-- :rjNo="" disi dari emit ListeneropenModalEditRj --}}
-
                     <livewire:r-j.emr-r-j.display-pasien.display-pasien :wire:key="$rjNoRef.'display-pasienEresep'"
                         :rjNoRef="$rjNoRef">
-
-                        {{-- <livewire:r-j.emr-r-j.form-entry-r-j.form-entry-r-j :rjNo="$regNo"
-                            :wire:key="$regNo.'form-entry-r-j'"> --}}
                 </div>
 
                 {{-- Grid Eresep --}}
