@@ -27,11 +27,11 @@ class EresepRJRacikan extends Component
     public array $formEntryRacikan = [
         'productId'      => '',
         'productName'    => '',
-        'sedia'          => 1,
+        'sedia'          => '',
         'dosis'          => '',
         'qty'            => '',
-        'signaX'         => 1,
-        'signaHari'      => 1,
+        'signaX'         => '',
+        'signaHari'      => '',
         'productPrice'   => 0,
         'catatan'        => '',
         'catatanKhusus'  => '',
@@ -64,9 +64,9 @@ class EresepRJRacikan extends Component
     {
         $this->formEntryRacikan['productId']   = $this->product['productId']   ?? '';
         $this->formEntryRacikan['productName'] = $this->product['productName'] ?? '';
-        $this->formEntryRacikan['sedia']       = $this->formEntryRacikan['sedia'] ?: 1;
-        $this->formEntryRacikan['signaX']      = $this->formEntryRacikan['signaX'] ?: 1;
-        $this->formEntryRacikan['signaHari']   = $this->formEntryRacikan['signaHari'] ?: 1;
+        $this->formEntryRacikan['sedia']       = $this->formEntryRacikan['sedia'] ?: '';
+        $this->formEntryRacikan['signaX']      = $this->formEntryRacikan['signaX'] ?: '';
+        $this->formEntryRacikan['signaHari']   = $this->formEntryRacikan['signaHari'] ?: '';
         $this->formEntryRacikan['noRacikan']   = $this->noRacikan;
 
         if (empty($this->formEntryRacikan['productPrice']) && !empty($this->formEntryRacikan['productId'])) {

@@ -437,9 +437,9 @@ class EresepRJ extends Component
         $this->formEntryResepNonRacikan['productId']   = $this->product['productId']   ?? '';
         $this->formEntryResepNonRacikan['productName'] = $this->product['productName'] ?? '';
         // qty default
-        if (empty($this->formEntryResepNonRacikan['qty'])) {
-            $this->formEntryResepNonRacikan['qty'] = 1;
-        }
+        // if (empty($this->formEntryResepNonRacikan['qty'])) {
+        //     $this->formEntryResepNonRacikan['qty'] = 1;
+        // }
 
         // price default: ambil dari tkmst_products berdasarkan productId (lowercase)
         if (empty($this->formEntryResepNonRacikan['productPrice']) && !empty($this->formEntryResepNonRacikan['productId'])) {
