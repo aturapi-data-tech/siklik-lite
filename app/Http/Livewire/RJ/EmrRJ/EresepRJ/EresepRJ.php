@@ -73,8 +73,8 @@ class EresepRJ extends Component
         $rules = [
             'formEntryResepNonRacikan.productId'    => 'bail|required',
             'formEntryResepNonRacikan.productName'  => 'bail|required',
-            'formEntryResepNonRacikan.signaX'       => 'bail|required|numeric|min:1',
-            'formEntryResepNonRacikan.signaHari'    => 'bail|required|numeric|min:1',
+            'formEntryResepNonRacikan.signaX'       => 'bail|required',
+            'formEntryResepNonRacikan.signaHari'    => 'bail|required',
             'formEntryResepNonRacikan.qty'          => 'bail|required|integer|min:1|max:999',
             'formEntryResepNonRacikan.productPrice' => 'bail|required|numeric|min:0',
             'formEntryResepNonRacikan.catatanKhusus' => 'bail|nullable|string',
@@ -88,13 +88,9 @@ class EresepRJ extends Component
 
             // signaX
             'formEntryResepNonRacikan.signaX.required' => ':attribute wajib diisi.',
-            'formEntryResepNonRacikan.signaX.numeric'  => ':attribute harus berupa angka.',
-            'formEntryResepNonRacikan.signaX.min'      => ':attribute minimal :min.',
 
             // signaHari
             'formEntryResepNonRacikan.signaHari.required' => ':attribute wajib diisi.',
-            'formEntryResepNonRacikan.signaHari.numeric'  => ':attribute harus berupa angka.',
-            'formEntryResepNonRacikan.signaHari.min'      => ':attribute minimal :min.',
 
             // qty
             'formEntryResepNonRacikan.qty.required' => ':attribute wajib diisi.',

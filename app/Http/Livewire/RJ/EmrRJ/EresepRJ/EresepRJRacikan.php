@@ -86,18 +86,32 @@ class EresepRJRacikan extends Component
             'formEntryRacikan.productName'   => 'bail|required',
             'formEntryRacikan.dosis'         => 'bail|required|max:150',
             'formEntryRacikan.qty'           => 'bail|nullable|digits_between:1,3',
-            'formEntryRacikan.signaX'        => 'bail|numeric|min:1|max:5',
-            'formEntryRacikan.signaHari'     => 'bail|numeric|min:1|max:5',
+            'formEntryRacikan.signaX'        => 'nullable',
+            'formEntryRacikan.signaHari'     => 'nullable',
             'formEntryRacikan.productPrice'  => 'bail|numeric|min:0',
             'formEntryRacikan.catatan'       => 'bail|nullable|max:150',
             'formEntryRacikan.catatanKhusus' => 'bail|nullable|max:150',
         ];
+
         $messages = [
             'formEntryRacikan.productId.required'   => 'ID Obat wajib diisi.',
             'formEntryRacikan.productName.required' => 'Nama obat wajib diisi.',
             'formEntryRacikan.dosis.required'       => 'Dosis wajib diisi.',
         ];
-        $this->validate($rules, $messages);
+
+        $attributes = [
+            'formEntryRacikan.productId'     => 'ID Obat',
+            'formEntryRacikan.productName'   => 'Nama Obat',
+            'formEntryRacikan.dosis'         => 'Dosis',
+            'formEntryRacikan.qty'           => 'Jumlah (Qty)',
+            'formEntryRacikan.signaX'        => 'Signa X',
+            'formEntryRacikan.signaHari'     => 'Signa Hari',
+            'formEntryRacikan.productPrice'  => 'Harga Obat',
+            'formEntryRacikan.catatan'       => 'Catatan',
+            'formEntryRacikan.catatanKhusus' => 'Catatan Khusus',
+        ];
+
+        $this->validate($rules, $messages, $attributes);
 
         $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef;
         if (!$rjNo) {
