@@ -138,7 +138,11 @@ class PelayananRJ extends Component
     // search
     public function updatedSearch(): void
     {
-        // $this->emit('toastr-error', "search.");
+        toastr()
+            ->closeOnHover(true)
+            ->closeDuration(3)
+            ->positionClass('toast-top-left')
+            ->addError("search.");
 
         $this->resetPage();
         $this->resetValidation();
@@ -147,7 +151,11 @@ class PelayananRJ extends Component
     // date
     public function updatedDaterjref(): void
     {
-        // $this->emit('toastr-error', "date.");
+        toastr()
+            ->closeOnHover(true)
+            ->closeDuration(3)
+            ->positionClass('toast-top-left')
+            ->addError("date.");
 
         $this->resetPage();
         $this->resetValidation();
@@ -156,7 +164,11 @@ class PelayananRJ extends Component
     // status
     public function updatedStatusrjref(): void
     {
-        // $this->emit('toastr-error', "status.");
+        toastr()
+            ->closeOnHover(true)
+            ->closeDuration(3)
+            ->positionClass('toast-top-left')
+            ->addError("status.");
 
         $this->resetPage();
         $this->resetValidation();
@@ -165,7 +177,11 @@ class PelayananRJ extends Component
     // dr
     public function setdrRjRef($id, $name): void
     {
-        // $this->emit('toastr-error', "dr.");
+        toastr()
+            ->closeOnHover(true)
+            ->closeDuration(3)
+            ->positionClass('toast-top-left')
+            ->addError("dr.");
 
         $this->drRjRef['drId'] = $id;
         $this->drRjRef['drName'] = $name;
@@ -191,7 +207,7 @@ class PelayananRJ extends Component
                     // 1) Guard via DB row + lockForUpdate
                     $row = DB::table('rstxn_rjhdrs')
                         ->where('rj_no', $rjNo)
-                        ->lockForUpdate()
+
                         ->first();
 
                     if (!$row) {
@@ -261,7 +277,7 @@ class PelayananRJ extends Component
 
                     $row = DB::table('rstxn_rjhdrs')
                         ->where('rj_no', $rjNo)
-                        ->lockForUpdate()
+
                         ->first();
 
                     if (!$row) {
@@ -334,7 +350,7 @@ class PelayananRJ extends Component
 
                     $row = DB::table('rstxn_rjhdrs')
                         ->where('rj_no', $rjNo)
-                        ->lockForUpdate()
+
                         ->first();
 
                     if (!$row) {
@@ -405,7 +421,8 @@ class PelayananRJ extends Component
         // $HttpGetBpjs =  AntrianTrait::taskid_antrean($noBooking)->getOriginalContent();
         $HttpGetBpjs = 'xxx';
         dd($HttpGetBpjs);
-        $this->emit('toastr-success', 'Task Id' . $noBooking . ' ' . $HttpGetBpjs);
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess('Task Id' . $noBooking . ' ' . $HttpGetBpjs);
     }
 
 

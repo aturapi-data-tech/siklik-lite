@@ -36,7 +36,11 @@ class CetakEtiket extends Component
                 'tglLahir' => '',
                 'thn' => '-',
             ]];
-            $this->emit('toastr-error', 'Data pasien tidak ditemukan.');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Data pasien tidak ditemukan.');
             return;
         }
 

@@ -89,7 +89,11 @@ class MasterDokter extends Component
         $validator = Validator::make($r, $rules, $customErrorMessagesTrait, $attribute);
 
         if ($validator->fails()) {
-            $this->emit('toastr-error', $validator->messages()->all());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($validator->messages()->all());
             return;
         }
         // Proses Validasi///////////////////////////////////////////
@@ -99,7 +103,8 @@ class MasterDokter extends Component
             ->where('dr_id', $dokterId)
             ->delete();
 
-        $this->emit('toastr-success', "Data " . $dokterDesc . " berhasil dihapus.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("Data " . $dokterDesc . " berhasil dihapus.");
     }
     // open and close modal start////////////////
 

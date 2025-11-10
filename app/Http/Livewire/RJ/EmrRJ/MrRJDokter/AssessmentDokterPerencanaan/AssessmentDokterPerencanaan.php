@@ -122,7 +122,11 @@ class AssessmentDokterPerencanaan extends Component
         try {
             $this->validate($this->rules, $this->messages, $this->validationAttributes);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            $this->emit('toastr-error', 'Lakukan pengecekan kembali Input Data.');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Lakukan pengecekan kembali Input Data.');
             $this->validate($this->rules, $this->messages, $this->validationAttributes);
         }
     }
@@ -139,13 +143,6 @@ class AssessmentDokterPerencanaan extends Component
             return;
         }
 
-        // optional: blokir bila pasien sudah pulang
-        $status = DB::scalar("select rj_status from rstxn_rjhdrs where rj_no=:rjNo", ['rjNo' => $rjNo]);
-        if ($status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Pasien sudah pulang. Tidak bisa menyimpan perencanaan.');
-            return;
-        }
 
         // validasi ringan
         $this->validateDataRJ();
@@ -219,7 +216,11 @@ class AssessmentDokterPerencanaan extends Component
         try {
             $this->validate($rules, []);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            $this->emit('toastr-error', 'Anda tidak dapat melakukan TTD-E karena data pemeriksaan belum lengkap.');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Anda tidak dapat melakukan TTD-E karena data pemeriksaan belum lengkap.');
             $this->validate($rules, []);
         }
     }
@@ -239,11 +240,19 @@ class AssessmentDokterPerencanaan extends Component
         $myUserNameActive = auth()->user()->myuser_name;
 
         if (!auth()->user()->hasRole('Dokter')) {
-            $this->emit('toastr-error', 'Anda tidak dapat melakukan TTD-E karena User Role ' . $myUserNameActive . ' Bukan Dokter');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Anda tidak dapat melakukan TTD-E karena User Role ' . $myUserNameActive . ' Bukan Dokter');
             return;
         }
         if (($this->dataDaftarPoliRJ['drId'] ?? null) !== $myUserCodeActive) {
-            $this->emit('toastr-error', 'Anda tidak dapat melakukan TTD-E karena Bukan Pasien ' . $myUserNameActive);
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Anda tidak dapat melakukan TTD-E karena Bukan Pasien ' . $myUserNameActive);
             return;
         }
 

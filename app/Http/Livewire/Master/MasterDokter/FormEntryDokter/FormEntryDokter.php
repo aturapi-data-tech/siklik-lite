@@ -73,7 +73,11 @@ class FormEntryDokter extends Component
                 ];
             } else {
 
-                $this->emit('toastr-error', "Data tidak ditemukan.");
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError("Data tidak ditemukan.");
                 $this->FormEntryDokter = [
                     'dokterId' => null,
                     'dokterName' => null,
@@ -84,7 +88,11 @@ class FormEntryDokter extends Component
                 ];
             }
         } catch (Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
             $this->FormEntryDokter = [
                 'dokterId' => null,
                 'dokterName' => null,
@@ -110,7 +118,8 @@ class FormEntryDokter extends Component
                 'dr_nik' => isset($this->FormEntryDokter['dokterNik']) ? $this->FormEntryDokter['dokterNik'] : '',
             ]);
 
-        $this->emit('toastr-success', "Data berhasil diupdate.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("Data berhasil diupdate.");
     }
 
     private function insert(): void
@@ -125,7 +134,8 @@ class FormEntryDokter extends Component
                 'dr_nik' => isset($this->FormEntryDokter['dokterNik']) ? $this->FormEntryDokter['dokterNik'] : '',
             ]);
 
-        $this->emit('toastr-success', "Data berhasil dimasukkan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("Data berhasil dimasukkan.");
     }
 
     public function store()
@@ -135,7 +145,11 @@ class FormEntryDokter extends Component
 
         // Jika mode data //insert
         if ($this->isOpenMode == 'insert') {
-            $this->emit('toastr-error', "masih dikembangkan Master Level 2.");
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("masih dikembangkan Master Level 2.");
             return;
             $this->insert();
             $this->isOpenMode = 'update';
@@ -158,7 +172,11 @@ class FormEntryDokter extends Component
         $validator = Validator::make($r, $rules, $customErrorMessagesTrait, $attribute);
 
         if ($validator->fails()) {
-            $this->emit('toastr-error', $validator->messages()->all());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($validator->messages()->all());
             return;
         }
         // Proses Validasi///////////////////////////////////////////
@@ -171,14 +189,19 @@ class FormEntryDokter extends Component
 
             // Jika uuid tidak ditemukan
             if (!isset($PractitionerByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'])) {
-                $this->emit('toastr-error', 'UUID tidak dapat ditemukan.' . $PractitionerByNIK->getOriginalContent()['metadata']['message']);
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('UUID tidak dapat ditemukan.' . $PractitionerByNIK->getOriginalContent()['metadata']['message']);
                 return;
             }
 
             $this->validateData();
             $this->FormEntryDokter['dokterUuid'] = $PractitionerByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'];
             $this->store();
-            $this->emit('toastr-success', $PractitionerByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'] . ' / ' . $PractitionerByNIK->getOriginalContent()['response']['entry'][0]['resource']['name'][0]['text']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess($PractitionerByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'] . ' / ' . $PractitionerByNIK->getOriginalContent()['response']['entry'][0]['resource']['name'][0]['text']);
             return;
 
             // dd($PractitionerByNIK->getOriginalContent());
@@ -186,7 +209,11 @@ class FormEntryDokter extends Component
             // dd($PractitionerByNIK->getOriginalContent()['response']['entry'][0]['resource']['name'][0]['text']);
         } catch (\Illuminate\Validation\ValidationException $e) {
             // dd($validator->fails());
-            $this->emit('toastr-error', 'Errors "' . $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Errors "' . $e->getMessage());
             return;
         }
     }
@@ -204,7 +231,11 @@ class FormEntryDokter extends Component
 
             $this->validate($this->rules, customErrorMessagesTrait::messages());
         } catch (\Illuminate\Validation\ValidationException $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
             $this->validate($this->rules, customErrorMessagesTrait::messages());
         }
     }

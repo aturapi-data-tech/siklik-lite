@@ -92,7 +92,8 @@ class LainLainRJ extends Component
 
     public function setMydataLainLainLov($id)
     {
-        if (!$this->checkRjStatus()) return;
+        if (!$this->checkRjStatus($this->rjNoRef)) return;
+
         $row = DB::table('rsmst_others')
             ->select('other_id', 'other_desc', 'other_price')
             ->where('active_status', '1')
@@ -128,12 +129,17 @@ class LainLainRJ extends Component
 
     public function enterMydataLainLainLov($id)
     {
-        if (!$this->checkRjStatus()) return;
+        if (!$this->checkRjStatus($this->rjNoRef)) return;
+
         if (isset($this->dataLainLainLov[$id]['other_id'])) {
             $this->addLainLain($this->dataLainLainLov[$id]['other_id'], $this->dataLainLainLov[$id]['other_desc'], $this->dataLainLainLov[$id]['other_price']);
             $this->resetdataLainLainLov();
         } else {
-            $this->emit('toastr-error', 'Lain-Lain belum tersedia.');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Lain-Lain belum tersedia.');
         }
     }
 
@@ -154,7 +160,8 @@ class LainLainRJ extends Component
     /////////////////////////////////////////////////
     public function insertLainLain(): void
     {
-        if (!$this->checkRjStatus()) return;
+        if (!$this->checkRjStatus($this->rjNoRef)) return;
+
 
         $messages = [
             'required' => ':attribute wajib diisi.',
@@ -231,7 +238,7 @@ class LainLainRJ extends Component
     /////////////////////////////////////////////////
     public function removeLainLain($rjotherDtl)
     {
-        if (!$this->checkRjStatus()) return;
+        if (!$this->checkRjStatus($this->rjNoRef)) return;
 
         $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef ?? null;
         if (!$rjNo) {
@@ -317,23 +324,7 @@ class LainLainRJ extends Component
         }
     }
 
-    /////////////////////////////////////////////////
-    // Guard ringan untuk UI
-    /////////////////////////////////////////////////
-    public function checkRjStatus(): bool
-    {
-        $row = DB::table('rstxn_rjhdrs')
-            ->select('rj_status')
-            ->where('rj_no', $this->rjNoRef)
-            ->first();
 
-        if (!$row || $row->rj_status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Pasien Sudah Pulang, Transaksi Terkunci.');
-            return false;
-        }
-        return true;
-    }
 
     public function resetformEntryLainLain()
     {

@@ -111,7 +111,7 @@ class JasaKaryawanRJ extends Component
 
     public function setMydataJasaKaryawanLov($id)
     {
-        if (!$this->checkRjStatus()) return;
+        if (!$this->checkRjStatus($this->rjNoRef)) return;
         $row = DB::table('rsmst_actemps')
             ->select('acte_id', 'acte_desc', 'acte_price')
             ->where('active_status', '1')
@@ -141,7 +141,7 @@ class JasaKaryawanRJ extends Component
     }
     public function enterMydataJasaKaryawanLov($id)
     {
-        if (!$this->checkRjStatus()) return;
+        if (!$this->checkRjStatus($this->rjNoRef)) return;
         if (isset($this->dataJasaKaryawanLov[$id]['acte_id'])) {
             $this->addJasaKaryawan(
                 $this->dataJasaKaryawanLov[$id]['acte_id'],
@@ -159,7 +159,7 @@ class JasaKaryawanRJ extends Component
     ////////////////////////////////////////////////
     public function insertJasaKaryawan(): void
     {
-        if (!$this->checkRjStatus()) return;
+        if (!$this->checkRjStatus($this->rjNoRef)) return;
 
         $rules = [
             'formEntryJasaKaryawan.JasaKaryawanId'    => 'bail|required|exists:rsmst_actemps,acte_id',
@@ -242,7 +242,7 @@ class JasaKaryawanRJ extends Component
 
     public function removeJasaKaryawan($rjActeDtl): void
     {
-        if (!$this->checkRjStatus()) return;
+        if (!$this->checkRjStatus($this->rjNoRef)) return;
 
         $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef ?? null;
         if (!$rjNo) {
@@ -494,15 +494,7 @@ class JasaKaryawanRJ extends Component
     ////////////////////////////////////////////////
     // Guard ringan untuk UI
     ////////////////////////////////////////////////
-    public function checkRjStatus(): bool
-    {
-        $row = DB::table('rstxn_rjhdrs')->select('rj_status')->where('rj_no', $this->rjNoRef)->first();
-        if (!$row || $row->rj_status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Pasien Sudah Pulang, Transaksi Terkunci.');
-            return false;
-        }
-        return true;
-    }
+
 
     ////////////////////////////////////////////////
     // Util

@@ -70,7 +70,11 @@ class RekamMedisDisplay extends Component
             // cek status transaksi
             $checkRjStatus = $this->checkRjStatus($this->rjNoRefCopyTo);
             if ($checkRjStatus) {
-                $this->emit('toastr-error', "Pasien Sudah Pulang, Trasaksi Terkunci.");
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError("Pasien Sudah Pulang, Trasaksi Terkunci.");
                 return;
             }
 
@@ -93,7 +97,11 @@ class RekamMedisDisplay extends Component
                 } catch (Exception $e) {
                     // display an error to user
                     // dd($e->getMessage());
-                    $this->emit('toastr-error', $e->getMessage());
+                    toastr()
+                        ->closeOnHover(true)
+                        ->closeDuration(3)
+                        ->positionClass('toast-top-left')
+                        ->addError($e->getMessage());
                     return;
                 }
 
@@ -134,7 +142,11 @@ class RekamMedisDisplay extends Component
                 } catch (Exception $e) {
                     // display an error to user
                     // dd($e->getMessage());
-                    $this->emit('toastr-error', $e->getMessage());
+                    toastr()
+                        ->closeOnHover(true)
+                        ->closeDuration(3)
+                        ->positionClass('toast-top-left')
+                        ->addError($e->getMessage());
                     return;
                 }
 
@@ -158,7 +170,11 @@ class RekamMedisDisplay extends Component
                 } catch (Exception $e) {
                     // display an error to user
                     // dd($e->getMessage());
-                    $this->emit('toastr-error', $e->getMessage());
+                    toastr()
+                        ->closeOnHover(true)
+                        ->closeDuration(3)
+                        ->positionClass('toast-top-left')
+                        ->addError($e->getMessage());
                     return;
                 }
 
@@ -204,7 +220,11 @@ class RekamMedisDisplay extends Component
                 } catch (Exception $e) {
                     // display an error to user
                     // dd($e->getMessage());
-                    $this->emit('toastr-error', $e->getMessage());
+                    toastr()
+                        ->closeOnHover(true)
+                        ->closeDuration(3)
+                        ->positionClass('toast-top-left')
+                        ->addError($e->getMessage());
                     return;
                 }
 
@@ -249,7 +269,11 @@ class RekamMedisDisplay extends Component
 
             $this->updateDataRj($this->rjNoRefCopyTo, $to);
         } else {
-            $this->emit('toastr-error', "Fitur Copy Terapi pasien masih dalam proses pengembangan.");
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Fitur Copy Terapi pasien masih dalam proses pengembangan.");
             return;
         }
     }
@@ -281,7 +305,8 @@ class RekamMedisDisplay extends Component
             ]);
 
 
-        $this->emit('toastr-success', "Data Resep berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("Data Resep berhasil disimpan.");
     }
 
     private function prosesDataArray(array $arr, string $arrName)
@@ -289,31 +314,25 @@ class RekamMedisDisplay extends Component
         $myArr = $arr ? $arr : [];
 
         if (!$myArr) {
-            $this->emit('toastr-error', "Data " . $arrName . " tidak ditemukan.");
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Data " . $arrName . " tidak ditemukan.");
             return;
         }
 
         return $myArr;
     }
 
-    private function checkRjStatus($rjNo): bool
-    {
-        $lastInserted = DB::table('rstxn_rjhdrs')
-            ->select('rj_status')
-            ->where('rj_no', $rjNo)
-            ->first();
-
-        if ($lastInserted->rj_status !== 'A') {
-            return true;
-        }
-        return false;
-    }
-
-
     public function myiCare($nomorKartu, $sep)
     {
         if (!$sep) {
-            $this->emit('toastr-error', "Belum Terbit SEP.");
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Belum Terbit SEP.");
             return;
         }
 
@@ -325,7 +344,11 @@ class RekamMedisDisplay extends Component
 
         // dd($kodeDokter);
         if ($kodeDokter->kd_dr_bpjs == null) {
-            $this->emit('toastr-error', "Dokter tidak memiliki hak akses untuk I-Care.");
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Dokter tidak memiliki hak akses untuk I-Care.");
             return;
         }
 
@@ -340,7 +363,11 @@ class RekamMedisDisplay extends Component
             $this->openModalicare();
             // return redirect()->to($HttpGetBpjsJson['response']['url']);
         } else {
-            $this->emit('toastr-error', json_encode($HttpGetBpjsJson['metadata']['message'], true));
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError(json_encode($HttpGetBpjsJson['metadata']['message'], true));
             return;
         }
     }

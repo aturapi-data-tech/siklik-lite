@@ -49,7 +49,11 @@ class PostSatuDataKesehatanRJ extends Component
 
         // cek data satu sehat dikirim atau belum
         if (isset($dataDaftarPoliRJ['satuDataKesehatanTulungagung'])) {
-            $this->emit('toastr-error', 'Data Pasien ' . $dataPasienRJ['regName'] . ' sudah dikirim ke Satu Data Kesehatan Tulungagung');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Data Pasien ' . $dataPasienRJ['regName'] . ' sudah dikirim ke Satu Data Kesehatan Tulungagung');
             return;
         }
 
@@ -62,12 +66,20 @@ class PostSatuDataKesehatanRJ extends Component
         // if// if poli uuid null -> then get uuid -> if fail batal proses if ok
         // proses
         if (!isset($dataDaftarPoliRJ['diagnosis'])) {
-            $this->emit('toastr-error', 'Data diagnosis kosong');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Data diagnosis kosong');
             return;
         }
 
         if (collect($dataDaftarPoliRJ['diagnosis'])->count() == 0) {
-            $this->emit('toastr-error', 'Data diagnosis kosong');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Data diagnosis kosong');
             return;
         }
 
@@ -116,7 +128,11 @@ class PostSatuDataKesehatanRJ extends Component
             $validator = Validator::make($r, $rules, $customErrorMessagesTrait, $attribute);
 
             if ($validator->fails()) {
-                $this->emit('toastr-error', $validator->messages()->all());
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError($validator->messages()->all());
                 return;
             }
 
@@ -135,12 +151,20 @@ class PostSatuDataKesehatanRJ extends Component
                 } else {
 
                     // dd($postSatuDataKesehatanRJ->getOriginalContent());
-                    $this->emit('toastr-error', json_encode($postSatuDataKesehatanRJ->getOriginalContent(), true));
+                    toastr()
+                        ->closeOnHover(true)
+                        ->closeDuration(3)
+                        ->positionClass('toast-top-left')
+                        ->addError(json_encode($postSatuDataKesehatanRJ->getOriginalContent(), true));
                     return;
                 }
             } catch (\Illuminate\Validation\ValidationException $e) {
                 // dd($validator->fails());
-                $this->emit('toastr-error', 'Errors "' . $e->getMessage());
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Errors "' . $e->getMessage());
                 return;
             }
         }

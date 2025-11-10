@@ -132,7 +132,11 @@ trait LOVPasienTrait
             $this->addPasien($this->dataPasienLov[$id]['reg_no'], $this->dataPasienLov[$id]['reg_name'], $this->dataPasienLov[$id]['address'], $this->dataPasienLov[$id]['sex']);
             $this->resetdataPasienLov();
         } else {
-            $this->emit('toastr-error', "Kode belum tersedia.");
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Kode belum tersedia.");
             return;
         }
     }
@@ -171,13 +175,17 @@ trait LOVPasienTrait
 
     public function enterMydataPasienLov($id)
     {
-        // $this->checkRjStatus();
+
         // jika JK belum siap maka toaster error
         if (isset($this->dataPasienLov[$id]['reg_no'])) {
             $this->addPasien($this->dataPasienLov[$id]['reg_no'], $this->dataPasienLov[$id]['reg_name'], $this->dataPasienLov[$id]['address'], $this->dataPasienLov[$id]['sex']);
             $this->resetdataPasienLov();
         } else {
-            $this->emit('toastr-error', "Kode belum tersedia.");
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Kode belum tersedia.");
             return;
         }
     }

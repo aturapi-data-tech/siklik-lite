@@ -26,7 +26,11 @@ class CetakEresepRJ extends Component
         // Ambil JSON RJ terbaru via trait
         $wrap = $this->findDataRJ($rjNo);
         if (isset($wrap['errorMessages'])) {
-            $this->emit('toastr-error', $wrap['errorMessages']);
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($wrap['errorMessages']);
             return;
         }
 
@@ -62,7 +66,11 @@ class CetakEresepRJ extends Component
             }
         } else {
             $this->dataPasien = ['pasien' => []];
-            $this->emit('toastr-error', 'RegNo tidak ditemukan pada data RJ.');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('RegNo tidak ditemukan pada data RJ.');
         }
     }
 
@@ -84,11 +92,19 @@ class CetakEresepRJ extends Component
         $adaResep = !empty($this->dataDaftarPoliRJ['eresep']) || !empty($this->dataDaftarPoliRJ['eresepRacikan']);
 
         if (!$adaTtdDokter) {
-            $this->emit('toastr-error', 'Belum ada TTD pada Data Resep');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Belum ada TTD pada Data Resep');
             return;
         }
         if (!$adaResep) {
-            $this->emit('toastr-error', 'Data Resep Tidak ditemukan');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Data Resep Tidak ditemukan');
             return;
         }
 
@@ -99,7 +115,8 @@ class CetakEresepRJ extends Component
         ];
 
         $pdfContent = Pdf::loadView('livewire.component.cetak.cetak-eresep-r-j-print', $data)->output();
-        $this->emit('toastr-success', 'Cetak Eresep RJ');
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess('Cetak Eresep RJ');
 
         return response()->streamDownload(
             fn() => print($pdfContent),

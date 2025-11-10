@@ -214,7 +214,8 @@ class SetupHfisBpjs extends Component
 
         $this->closeModal();
         $this->resetInputFields();
-        $this->emit('toastr-success', "Data " . $this->name . " berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("Data " . $this->name . " berhasil disimpan.");
     }
     // insert record end////////////////
 
@@ -260,7 +261,8 @@ class SetupHfisBpjs extends Component
     public function delete($id, $name)
     {
         Province::find($id)->delete();
-        $this->emit('toastr-success', "Hapus data " . $name . " berhasil.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("Hapus data " . $name . " berhasil.");
     }
     // delete record end////////////////
 
@@ -289,10 +291,15 @@ class SetupHfisBpjs extends Component
 
             if ($HttpGetBpjs['metadata']['code'] == 200) {
                 $this->hfisLov = $HttpGetBpjs['response']['poli'];
-                $this->emit('toastr-success', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess($HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
             } else {
                 $this->hfisLov = [];
-                $this->emit('toastr-error', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError($HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
             }
         }
     }
@@ -310,10 +317,15 @@ class SetupHfisBpjs extends Component
             $this->jadwal_dokter = $HttpGetBpjs['response'];
             // dd($this->jadwal_dokter);
 
-            $this->emit('toastr-success', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess($HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         } else {
             $this->jadwal_dokter = [];
-            $this->emit('toastr-error', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         }
 
 
@@ -393,7 +405,8 @@ class SetupHfisBpjs extends Component
                 'kuota' => $kuota,
                 'selesai_praktek' => $jamselesai . ':00',
             ]);
-            $this->emit('toastr-success', 'Insert OK');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Insert OK');
         } else {
             // update
             DB::table('scmst_scpolis')
@@ -415,7 +428,8 @@ class SetupHfisBpjs extends Component
                     'kuota' => $kuota,
                     'selesai_praktek' => $jamselesai . ':00',
                 ]);
-            $this->emit('toastr-success', 'Update OK');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Update OK');
         }
     }
 

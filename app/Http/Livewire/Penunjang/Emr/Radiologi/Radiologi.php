@@ -56,7 +56,11 @@ class Radiologi extends Component
         //     $this->isOpenRekamMedisRadiologi = true;
         //     $this->rad_pdf_file = $rad_pdf_file;
         // } else {
-        //     $this->emit('toastr-error', 'Hasil Bacaan Radiologi masih dalam Proses');
+        toastr()
+            ->closeOnHover(true)
+            ->closeDuration(3)
+            ->positionClass('toast-top-left')
+            ->addError('Hasil Bacaan Radiologi masih dalam Proses');
         // }
         if ($rad_pdf_file) {
             try {
@@ -65,10 +69,18 @@ class Radiologi extends Component
                 $this->isOpenRekamMedisRadiologi = true;
                 $this->rad_pdf_file = $rad_pdf_file;
             } catch (Exception $e) {
-                $this->emit('toastr-error', 'File tidak ditemukan');
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('File tidak ditemukan');
             }
         } else {
-            $this->emit('toastr-error', 'Hasil Bacaan Radiologi masih dalam Proses');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Hasil Bacaan Radiologi masih dalam Proses');
         }
     }
 
@@ -288,7 +300,8 @@ class Radiologi extends Component
 
         ];
         $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-u-g-d', $data)->output();
-        $this->emit('toastr-success', 'Cetak RM IGD');
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess('Cetak RM IGD');
 
         return response()->streamDownload(
             fn() => print($pdfContent),
@@ -316,7 +329,8 @@ class Radiologi extends Component
 
         ];
         $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-r-j', $data)->output();
-        $this->emit('toastr-success', 'Cetak RM RJ');
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess('Cetak RM RJ');
 
         return response()->streamDownload(
             fn() => print($pdfContent),
@@ -352,7 +366,8 @@ class Radiologi extends Component
 
                 ];
                 $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-r-j', $data)->output();
-                $this->emit('toastr-success', 'Cetak RM RJ');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess('Cetak RM RJ');
 
 
                 return response()->streamDownload(
@@ -374,14 +389,19 @@ class Radiologi extends Component
 
                 ];
                 $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-u-g-d', $data)->output();
-                $this->emit('toastr-success', 'Cetak RM IGD');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess('Cetak RM IGD');
 
                 return response()->streamDownload(
                     fn() => print($pdfContent),
                     "rmUGD.pdf"
                 );
             } else if ($layananStatus === 'RI') {
-                $this->emit('toastr-error', 'Rekam Medis (Rawat Inap) Fitur dalam masa pengembangan');
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Rekam Medis (Rawat Inap) Fitur dalam masa pengembangan');
                 // $this->dataDaftarTxn = $dataDaftarTxn;
 
                 // if (isset($this->dataDaftarTxn['regNo'])) {
@@ -389,7 +409,11 @@ class Radiologi extends Component
                 // }
             }
         } else {
-            $this->emit('toastr-error', 'Data Rekam Medis Tidak di Temukan');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Data Rekam Medis Tidak di Temukan');
         }
     }
 

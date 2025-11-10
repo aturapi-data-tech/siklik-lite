@@ -105,13 +105,16 @@ trait LOVGetPoliFKTPTrait
 
     public function enterMydataGetPoliFKTPLov($id)
     {
-        // $this->checkRjStatus(); //sementara blm bisa dipakai LOV enter daro data JSON
         // jika JK belum siap maka toaster error
         if (isset($this->dataGetPoliFKTPLov[$id]['kdPoli'])) {
             $this->addGetPoliFKTP($this->dataGetPoliFKTPLov[$id]['kdPoli'], $this->dataGetPoliFKTPLov[$id]['nmPoli'], $this->dataGetPoliFKTPLov[$id]['poliSakit']);
             $this->resetdataGetPoliFKTPLov();
         } else {
-            $this->emit('toastr-error', "Kode belum tersedia.");
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Kode belum tersedia.");
             return;
         }
     }

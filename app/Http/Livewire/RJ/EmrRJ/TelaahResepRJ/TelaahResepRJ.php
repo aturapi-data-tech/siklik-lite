@@ -342,7 +342,11 @@ class TelaahResepRJ extends Component
     public function editTelaahResep($eresep, $rjNo, $regNoRef)
     {
         if (!$eresep) {
-            $this->emit('toastr-error', 'E-Resep Tidak ditemukan');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('E-Resep Tidak ditemukan');
         } else {
             $this->openModalEditTelaahResep($rjNo, $regNoRef);
         }

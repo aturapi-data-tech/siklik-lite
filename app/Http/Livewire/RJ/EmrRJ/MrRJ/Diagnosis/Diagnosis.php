@@ -132,7 +132,7 @@ class Diagnosis extends Component
     // LOV selected start
     public function setMydataDiagnosaICD10Lov($id)
     {
-        // $this->checkRjStatus();
+
         $dataDiagnosaICD10Lovs = DB::table('rsmst_mstdiags')->select(
             'diag_id',
             'diag_desc',
@@ -181,7 +181,7 @@ class Diagnosis extends Component
 
     public function enterMydataDiagnosaICD10Lov($id)
     {
-        // $this->checkRjStatus();
+
         // jika JK belum siap maka toaster error
         if (isset($this->dataDiagnosaICD10Lov[$id]['diag_id'])) {
             $this->addDiagnosaICD10($this->dataDiagnosaICD10Lov[$id]['diag_id'], $this->dataDiagnosaICD10Lov[$id]['diag_desc'], $this->dataDiagnosaICD10Lov[$id]['icdx']);
@@ -401,7 +401,7 @@ class Diagnosis extends Component
     // LOV selected start
     public function setMydataProcedureICD9CmLov($id)
     {
-        // $this->checkRjStatus();
+
         $dataProcedureICD9CmLovs = DB::table('rsmst_mstprocedures')->select(
             'proc_id',
             'proc_desc',
@@ -450,7 +450,7 @@ class Diagnosis extends Component
 
     public function enterMydataProcedureICD9CmLov($id)
     {
-        // $this->checkRjStatus();
+
         // jika JK belum siap maka toaster error
         if (isset($this->dataProcedureICD9CmLov[$id]['proc_id'])) {
             $this->addProcedureICD9Cm($this->dataProcedureICD9CmLov[$id]['proc_id'], $this->dataProcedureICD9CmLov[$id]['proc_desc']);
@@ -576,13 +576,7 @@ class Diagnosis extends Component
             return;
         }
 
-        // (opsional) blokir bila RJ sudah pulang
-        $status = DB::scalar("select rj_status from rstxn_rjhdrs where rj_no=:rjNo", ['rjNo' => $rjNo]);
-        if ($status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Pasien sudah pulang. Tidak bisa menyimpan diagnosis/procedure.');
-            return;
-        }
+
 
         $lockKey = "rj:{$rjNo}";
         try {
@@ -631,9 +625,6 @@ class Diagnosis extends Component
             $this->dataDaftarPoliRJ['procedure'] = [];
         }
     }
-
-
-    private function setDataPrimer(): void {}
 
 
 

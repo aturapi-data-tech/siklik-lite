@@ -83,7 +83,7 @@ trait LOVDokterTrait
     // LOV selected start
     public function setMydataDokterLov($id)
     {
-        // $this->checkRjStatus();
+
         $dataDokterLovs = DB::table('rsmst_doctors')
             ->select(
                 'dr_id',
@@ -137,13 +137,17 @@ trait LOVDokterTrait
     public function enterMydataDokterLov($id)
     {
         // dd($this->dataDokterLov);
-        // $this->checkRjStatus();
+
         // jika JK belum siap maka toaster error
         if (isset($this->dataDokterLov[$id]['dr_id'])) {
             $this->addDokter($this->dataDokterLov[$id]['dr_id'], $this->dataDokterLov[$id]['dr_name'], $this->dataDokterLov[$id]['poli_id'], $this->dataDokterLov[$id]['poli_desc'], $this->dataDokterLov[$id]['kd_poli_bpjs'], $this->dataDokterLov[$id]['kd_dr_bpjs']);
             $this->resetdataDokterLov();
         } else {
-            $this->emit('toastr-error', "Kode belum tersedia.");
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Kode belum tersedia.");
             return;
         }
     }

@@ -36,15 +36,24 @@ class FormEntryRefBpjs extends Component
             ) {
                 $this->updateData('Kesadaran', $getKesadaran);
 
-                $this->emit('toastr-success', 'Data Ref Kesadaran BPJS telah diperbarui.');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess('Data Ref Kesadaran BPJS telah diperbarui.');
             } else {
-                $this->emit('toastr-error', 'Data Ref Kesadaran BPJS sekarang sudah akurat dan terbaru');
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Data Ref Kesadaran BPJS sekarang sudah akurat dan terbaru');
             }
 
 
             return;
         } catch (\Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
             return;
         }
     }
@@ -67,15 +76,24 @@ class FormEntryRefBpjs extends Component
                 $getDokter !== []
             ) {
                 $this->updateData('Dokter', $getDokter);
-                $this->emit('toastr-success', 'Data Ref Dokter BPJS telah diperbarui.');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess('Data Ref Dokter BPJS telah diperbarui.');
             } else {
-                $this->emit('toastr-error', 'Data Ref Dokter BPJS sekarang sudah akurat dan terbaru');
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Data Ref Dokter BPJS sekarang sudah akurat dan terbaru');
             }
 
 
             return;
         } catch (\Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
             return;
         }
     }
@@ -100,12 +118,21 @@ class FormEntryRefBpjs extends Component
                 $getAlergi !== []
             ) {
                 $this->updateData('Alergi Makanan', $getAlergi);
-                $this->emit('toastr-success', 'Data Ref Alergi Makanan BPJS telah diperbarui.');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess('Data Ref Alergi Makanan BPJS telah diperbarui.');
             } else {
-                $this->emit('toastr-error', 'Data Ref Alergi Makanan BPJS sekarang sudah akurat dan terbaru');
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Data Ref Alergi Makanan BPJS sekarang sudah akurat dan terbaru');
             }
         } catch (\Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
         }
         //////////////////////////////////
         try {
@@ -123,12 +150,21 @@ class FormEntryRefBpjs extends Component
                 $getAlergi !== []
             ) {
                 $this->updateData('Alergi Udara', $getAlergi);
-                $this->emit('toastr-success', 'Data Ref Alergi Udara BPJS telah diperbarui.');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess('Data Ref Alergi Udara BPJS telah diperbarui.');
             } else {
-                $this->emit('toastr-error', 'Data Ref Alergi Udara BPJS sekarang sudah akurat dan terbaru');
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Data Ref Alergi Udara BPJS sekarang sudah akurat dan terbaru');
             }
         } catch (\Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
         }
         //////////////////////////////////
         try {
@@ -146,12 +182,21 @@ class FormEntryRefBpjs extends Component
                 $getAlergi !== []
             ) {
                 $this->updateData('Alergi Obat', $getAlergi);
-                $this->emit('toastr-success', 'Data Ref Alergi Obat BPJS telah diperbarui.');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess('Data Ref Alergi Obat BPJS telah diperbarui.');
             } else {
-                $this->emit('toastr-error', 'Data Ref Alergi Obat BPJS sekarang sudah akurat dan terbaru');
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Data Ref Alergi Obat BPJS sekarang sudah akurat dan terbaru');
             }
         } catch (\Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
         }
     }
 
@@ -174,15 +219,24 @@ class FormEntryRefBpjs extends Component
                 $getPrognosa !== []
             ) {
                 $this->updateData('Prognosa', $getPrognosa);
-                $this->emit('toastr-success', 'Data Ref Prognosa BPJS telah diperbarui.');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess('Data Ref Prognosa BPJS telah diperbarui.');
             } else {
-                $this->emit('toastr-error', 'Data Ref Prognosa BPJS sekarang sudah akurat dan terbaru');
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Data Ref Prognosa BPJS sekarang sudah akurat dan terbaru');
             }
 
 
             return;
         } catch (\Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
             return;
         }
     }
@@ -205,15 +259,24 @@ class FormEntryRefBpjs extends Component
                 $getPoliFktp !== []
             ) {
                 $this->updateData('PoliFktp', $getPoliFktp);
-                $this->emit('toastr-success', 'Data Ref PoliFktp BPJS telah diperbarui.');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess('Data Ref PoliFktp BPJS telah diperbarui.');
             } else {
-                $this->emit('toastr-error', 'Data Ref PoliFktp BPJS sekarang sudah akurat dan terbaru');
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Data Ref PoliFktp BPJS sekarang sudah akurat dan terbaru');
             }
 
 
             return;
         } catch (\Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
             return;
         }
     }
@@ -237,12 +300,21 @@ class FormEntryRefBpjs extends Component
                 $getStatusPulang !== []
             ) {
                 $this->updateData('Status Pulang RI', $getStatusPulang);
-                $this->emit('toastr-success', 'Data Ref Status Pulang RI BPJS telah diperbarui.');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess('Data Ref Status Pulang RI BPJS telah diperbarui.');
             } else {
-                $this->emit('toastr-error', 'Data Ref Status Pulang RI BPJS sekarang sudah akurat dan terbaru');
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Data Ref Status Pulang RI BPJS sekarang sudah akurat dan terbaru');
             }
         } catch (\Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
         }
 
         try {
@@ -260,12 +332,21 @@ class FormEntryRefBpjs extends Component
                 $getStatusPulang !== []
             ) {
                 $this->updateData('Status Pulang RJ', $getStatusPulang);
-                $this->emit('toastr-success', 'Data Ref Status Pulang RJ BPJS telah diperbarui.');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess('Data Ref Status Pulang RJ BPJS telah diperbarui.');
             } else {
-                $this->emit('toastr-error', 'Data Ref Status Pulang RJ BPJS sekarang sudah akurat dan terbaru');
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Data Ref Status Pulang RJ BPJS sekarang sudah akurat dan terbaru');
             }
         } catch (\Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
         }
     }
 
@@ -291,12 +372,21 @@ class FormEntryRefBpjs extends Component
                 $getProviderRayonisasi !== []
             ) {
                 $this->updateData('Provider', $getProviderRayonisasi);
-                $this->emit('toastr-success', 'Data Ref Provider BPJS telah diperbarui.');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess('Data Ref Provider BPJS telah diperbarui.');
             } else {
-                $this->emit('toastr-error', 'Data Ref Provider BPJS sekarang sudah akurat dan terbaru');
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Data Ref Provider BPJS sekarang sudah akurat dan terbaru');
             }
         } catch (\Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
         }
     }
 
@@ -321,12 +411,21 @@ class FormEntryRefBpjs extends Component
                 $getSarana !== []
             ) {
                 $this->updateData('Sarana', $getSarana);
-                $this->emit('toastr-success', 'Data Ref Sarana BPJS telah diperbarui.');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess('Data Ref Sarana BPJS telah diperbarui.');
             } else {
-                $this->emit('toastr-error', 'Data Ref Sarana BPJS sekarang sudah akurat dan terbaru');
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Data Ref Sarana BPJS sekarang sudah akurat dan terbaru');
             }
         } catch (\Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
         }
     }
 
@@ -348,15 +447,24 @@ class FormEntryRefBpjs extends Component
                 $getSpesialis !== []
             ) {
                 $this->updateData('Spesialis', $getSpesialis);
-                $this->emit('toastr-success', 'Data Ref Spesialis BPJS telah diperbarui.');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess('Data Ref Spesialis BPJS telah diperbarui.');
             } else {
-                $this->emit('toastr-error', 'Data Ref Spesialis BPJS sekarang sudah akurat dan terbaru');
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Data Ref Spesialis BPJS sekarang sudah akurat dan terbaru');
             }
 
 
             return;
         } catch (\Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
             return;
         }
     }

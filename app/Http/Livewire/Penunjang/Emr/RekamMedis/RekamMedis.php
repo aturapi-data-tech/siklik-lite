@@ -276,7 +276,8 @@ class RekamMedis extends Component
 
         ];
         $pdfContent = PDF::loadView('livewire.penunjang.emr.rekam-medis.cetak-rekam-medis-r-j', $data)->output();
-        $this->emit('toastr-success', 'Cetak RM RJ');
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess('Cetak RM RJ');
 
         return response()->streamDownload(
             fn() => print($pdfContent),
@@ -312,7 +313,8 @@ class RekamMedis extends Component
 
                 ];
                 $pdfContent = PDF::loadView('livewire.penunjang.emr.rekam-medis.cetak-rekam-medis-r-j', $data)->output();
-                $this->emit('toastr-success', 'Cetak RM RJ');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess('Cetak RM RJ');
 
 
                 return response()->streamDownload(
@@ -321,7 +323,11 @@ class RekamMedis extends Component
                 );
             }
         } else {
-            $this->emit('toastr-error', 'Data Rekam Medis Tidak di Temukan');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Data Rekam Medis Tidak di Temukan');
         }
     }
 
@@ -354,7 +360,8 @@ class RekamMedis extends Component
 
                 ];
                 $pdfContent = PDF::loadView('livewire.penunjang.emr.rekam-medis.cetak-rekam-medis-r-j-suket-istirahat', $data)->output();
-                $this->emit('toastr-success', 'Cetak Suket Istirahat');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess('Cetak Suket Istirahat');
 
 
                 return response()->streamDownload(
@@ -363,7 +370,11 @@ class RekamMedis extends Component
                 );
             }
         } else {
-            $this->emit('toastr-error', 'Data Rekam Medis Tidak di Temukan');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Data Rekam Medis Tidak di Temukan');
         }
     }
 
@@ -396,7 +407,8 @@ class RekamMedis extends Component
 
                 ];
                 $pdfContent = PDF::loadView('livewire.penunjang.emr.rekam-medis.cetak-rekam-medis-r-j-suket-sehat', $data)->output();
-                $this->emit('toastr-success', 'Cetak Suket Sehat');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess('Cetak Suket Sehat');
 
 
                 return response()->streamDownload(
@@ -405,7 +417,11 @@ class RekamMedis extends Component
                 );
             }
         } else {
-            $this->emit('toastr-error', 'Data Rekam Medis Tidak di Temukan');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Data Rekam Medis Tidak di Temukan');
         }
     }
 

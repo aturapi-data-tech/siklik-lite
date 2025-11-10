@@ -63,7 +63,11 @@ class PostEncounterRJ extends Component
                     return $item['response']['resourceType'] === 'Encounter';
                 })->first();
 
-            $this->emit('toastr-error', 'Data Pasien ' . $dataPasienRJ['regName'] . ' sudah dikirim ke satu sehat dengan EncounterID ' . $EncounterID['response']['resourceID']);
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Data Pasien ' . $dataPasienRJ['regName'] . ' sudah dikirim ke satu sehat dengan EncounterID ' . $EncounterID['response']['resourceID']);
             return;
         }
 
@@ -112,7 +116,11 @@ class PostEncounterRJ extends Component
         $validator = Validator::make($r, $rules, $customErrorMessagesTrait, $attribute);
 
         if ($validator->fails()) {
-            $this->emit('toastr-error', $validator->messages()->all());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($validator->messages()->all());
             return;
         }
 
@@ -167,12 +175,20 @@ class PostEncounterRJ extends Component
             } else {
 
                 // dd($postEncounter->getOriginalContent());
-                $this->emit('toastr-error', json_encode($postEncounter->getOriginalContent(), true));
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError(json_encode($postEncounter->getOriginalContent(), true));
                 return;
             }
         } catch (\Illuminate\Validation\ValidationException $e) {
             // dd($validator->fails());
-            $this->emit('toastr-error', 'Errors "' . $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Errors "' . $e->getMessage());
             return;
         }
     }
@@ -187,7 +203,11 @@ class PostEncounterRJ extends Component
         $attribute = ['nik' => 'NIK', 'regNo' => 'No Rekam Medis'];
         $validator = Validator::make($r, $rules, $customErrorMessagesTrait, $attribute);
         if ($validator->fails()) {
-            $this->emit('toastr-error', $validator->messages()->all());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($validator->messages()->all());
             return;
         }
         // validateNIIK
@@ -200,7 +220,11 @@ class PostEncounterRJ extends Component
 
             // Jika uuid tidak ditemukan
             if (!isset($PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'])) {
-                $this->emit('toastr-error', 'UUID tidak dapat ditemukan.' . $PatientByNIK->getOriginalContent()['metadata']['message']);
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('UUID tidak dapat ditemukan.' . $PatientByNIK->getOriginalContent()['metadata']['message']);
                 return;
             }
 
@@ -216,11 +240,16 @@ class PostEncounterRJ extends Component
             //    updateJson
             $this->updateJsonMasterPasien($regNo, $dataPasien);
 
-            $this->emit('toastr-success', $PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'] . ' / ' . $PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['name'][0]['text']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess($PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'] . ' / ' . $PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['name'][0]['text']);
             return  $PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'];
         } catch (\Illuminate\Validation\ValidationException $e) {
             // dd($validator->fails());
-            $this->emit('toastr-error', 'Errors "' . $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Errors "' . $e->getMessage());
             return;
         }
     }

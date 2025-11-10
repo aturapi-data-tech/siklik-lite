@@ -105,13 +105,17 @@ trait LOVGetKesadaranTrait
 
     public function enterMydataGetKesadaranLov($id)
     {
-        // $this->checkRjStatus(); //sementara blm bisa dipakai LOV enter daro data JSON
+
         // jika JK belum siap maka toaster error
         if (isset($this->dataGetKesadaranLov[$id]['kdPoli'])) {
             $this->addGetKesadaran($this->dataGetKesadaranLov[$id]['kdPoli'], $this->dataGetKesadaranLov[$id]['nmPoli'], $this->dataGetKesadaranLov[$id]['poliSakit']);
             $this->resetdataGetKesadaranLov();
         } else {
-            $this->emit('toastr-error', "Kode belum tersedia.");
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Kode belum tersedia.");
             return;
         }
     }

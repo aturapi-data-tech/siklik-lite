@@ -93,7 +93,7 @@ trait LOVProductTrait
     // LOV selected start
     public function setMydataProductLov($id)
     {
-        // $this->checkRjStatus();
+
         $dataProductLovs = DB::table('tkmst_products')
             ->select(
                 'product_id',
@@ -151,13 +151,17 @@ trait LOVProductTrait
     public function enterMydataProductLov($id)
     {
         // dd($this->dataProductLov);
-        // $this->checkRjStatus();
+
         // jika JK belum siap maka toaster error
         if (isset($this->dataProductLov[$id]['product_id'])) {
             $this->addProduct($this->dataProductLov[$id]['product_id'], $this->dataProductLov[$id]['product_name'], $this->dataProductLov[$id]['sales_price']);
             $this->resetdataProductLov();
         } else {
-            $this->emit('toastr-error', "Kode belum tersedia.");
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Kode belum tersedia.");
             return;
         }
     }

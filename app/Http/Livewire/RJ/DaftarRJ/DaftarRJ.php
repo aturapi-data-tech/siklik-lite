@@ -39,7 +39,11 @@ class DaftarRJ extends Component
             dd($data);
             $this->pendaftaranProvider = isset($data['response']['count']) ? $data : [];
         } catch (\Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
             return;
         }
     }
@@ -83,7 +87,11 @@ class DaftarRJ extends Component
     // dr
     public function setdrRjRef($id, $name): void
     {
-        // $this->emit('toastr-error', $id);
+        toastr()
+            ->closeOnHover(true)
+            ->closeDuration(3)
+            ->positionClass('toast-top-left')
+            ->addError($id);
 
         $this->drRjRef['drId'] = $id;
         $this->drRjRef['drName'] = $name;

@@ -107,7 +107,11 @@ class FormEntryKunjungan extends Component
         try {
             $findData = $this->findDataRJ($id);
             if (isset($findData['errorMessages'])) {
-                $this->emit('toastr-error', $findData['errorMessages']);
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError($findData['errorMessages']);
                 $this->emit('CloseModal');
                 return;
             }
@@ -118,7 +122,11 @@ class FormEntryKunjungan extends Component
             $this->syncDataPrimer();
             $this->rjStatusRef = $this->checkRJStatus($id);
         } catch (Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
             $this->emit('CloseModal');
         }
     }
@@ -196,7 +204,11 @@ class FormEntryKunjungan extends Component
         try {
             $this->validate($this->rules, $this->messages, $this->validationAttributes);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
             $this->validate($this->rules, customErrorMessagesTrait::messages(), $this->validationAttributes);
         }
     }
@@ -252,11 +264,20 @@ class FormEntryKunjungan extends Component
                 $this->editKunjunganBpjs();
             }
             $this->patchJsonKunjungan();
-            $this->emit('toastr-success', 'Data Berhasil disimpan');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Data Berhasil disimpan');
         } catch (LockTimeoutException $e) {
-            $this->emit('toastr-error', 'Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
         } catch (Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
         }
     }
 
@@ -268,7 +289,11 @@ class FormEntryKunjungan extends Component
             $noKunjungan = collect($this->FormEntry['dataKunjungan'])->where('field', 'noKunjungan')->first()['message'] ?? null;
             $this->FormEntry['addKunjungan']['noKunjungan'] = $noKunjungan;
         } else {
-            $this->emit('toastr-error', json_encode($resp, JSON_UNESCAPED_UNICODE));
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError(json_encode($resp, JSON_UNESCAPED_UNICODE));
         }
     }
 
@@ -276,9 +301,14 @@ class FormEntryKunjungan extends Component
     {
         $resp = $this->editKunjungan($this->FormEntry['addKunjungan'])->getOriginalContent();
         if (($resp['metadata']['code'] ?? 0) == 200) {
-            $this->emit('toastr-success', $resp['metadata']['message'] ?? 'Berhasil memperbarui');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess($resp['metadata']['message'] ?? 'Berhasil memperbarui');
         } else {
-            $this->emit('toastr-error', json_encode($resp, JSON_UNESCAPED_UNICODE));
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError(json_encode($resp, JSON_UNESCAPED_UNICODE));
         }
     }
 
@@ -287,16 +317,26 @@ class FormEntryKunjungan extends Component
         try {
             $resp = $this->deleteKunjungan($this->FormEntry['addKunjungan']['noKunjungan'] ?? '')->getOriginalContent();
             if (($resp['metadata']['code'] ?? 0) == 200) {
-                $this->emit('toastr-success', $resp['metadata']['message'] ?? 'Berhasil dihapus');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess($resp['metadata']['message'] ?? 'Berhasil dihapus');
                 unset($this->FormEntry['dataKunjungan'], $this->FormEntry['addKunjungan']);
                 $this->FormEntry['noUrutBpjs'] = null;
                 $this->patchJsonKunjungan();
-                $this->emit('toastr-success', 'Data Berhasil dihapus');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess('Data Berhasil dihapus');
             } else {
-                $this->emit('toastr-error', json_encode($resp, JSON_UNESCAPED_UNICODE));
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError(json_encode($resp, JSON_UNESCAPED_UNICODE));
             }
         } catch (Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
         }
     }
 
@@ -305,9 +345,14 @@ class FormEntryKunjungan extends Component
         if (!isset($this->FormEntry['dataKunjungan'])) {
             unset($this->FormEntry['addKunjungan'], $this->FormEntry['dataKunjungan']);
             $this->patchJsonKunjungan();
-            $this->emit('toastr-success', 'Data Berhasil dihapus');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Data Berhasil dihapus');
         } else {
-            $this->emit('toastr-error', 'Data Kunjungan sudah di buat, anda tidak bisa me-reset data ini');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Data Kunjungan sudah di buat, anda tidak bisa me-reset data ini');
         }
     }
 
@@ -318,12 +363,21 @@ class FormEntryKunjungan extends Component
             if (($resp['metadata']['code'] ?? 0) == 200) {
                 $this->FormEntry['addKunjungan']['nonSpesialis'] = $resp['response']['list'][0]['nonSpesialis'] ?? false;
                 $this->patchJsonKunjungan();
-                $this->emit('toastr-success', 'syncronze nonSpesialis status ok!');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess('syncronze nonSpesialis status ok!');
             } else {
-                $this->emit('toastr-error', json_encode($resp, JSON_UNESCAPED_UNICODE));
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError(json_encode($resp, JSON_UNESCAPED_UNICODE));
             }
         } catch (Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
         }
     }
 
@@ -498,7 +552,11 @@ class FormEntryKunjungan extends Component
         ];
         $validator = Validator::make(['noKartu' => $noKartu], ['noKartu' => 'required|numeric|digits:13'], $messages);
         if ($validator->fails()) {
-            $this->emit('toastr-error', $validator->errors()->first());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($validator->errors()->first());
             return;
         }
 
@@ -515,7 +573,11 @@ class FormEntryKunjungan extends Component
         ];
         $validator = Validator::make(['noRujukan' => $noRujukan], ['noRujukan' => 'required|string|size:19'], $messages);
         if ($validator->fails()) {
-            $this->emit('toastr-error', $validator->errors()->first());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($validator->errors()->first());
             return;
         }
 

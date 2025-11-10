@@ -6,15 +6,7 @@ use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-// use Carbon\Carbon;
-// use Illuminate\Support\Facades\Validator;
 
-
-// use App\Http\Traits\customErrorMessagesTrait;
-
-// use Illuminate\Support\Str;
-// use Spatie\ArrayToXml\ArrayToXml;
-// use Exception;
 
 
 class RadiologiRJ extends Component
@@ -55,21 +47,6 @@ class RadiologiRJ extends Component
         } else {
 
             $this->dataDaftarPoliRJ['rjRad'] = [];
-        }
-    }
-
-
-
-    public function checkRjStatus()
-    {
-        $lastInserted = DB::table('rstxn_rjhdrs')
-            ->select('rj_status')
-            ->where('rj_no', $this->rjNoRef)
-            ->first();
-
-        if ($lastInserted->rj_status !== 'A') {
-            $this->emit('toastr-error', "Pasien Sudah Pulang, Trasaksi Terkunci.");
-            return (dd('Pasien Sudah Pulang, Trasaksi Terkuncixx.'));
         }
     }
 

@@ -67,7 +67,7 @@ class EresepRJ extends Component
 
     public function insertProduct(): void
     {
-        if (!$this->checkRjStatus()) return;
+        if (!$this->checkRjStatus($this->rjNoRef)) return;
 
         $rules = [
             'formEntryResepNonRacikan.productId'     => 'bail|required',
@@ -195,7 +195,8 @@ class EresepRJ extends Component
 
     public function updateProduct($rjobat_dtl, $qty = null, $signaX = null, $signaHari = null, $catatanKhusus = null): void
     {
-        if (!$this->checkRjStatus()) return;
+        if (!$this->checkRjStatus($this->rjNoRef)) return;
+
 
         $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef ?? null;
         if (!$rjNo) {
@@ -296,7 +297,8 @@ class EresepRJ extends Component
 
     public function removeProduct($rjObatDtl)
     {
-        if (!$this->checkRjStatus()) return;
+        if (!$this->checkRjStatus($this->rjNoRef)) return;
+
 
         $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef ?? null;
         if (!$rjNo) {
@@ -407,29 +409,6 @@ class EresepRJ extends Component
             $this->dataDaftarPoliRJ['eresep'] = [];
         }
     }
-
-    ////////////////////////////////////////////////
-    // Guard ringan untuk UI
-    ////////////////////////////////////////////////
-    public function checkRjStatus(): bool
-    {
-        $row = DB::table('rstxn_rjhdrs')
-            ->select('rj_status')
-            ->where('rj_no', $this->rjNoRef)
-            ->first();
-
-        if (!$row || $row->rj_status !== 'A') {
-            toastr()
-                ->closeOnHover(true)
-                ->closeDuration(3)
-                ->positionClass('toast-top-left')
-                ->addError('Pasien Sudah Pulang, Transaksi Terkunci.');
-            return false;
-        }
-        return true;
-    }
-
-
 
     private function syncDataFormEntry(): void
     {

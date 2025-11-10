@@ -48,7 +48,11 @@ class CetakSuratRujukan extends Component
                 "surat-rujukan.pdf"
             );
         } else {
-            $this->emit('toastr-error', 'No Rujukan Tidak Ditemukan');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('No Rujukan Tidak Ditemukan');
         }
     }
 

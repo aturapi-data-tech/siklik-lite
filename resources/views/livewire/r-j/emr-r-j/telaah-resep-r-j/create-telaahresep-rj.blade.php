@@ -4,6 +4,9 @@
         $disabledPropertyRjStatusResep = isset($dataDaftarPoliRJ['telaahResep']['penanggungJawab']) ? true : false;
         $disabledPropertyRjStatusObat = isset($dataDaftarPoliRJ['telaahObat']['penanggungJawab']) ? true : false;
 
+        $eresep = collect($dataDaftarPoliRJ['eresep'] ?? [])->count();
+        $eresepRacikan = collect($dataDaftarPoliRJ['eresepRacikan'] ?? [])->count();
+
     @endphp
 
     <div class="">
@@ -75,7 +78,6 @@
                                                 class="inline-block p-2 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
                                                 x-on:click="activeTabRacikanNonRacikan ='{{ $EmrM['ermMenuId'] }}'"
                                                 wire:click="$set('activeTabRacikanNonRacikan', '{{ $EmrM['ermMenuId'] }}')">{{ $EmrM['ermMenuName'] }}
-
                                                 @if ($EmrM['ermMenuId'] === 'NonRacikan')
                                                     @if ($eresep)
                                                         <span

@@ -43,7 +43,11 @@ class PostEncounterRJAll extends Component
         $validator = Validator::make($r, $rules, $customErrorMessagesTrait, $attribute);
 
         if ($validator->fails()) {
-            $this->emit('toastr-error', $validator->messages()->all());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($validator->messages()->all());
             return;
         }
         ///////////////////////
@@ -64,7 +68,11 @@ class PostEncounterRJAll extends Component
         ///////////////////////
 
         if ($dataDaftarPoliRJDate->isEmpty()) {
-            $this->emit('toastr-error', 'Tidak ada data yang diproses');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Tidak ada data yang diproses');
             return;
         }
         ///////////////////////
@@ -91,7 +99,11 @@ class PostEncounterRJAll extends Component
                         return $item['response']['resourceType'] === 'Encounter';
                     })->first();
 
-                $this->emit('toastr-error', 'Data Pasien ' . $dataPasienRJ['regName'] . ' sudah dikirim ke satu sehat dengan EncounterID ' . $EncounterID['response']['resourceID']);
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Data Pasien ' . $dataPasienRJ['regName'] . ' sudah dikirim ke satu sehat dengan EncounterID ' . $EncounterID['response']['resourceID']);
                 return;
             }
         }
@@ -133,7 +145,11 @@ class PostEncounterRJAll extends Component
         $validator = Validator::make($r, $rules, $customErrorMessagesTrait, $attribute);
 
         if ($validator->fails()) {
-            $this->emit('toastr-error', $validator->messages()->all());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($validator->messages()->all());
             return;
         }
 
@@ -190,12 +206,20 @@ class PostEncounterRJAll extends Component
             } else {
 
                 // dd($postEncounter->getOriginalContent());
-                $this->emit('toastr-error', json_encode($postEncounter->getOriginalContent(), true));
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError(json_encode($postEncounter->getOriginalContent(), true));
                 return;
             }
         } catch (\Illuminate\Validation\ValidationException $e) {
             // dd($validator->fails());
-            $this->emit('toastr-error', 'Errors "' . $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Errors "' . $e->getMessage());
             return;
         }
     }

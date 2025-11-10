@@ -111,7 +111,7 @@ class JasaDokterRJ extends Component
 
     public function setMydataJasaDokterLov($id)
     {
-        if (!$this->checkRjStatus()) return;
+        if (!$this->checkRjStatus($this->rjNoRef)) return;
         $row = DB::table('rsmst_accdocs')
             ->select('accdoc_id', 'accdoc_desc', 'accdoc_price')
             ->where('active_status', '1')
@@ -154,13 +154,17 @@ class JasaDokterRJ extends Component
 
     public function enterMydataJasaDokterLov($id)
     {
-        if (!$this->checkRjStatus()) return;
+        if (!$this->checkRjStatus($this->rjNoRef)) return;
         if (isset($this->dataJasaDokterLov[$id]['accdoc_id'])) {
             $row = $this->dataJasaDokterLov[$id];
             $this->setJDFromLov($row['accdoc_id'], $row['accdoc_desc'], $row['accdoc_price']);
             $this->resetdataJasaDokterLov();
         } else {
-            $this->emit('toastr-error', 'Jasa Dokter belum tersedia.');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Jasa Dokter belum tersedia.');
         }
     }
 
@@ -169,7 +173,7 @@ class JasaDokterRJ extends Component
     ////////////////////////////////////////////////
     public function insertJasaDokter(): void
     {
-        if (!$this->checkRjStatus()) return;
+        if (!$this->checkRjStatus($this->rjNoRef)) return;
 
         $rules = [
             'formEntryJasaDokter.JasaDokterId'    => 'bail|required|exists:rsmst_accdocs,accdoc_id',
@@ -257,7 +261,7 @@ class JasaDokterRJ extends Component
 
     public function removeJasaDokter($rjaccdocDtl): void
     {
-        if (!$this->checkRjStatus()) return;
+        if (!$this->checkRjStatus($this->rjNoRef)) return;
 
         $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef ?? null;
         if (!$rjNo) {
@@ -501,24 +505,6 @@ class JasaDokterRJ extends Component
                 $this->dataDaftarPoliRJ[$key] = [];
             }
         }
-    }
-
-    ////////////////////////////////////////////////
-    // Guard ringan untuk UI
-    ////////////////////////////////////////////////
-    public function checkRjStatus(): bool
-    {
-        $row = DB::table('rstxn_rjhdrs')
-            ->select('rj_status')
-            ->where('rj_no', $this->rjNoRef)
-            ->first();
-
-        if (!$row || $row->rj_status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Pasien Sudah Pulang, Transaksi Terkunci.');
-            return false;
-        }
-        return true;
     }
 
     ////////////////////////////////////////////////

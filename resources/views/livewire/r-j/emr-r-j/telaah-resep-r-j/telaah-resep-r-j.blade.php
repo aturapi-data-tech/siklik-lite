@@ -212,10 +212,7 @@
 
                         @endphp
 
-
                         <tr class="border-b group ">
-
-
                             <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
                                 <div class="">
                                     <div class="font-semibold text-primary">

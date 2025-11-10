@@ -79,7 +79,8 @@ class EresepRJRacikan extends Component
 
     public function insertProduct(): void
     {
-        if (!$this->checkRjStatus()) return;
+        if (!$this->checkRjStatus($this->rjNoRef)) return;
+
 
         $rules = [
             'formEntryRacikan.productId'     => 'bail|required',
@@ -192,7 +193,8 @@ class EresepRJRacikan extends Component
 
     public function updateProduct($rjobat_dtl, $dosis = null, $qty = null, $catatan = null, $catatanKhusus = null): void
     {
-        if (!$this->checkRjStatus()) return;
+        if (!$this->checkRjStatus($this->rjNoRef)) return;
+
         $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef;
         if (!$rjNo) {
             toastr()->closeOnHover(true)->closeDuration(3)->addError('Nomor RJ kosong.');
@@ -249,7 +251,8 @@ class EresepRJRacikan extends Component
 
     public function removeProduct($rjObatDtl): void
     {
-        if (!$this->checkRjStatus()) return;
+        if (!$this->checkRjStatus($this->rjNoRef)) return;
+
 
         $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef;
         if (!$rjNo) {
@@ -325,15 +328,6 @@ class EresepRJRacikan extends Component
         }
     }
 
-    public function checkRjStatus(): bool
-    {
-        $status = DB::table('rstxn_rjhdrs')->where('rj_no', $this->rjNoRef)->value('rj_status');
-        if ($status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->addError('Pasien Sudah Pulang, Transaksi Terkunci.');
-            return false;
-        }
-        return true;
-    }
 
     public function resetformEntryRacikan()
     {

@@ -73,7 +73,11 @@ class FormEntryPoli extends Component
                 ];
             } else {
 
-                $this->emit('toastr-error', "Data tidak ditemukan.");
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError("Data tidak ditemukan.");
                 $this->FormEntryPoli = [
                     'poliId' => null,
                     'poliDesc' => null,
@@ -82,7 +86,11 @@ class FormEntryPoli extends Component
                 ];
             }
         } catch (Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
             $this->FormEntryPoli = [
                 'poliId' => null,
                 'poliDesc' => null,
@@ -107,7 +115,8 @@ class FormEntryPoli extends Component
                 'poli_uuid' => isset($this->FormEntryPoli['poliUuid']) ? $this->FormEntryPoli['poliUuid'] : ''
             ]);
 
-        $this->emit('toastr-success', "Data berhasil diupdate.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("Data berhasil diupdate.");
     }
 
     private function insert(): void
@@ -121,7 +130,8 @@ class FormEntryPoli extends Component
                 'poli_uuid' => isset($this->FormEntryPoli['poliUuid']) ? $this->FormEntryPoli['poliUuid'] : ''
             ]);
 
-        $this->emit('toastr-success', "Data berhasil dimasukkan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("Data berhasil dimasukkan.");
     }
 
     public function store()
@@ -167,7 +177,11 @@ class FormEntryPoli extends Component
             $this->FormEntryPoli['poliUuid'] = $mylocation->getOriginalContent()['response']['id'];
             $this->store();
         } else {
-            $this->emit('toastr-error', $mylocation->getOriginalContent()['metadata']['message']);
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($mylocation->getOriginalContent()['metadata']['message']);
             return;
         }
     }
@@ -193,7 +207,11 @@ class FormEntryPoli extends Component
 
             $this->validate($this->rules, customErrorMessagesTrait::messages());
         } catch (\Illuminate\Validation\ValidationException $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($e->getMessage());
             $this->validate($this->rules, customErrorMessagesTrait::messages());
         }
     }

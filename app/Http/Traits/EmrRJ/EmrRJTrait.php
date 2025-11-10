@@ -249,18 +249,22 @@ trait EmrRJTrait
         }
     }
 
-    protected  function checkRJStatus($rjNo): bool
+    public function checkRjStatus($rjNo): bool
     {
-        $lastInserted = DB::table('rstxn_rjhdrs')
+        $row = DB::table('rstxn_rjhdrs')
             ->select('rj_status')
-            ->where('rj_no', '=', $rjNo)
+            ->where('rj_no', $rjNo)
             ->first();
 
-        if ($lastInserted->rj_status !== 'A') {
-            return true;
+        if (!$row || $row->rj_status !== 'A') {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Pasien Sudah Pulang, Transaksi Terkunci.');
+            return false;
         }
-        return false;
+        return true;
     }
+
+
 
     public static function updateJsonRJ(string $rjNo, array $rjArr): void
     {
