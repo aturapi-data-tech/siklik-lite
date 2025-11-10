@@ -181,6 +181,7 @@
 
                             $eresep = isset($datadaftar_json['eresep']);
                             $eresepRacikan = isset($datadaftar_json['eresepRacikan']);
+                            $jenis = $eresepRacikan ? 'racikan' : 'non racikan';
 
                             if ($eresep || $eresepRacikan) {
                                 $prosentaseEResep = 100;
@@ -281,6 +282,10 @@
                                         <x-badge :badgecolor="__($badgecolorEresep)">
                                             E-Resep: {{ $prosentaseEResep . '%' }}
                                         </x-badge>
+                                        <x-badge :badgecolor="$jenis === 'racikan' ? 'default' : 'green'">
+                                            {{ $jenis }}
+                                        </x-badge>
+
                                     </div>
 
                                     <div>
