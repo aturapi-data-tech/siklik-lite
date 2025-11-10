@@ -69,16 +69,16 @@ class EresepRJ extends Component
     {
         if (!$this->checkRjStatus()) return;
 
-        // Validasi draft
         $rules = [
-            'formEntryResepNonRacikan.productId'    => 'bail|required',
-            'formEntryResepNonRacikan.productName'  => 'bail|required',
-            'formEntryResepNonRacikan.signaX'       => 'bail|required',
-            'formEntryResepNonRacikan.signaHari'    => 'bail|required',
-            'formEntryResepNonRacikan.qty'          => 'bail|required|integer|min:1|max:999',
-            'formEntryResepNonRacikan.productPrice' => 'bail|required|numeric|min:0',
+            'formEntryResepNonRacikan.productId'     => 'bail|required',
+            'formEntryResepNonRacikan.productName'   => 'bail|required',
+            'formEntryResepNonRacikan.signaX'        => 'bail|required|string|min:1|max:25',
+            'formEntryResepNonRacikan.signaHari'     => 'bail|required|string|min:1|max:25',
+            'formEntryResepNonRacikan.qty'           => 'bail|required|integer|min:1|max:999',
+            'formEntryResepNonRacikan.productPrice'  => 'bail|required|numeric|min:0',
             'formEntryResepNonRacikan.catatanKhusus' => 'bail|nullable|string',
         ];
+
         $messages = [
             // productId
             'formEntryResepNonRacikan.productId.required' => ':attribute wajib diisi.',
@@ -88,9 +88,15 @@ class EresepRJ extends Component
 
             // signaX
             'formEntryResepNonRacikan.signaX.required' => ':attribute wajib diisi.',
+            'formEntryResepNonRacikan.signaX.string'   => ':attribute harus berupa teks.',
+            'formEntryResepNonRacikan.signaX.min'      => ':attribute minimal :min karakter.',
+            'formEntryResepNonRacikan.signaX.max'      => ':attribute maksimal :max karakter.',
 
             // signaHari
             'formEntryResepNonRacikan.signaHari.required' => ':attribute wajib diisi.',
+            'formEntryResepNonRacikan.signaHari.string'   => ':attribute harus berupa teks.',
+            'formEntryResepNonRacikan.signaHari.min'      => ':attribute minimal :min karakter.',
+            'formEntryResepNonRacikan.signaHari.max'      => ':attribute maksimal :max karakter.',
 
             // qty
             'formEntryResepNonRacikan.qty.required' => ':attribute wajib diisi.',
@@ -111,12 +117,14 @@ class EresepRJ extends Component
             'formEntryResepNonRacikan.productId'     => 'ID Obat',
             'formEntryResepNonRacikan.productName'   => 'Nama Obat',
             'formEntryResepNonRacikan.signaX'        => 'Signa (kali sehari)',
-            'formEntryResepNonRacikan.signaHari'     => 'Lama hari pemakaian',
-            'formEntryResepNonRacikan.qty'           => 'Jumlah obat',
-            'formEntryResepNonRacikan.productPrice'  => 'Harga satuan',
-            'formEntryResepNonRacikan.catatanKhusus' => 'Catatan khusus',
+            'formEntryResepNonRacikan.signaHari'     => 'Signa (lama hari pemakaian)',
+            'formEntryResepNonRacikan.qty'           => 'Jumlah Obat',
+            'formEntryResepNonRacikan.productPrice'  => 'Harga Satuan',
+            'formEntryResepNonRacikan.catatanKhusus' => 'Catatan Khusus',
         ];
+
         $this->validate($rules, $messages, $attributes);
+
 
         $rjNo = $this->dataDaftarPoliRJ['rjNo'] ?? $this->rjNoRef ?? null;
         if (!$rjNo) {

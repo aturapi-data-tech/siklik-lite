@@ -86,17 +86,30 @@ class EresepRJRacikan extends Component
             'formEntryRacikan.productName'   => 'bail|required',
             'formEntryRacikan.dosis'         => 'bail|required|max:150',
             'formEntryRacikan.qty'           => 'bail|nullable|digits_between:1,3',
-            'formEntryRacikan.signaX'        => 'nullable',
-            'formEntryRacikan.signaHari'     => 'nullable',
+            'formEntryRacikan.signaX'        => 'bail|nullable|string|min:1|max:25',
+            'formEntryRacikan.signaHari'     => 'bail|nullable|string|min:1|max:25',
             'formEntryRacikan.productPrice'  => 'bail|numeric|min:0',
             'formEntryRacikan.catatan'       => 'bail|nullable|max:150',
             'formEntryRacikan.catatanKhusus' => 'bail|nullable|max:150',
         ];
 
         $messages = [
+            // productId
             'formEntryRacikan.productId.required'   => 'ID Obat wajib diisi.',
+            // productName
             'formEntryRacikan.productName.required' => 'Nama obat wajib diisi.',
+            // dosis
             'formEntryRacikan.dosis.required'       => 'Dosis wajib diisi.',
+
+            // signaX
+            'formEntryRacikan.signaX.string' => ':attribute harus berupa teks.',
+            'formEntryRacikan.signaX.min'    => ':attribute minimal :min karakter.',
+            'formEntryRacikan.signaX.max'    => ':attribute maksimal :max karakter.',
+
+            // signaHari
+            'formEntryRacikan.signaHari.string' => ':attribute harus berupa teks.',
+            'formEntryRacikan.signaHari.min'    => ':attribute minimal :min karakter.',
+            'formEntryRacikan.signaHari.max'    => ':attribute maksimal :max karakter.',
         ];
 
         $attributes = [
