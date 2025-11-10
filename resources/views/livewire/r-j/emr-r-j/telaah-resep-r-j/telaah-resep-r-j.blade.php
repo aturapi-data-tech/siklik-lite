@@ -179,9 +179,14 @@
                         @php
                             $datadaftar_json = json_decode($myQData->datadaftarpolirj_json, true);
 
-                            $eresep = isset($datadaftar_json['eresep']) ? 1 : 0;
+                            $eresep = isset($datadaftar_json['eresep']);
+                            $eresepRacikan = isset($datadaftar_json['eresepRacikan']);
 
-                            $prosentaseEMR = ($eresep / 1) * 100;
+                            if ($eresep || $eresepRacikan) {
+                                $prosentaseEResep = 100;
+                            } else {
+                                $prosentaseEResep = 0;
+                            }
 
                             $badgecolorStatus = isset($myQData->rj_status)
                                 ? ($myQData->rj_status === 'A'
@@ -195,7 +200,7 @@
                                                 : 'default'))))
                                 : '';
 
-                            $badgecolorEresep = $eresep ? 'green' : 'red';
+                            $badgecolorEresep = $prosentaseEResep ? 'green' : 'red';
 
                             $badgecolorKlaim =
                                 $myQData->klaim_id == 'UM'
@@ -274,7 +279,7 @@
                                                 : '' }}
                                         </x-badge>
                                         <x-badge :badgecolor="__($badgecolorEresep)">
-                                            E-Resep: {{ $prosentaseEMR . '%' }}
+                                            E-Resep: {{ $prosentaseEResep . '%' }}
                                         </x-badge>
                                     </div>
 
@@ -313,7 +318,7 @@
                                 <div class="grid grid-cols-2 gap-2">
 
                                     <x-light-button
-                                        wire:click="editTelaahResep('{{ $eresep }}','{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Telaah
+                                        wire:click="editTelaahResep('{{ $prosentaseEResep }}','{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Telaah
                                         Resep</x-light-button>
                                     <x-green-button
                                         wire:click="editAdministrasi('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Admin
