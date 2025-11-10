@@ -246,7 +246,7 @@ class FormEntryDaftarRJ extends Component
 
             $this->FormEntry = $res['dataDaftarRJ'];
             $this->syncDataPrimer();
-            $this->rjStatusRef = (bool) $this->checkRJStatus($id);
+            $this->rjStatusRef = (bool) $this->checkRJStatus($id) ? false : true;
         } catch (\Throwable $e) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
                 ->addError('Gagal memuat data: ' . $e->getMessage());

@@ -5,11 +5,9 @@ namespace App\Http\Livewire\RJ\DaftarRJ;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use App\Http\Traits\BPJS\PcareTrait;
 
-use App\Http\Traits\customErrorMessagesTrait;
 
 class DaftarRJ extends Component
 {

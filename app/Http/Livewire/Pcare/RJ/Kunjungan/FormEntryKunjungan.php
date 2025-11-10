@@ -120,7 +120,7 @@ class FormEntryKunjungan extends Component
             $this->displayPasien  = $this->findDataMasterPasien($this->FormEntry['regNo']);
 
             $this->syncDataPrimer();
-            $this->rjStatusRef = $this->checkRJStatus($id);
+            $this->rjStatusRef = (bool) $this->checkRJStatus($id) ? false : true;
         } catch (Exception $e) {
             toastr()
                 ->closeOnHover(true)
@@ -363,8 +363,8 @@ class FormEntryKunjungan extends Component
             if (($resp['metadata']['code'] ?? 0) == 200) {
                 $this->FormEntry['addKunjungan']['nonSpesialis'] = $resp['response']['list'][0]['nonSpesialis'] ?? false;
                 $this->patchJsonKunjungan();
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                    ->addSuccess('syncronze nonSpesialis status ok!');
+                // toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                //     ->addSuccess('syncronze nonSpesialis status ok!');
             } else {
                 toastr()
                     ->closeOnHover(true)

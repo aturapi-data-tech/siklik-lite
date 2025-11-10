@@ -135,11 +135,11 @@ class DisplayPasien extends Component
                     ->addError("Data Klaim tidak ditemukan, Reset Data Ke UMUM");
             }
             // if (!isset($this->dataDaftarPoliRJ['kunjunganId'])) {
-            toastr()
-                ->closeOnHover(true)
-                ->closeDuration(3)
-                ->positionClass('toast-top-left')
-                ->addError("Data Kunjungan tidak ditemukan, Reset Data Ke FKTP");
+            // toastr()
+            //     ->closeOnHover(true)
+            //     ->closeDuration(3)
+            //     ->positionClass('toast-top-left')
+            //     ->addError("Data Kunjungan tidak ditemukan, Reset Data Ke FKTP");
             // }
         } else {
 
