@@ -656,6 +656,13 @@ class AssessmentDokterPemeriksaan extends Component
             return;
         }
 
+        if (!$this->checkRjStatus($this->rjNoRef)) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Data pasien terkunci, pasien sudah pulang.');
+            return;
+        }
+
+
         $sql = "select rj_status from rstxn_rjhdrs where rj_no=:rjNo";
         $checkStatusRJ = DB::scalar($sql, ["rjNo" => $rjNo]);
 
@@ -835,6 +842,12 @@ class AssessmentDokterPemeriksaan extends Component
                 ->addError('Nomor RJ kosong.');
             return;
         }
+        if (!$this->checkRjStatus($this->rjNoRef)) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Data pasien terkunci, pasien sudah pulang.');
+            return;
+        }
+
 
         $sql = "select rj_status from rstxn_rjhdrs where rj_no=:rjNo";
         $checkStatusRJ = DB::scalar($sql, ["rjNo" => $rjNo]);

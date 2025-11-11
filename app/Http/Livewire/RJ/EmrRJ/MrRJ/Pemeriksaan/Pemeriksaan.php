@@ -655,6 +655,14 @@ class Pemeriksaan extends Component
             return;
         }
 
+        if (!$this->checkRjStatus($this->rjNoRef)) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Data pasien terkunci, pasien sudah pulang.');
+            return;
+        }
+
+
+
         $sql = "select rj_status from rstxn_rjhdrs where rj_no=:rjNo";
         $checkStatusRJ = DB::scalar($sql, ["rjNo" => $rjNo]);
 
@@ -734,11 +742,11 @@ class Pemeriksaan extends Component
                             $checkupDtl = DB::scalar($sql);
 
                             DB::table('lbtxn_checkupdtls')->insert([
-                                'clabitem_id' => $item->clabitem_id,
+                                'clabitem_id' => $items->clabitem_id,
                                 'checkup_no' => $checkupNo,
                                 'checkup_dtl' => $checkupDtl,
-                                'lab_item_code' => $item->item_code,
-                                'price' => $item->price
+                                'lab_item_code' => $items->item_code,
+                                'price' => $items->price
                             ]);
                         }
                     }
@@ -834,6 +842,12 @@ class Pemeriksaan extends Component
                 ->addError('Nomor RJ kosong.');
             return;
         }
+        if (!$this->checkRjStatus($this->rjNoRef)) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Data pasien terkunci, pasien sudah pulang.');
+            return;
+        }
+
 
         $sql = "select rj_status from rstxn_rjhdrs where rj_no=:rjNo";
         $checkStatusRJ = DB::scalar($sql, ["rjNo" => $rjNo]);
