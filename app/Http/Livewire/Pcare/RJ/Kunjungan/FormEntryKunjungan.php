@@ -187,7 +187,8 @@ class FormEntryKunjungan extends Component
             $this->FormEntry['addKunjungan']['alasanTacc'] = null;
 
             $this->FormEntry['addKunjungan']['nonSpesialis'] = $this->FormEntry['addKunjungan']['nonSpesialis'] ?? false;
-            $this->getDiagnosaBpjs();
+            // offkandulu untuk production bpjs
+            // $this->getDiagnosaBpjs();
         }
     }
 

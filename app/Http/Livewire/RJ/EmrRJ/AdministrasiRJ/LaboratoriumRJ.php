@@ -20,7 +20,9 @@ use Exception;
 class LaboratoriumRJ extends Component
 {
     use WithPagination;
-
+    protected $listeners = [
+        'rj:refresh-data-admin' => 'mount'
+    ];
 
 
 

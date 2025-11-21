@@ -15,7 +15,9 @@ use App\Http\Traits\EmrRJ\EmrRJTrait;
 class LainLainRJ extends Component
 {
     use WithPagination, EmrRJTrait;
-
+    protected $listeners = [
+        'rj:refresh-data-admin' => 'mount'
+    ];
     //////////////////////////////
     // Refs & State
     //////////////////////////////
@@ -223,6 +225,7 @@ class LainLainRJ extends Component
 
             $this->store();
             $this->emit('rj:refresh-summary');
+            $this->emit('rj:refresh-data-admin');
             $this->reset(['formEntryLainLain']);
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Lain-Lain ditambahkan.');
         } catch (LockTimeoutException $e) {
@@ -263,6 +266,7 @@ class LainLainRJ extends Component
 
             $this->store();
             $this->emit('rj:refresh-summary');
+            $this->emit('rj:refresh-data-admin');
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Lain-Lain dihapus.');
         } catch (LockTimeoutException $e) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');

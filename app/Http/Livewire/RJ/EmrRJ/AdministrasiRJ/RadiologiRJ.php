@@ -12,7 +12,9 @@ use Livewire\WithPagination;
 class RadiologiRJ extends Component
 {
     use WithPagination;
-
+    protected $listeners = [
+        'rj:refresh-data-admin' => 'mount'
+    ];
 
 
 

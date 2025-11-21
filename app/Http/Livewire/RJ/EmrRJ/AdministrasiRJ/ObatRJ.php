@@ -20,7 +20,9 @@ use Livewire\WithPagination;
 class ObatRJ extends Component
 {
     use WithPagination;
-
+    protected $listeners = [
+        'rj:refresh-data-admin' => 'mount'
+    ];
 
 
 

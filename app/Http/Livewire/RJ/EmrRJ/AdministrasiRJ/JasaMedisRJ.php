@@ -17,6 +17,10 @@ class JasaMedisRJ extends Component
 {
     use EmrRJTrait;
 
+    protected $listeners = [
+        'rj:refresh-data-admin' => 'mount'
+    ];
+
     ////////////////////////////////////////////////
     // Refs & State
     ////////////////////////////////////////////////
@@ -306,6 +310,7 @@ class JasaMedisRJ extends Component
             // Simpan JSON besar sekali jalan (PATCH JM + LainLain saja)
             $this->store();
             $this->emit('rj:refresh-summary');
+            $this->emit('rj:refresh-data-admin');
 
             $this->reset(['formEntryJasaMedis']);
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
@@ -363,6 +368,7 @@ class JasaMedisRJ extends Component
 
             $this->store();
             $this->emit('rj:refresh-summary');
+            $this->emit('rj:refresh-data-admin');
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
                 ->addSuccess('Jasa Medis dihapus.');
         } catch (LockTimeoutException $e) {

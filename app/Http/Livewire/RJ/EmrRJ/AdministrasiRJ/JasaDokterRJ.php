@@ -16,7 +16,9 @@ use App\Http\Traits\customErrorMessagesTrait;
 class JasaDokterRJ extends Component
 {
     use EmrRJTrait;
-
+    protected $listeners = [
+        'rj:refresh-data-admin' => 'mount'
+    ];
 
     ////////////////////////////////////////////////
     // Refs & State
@@ -249,6 +251,7 @@ class JasaDokterRJ extends Component
 
             $this->store();
             $this->emit('rj:refresh-summary');
+            $this->emit('rj:refresh-data-admin');
             $this->reset(['formEntryJasaDokter']);
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Jasa Dokter ditambahkan.');
         } catch (LockTimeoutException $e) {
@@ -298,6 +301,7 @@ class JasaDokterRJ extends Component
 
             $this->store();
             $this->emit('rj:refresh-summary');
+            $this->emit('rj:refresh-data-admin');
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Jasa Dokter dihapus.');
         } catch (LockTimeoutException $e) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
