@@ -1,6 +1,6 @@
 <div x-data @click.outside="$wire.faskesRujukanLovStatus = false" class="absolute">
 
-    @if ($faskesRujukanLovStatus)
+    @if ($faskesRujukanLovStatus ?? false)
         <!-- Dropdown list Title -->
 
 
