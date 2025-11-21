@@ -32,7 +32,7 @@
         {{-- surat keterangan istirahat isi --}}
         <div>
             <div>
-                <table class="w-full table-auto">
+                {{-- <table class="w-full table-auto">
                     <tbody>
                         <tr>
                             <td class="text-xs text-center border-2 border-black ">
@@ -45,7 +45,6 @@
                                 {!! $myQueryIdentitas->int_city . '</br>' !!}
                                 {!! $myQueryIdentitas->int_phone1 . '-' !!}
                                 {!! $myQueryIdentitas->int_phone2 . '' !!}
-                                {{-- {!! $myQueryIdentitas->int_fax . '-' !!} --}}
                             </td>
                         </tr>
 
@@ -55,11 +54,36 @@
                             </td>
                         </tr>
                     </tbody>
+                </table> --}}
+
+                <table class="w-full mb-4 table-auto">
+                    <tr>
+                        <td class="w-2/3 align-top"></td>
+
+                        <td class="w-1/3 text-right align-top">
+                            <img src="madinahlogopersegi.png" class="object-fill ml-auto h-28">
+                            <div class="mt-1 text-xs leading-tight text-right">
+                                <span class="text-sm font-semibold">Klinik Madinah Pratama</span><br>
+                                Jalan Jatiwayang Lk 2 Ds Ngunut<br>
+                                Kec Ngunut, Kab Tulungagung<br>
+                                Jawa Timur 66292<br>
+                                Telp. 0813-8785-9218<br>
+                                Fax. (0355) 396824<br>
+                                klinikmadinahpratama@gmail.com
+                            </div>
+                        </td>
+                    </tr>
                 </table>
+
             </div>
             <div class="">
                 <table class="w-full table-auto ">
                     <tbody>
+                        <tr>
+                            <td class="p-2 m-2 text-lg font-semibold text-center uppercase ">
+                                surat keterangan istirahat
+                            </td>
+                        </tr>
                         <tr>
                             <td class="p-2 m-2 text-sm text-start">
                                 <p>
