@@ -806,7 +806,7 @@ class TelaahResepRJ extends Component
 
                 // 3) Flag transaksi selesai: 1 jika sudah ada eresep + administrasirj
                 // flag masing-masing
-                $hasEresep             = isset($jsonData['eresep'])             ? 1 : 0;
+                $hasEresep = (isset($jsonData['eresep']) || isset($jsonData['eresepRacikan'])) ? 1 : 0;
                 $hasAdministrasiRj     = isset($jsonData['AdministrasiRj'])     ? 1 : 0;
 
                 // 4) Parse timestamp taskId5 (fallback ke VERY LARGE agar muncul di akhir jika null)
@@ -837,7 +837,6 @@ class TelaahResepRJ extends Component
                 ];
             }
         );
-
 
 
         $myQueryPagination = $this->paginate($myQueryPagination, $this->limitPerPage);
