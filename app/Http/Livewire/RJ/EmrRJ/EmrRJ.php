@@ -149,6 +149,9 @@ class EmrRJ extends Component
 
     public bool $forceInsertRecord = false;
 
+    public bool $isOpenGeneralConsentPasienRJ = false;
+    public string $isOpenModeGeneralConsentPasienRJ = 'insert';
+
     public int $rjNoRef;
     public string $regNoRef;
 
@@ -181,6 +184,14 @@ class EmrRJ extends Component
         $this->regNoRef = $regNoRef;
     }
 
+    private function openModalEditGeneralConsentPasienRJ($rjNo, $regNoRef): void
+    {
+        $this->isOpenGeneralConsentPasienRJ = true;
+        $this->isOpenModeGeneralConsentPasienRJ = 'update';
+        $this->rjNoRef = $rjNo;
+        $this->regNoRef = $regNoRef;
+    }
+
     private function openModalTampil(): void
     {
         $this->isOpen = true;
@@ -205,6 +216,13 @@ class EmrRJ extends Component
     {
         $this->isOpenScreening = false;
         $this->isOpenModeScreening = 'insert';
+        $this->resetInputFields();
+    }
+
+    public function closeModalGeneralConsentPasienRJ(): void
+    {
+        $this->isOpenGeneralConsentPasienRJ = false;
+        $this->isOpenModeGeneralConsentPasienRJ = 'insert';
         $this->resetInputFields();
     }
     // open and close modal end////////////////
@@ -240,7 +258,11 @@ class EmrRJ extends Component
         // $this->findData($id);
     }
 
-
+    public function editGeneralConsentPasienRJ($rjNo, $regNoRef)
+    {
+        $this->openModalEditGeneralConsentPasienRJ($rjNo, $regNoRef);
+        // kalau perlu, bisa isi logic load-data di sini
+    }
 
 
 
@@ -296,15 +318,13 @@ class EmrRJ extends Component
 
     public string $activeTab = "rekamMedis";
     public string $activeTabDokter = "assessmentDokter";
+    public string $activeTabGeneralConsentPasienRJ = "generalConsentPasienRJ";
+
 
 
 
 
     public array $EmrMenu = [
-        // [
-        //     'ermMenuId' => 'keperawatan',
-        //     'ermMenuName' => 'Keperawatan'
-        // ],
         [
             'ermMenuId' => 'anamnesa',
             'ermMenuName' => 'Anamnesa'
@@ -321,10 +341,6 @@ class EmrRJ extends Component
             'ermMenuId' => 'diagnosis',
             'ermMenuName' => 'Diagnosis (ICD)'
         ],
-        // [
-        //     'ermMenuId' => 'penandaanGbr',
-        //     'ermMenuName' => 'Penandaan Gambar'
-        // ],
         [
             'ermMenuId' => 'perencanaan',
             'ermMenuName' => 'Perencanaan'
@@ -337,18 +353,6 @@ class EmrRJ extends Component
             'ermMenuId' => 'suket',
             'ermMenuName' => 'Surat Keterangan (Sehat/Istirahat)'
         ],
-        // [
-        //     'ermMenuId' => 'cppt',
-        //     'ermMenuName' => 'CPPT'
-        // ],
-        // [
-        //     'ermMenuId' => 'resumeMds',
-        //     'ermMenuName' => 'Resume Medis'
-        // ],
-        // [
-        //     'ermMenuId' => 'penerbitanSrt',
-        //     'ermMenuName' => 'Penerbitan Surat'
-        // ],
         [
             'ermMenuId' => 'rekamMedis',
             'ermMenuName' => 'Resume Medis'
@@ -377,6 +381,10 @@ class EmrRJ extends Component
 
     ];
 
+    public array $EmrMenuGeneralConsentPasienRJ = [
+        ['ermMenuId' => 'generalConsentPasienRJ', 'ermMenuName' => 'General Consent Pasien RJ'],
+        ['ermMenuId' => 'informConsentPasienRJ',  'ermMenuName' => 'Inform Consent Pasien RJ'],
+    ];
 
     public function store()
     {

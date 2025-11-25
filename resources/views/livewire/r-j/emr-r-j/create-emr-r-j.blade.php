@@ -41,8 +41,8 @@
 
                 {{-- Display Pasien Componen --}}
                 <div>
-                    <livewire:r-j.emr-r-j.display-pasien.display-pasien :wire:key="$regNo.'display-pasienEresep'"
-                        :rjNoRef="$rjNoRef">
+                    <livewire:r-j.emr-r-j.display-pasien.display-pasien
+                        :wire:key="$regNo.'display-pasien-general-consent'" :rjNoRef="$rjNoRef">
                 </div>
 
 
