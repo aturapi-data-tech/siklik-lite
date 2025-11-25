@@ -120,10 +120,6 @@
                         <td class="py-1 pr-2 text-gray-700">Tanggal / Jam Kunjungan</td>
                         <td class="py-1">{{ $tglKunjungan ?? '-' }}</td>
                     </tr>
-                    <tr>
-                        <td class="py-1 pr-2 text-gray-700">No Kunjungan RJ</td>
-                        <td class="py-1">{{ $noKunjungan ?: '-' }}</td>
-                    </tr>
                 </table>
             </td>
 
