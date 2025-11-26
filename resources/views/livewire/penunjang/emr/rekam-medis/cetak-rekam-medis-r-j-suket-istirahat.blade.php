@@ -194,32 +194,51 @@
                                 </div>
                                 @inject('carbon', 'Carbon\Carbon')
                                 @php
+                                    // 1. Tanggal kunjungan sebagai dasar
+                                    /** @var \Carbon\Carbon $tglRj */
                                     $tglRj = isset($dataDaftarTxn['rjDate'])
                                         ? $carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['rjDate'])
-                                        : $carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
+                                        : $carbon::now(env('APP_TIMEZONE'));
 
-                                    $suketIstirahatHari = isset(
-                                        $dataDaftarTxn['suket']['suketIstirahat']['suketIstirahatHari'],
-                                    )
-                                        ? $dataDaftarTxn['suket']['suketIstirahat']['suketIstirahatHari']
-                                        : 3;
+                                    // 2. Lama istirahat (default 3 hari)
+                                    $suketIstirahatHari =
+                                        (int) ($dataDaftarTxn['suket']['suketIstirahat']['suketIstirahatHari'] ?? 3);
 
-                                    $tglRjAwal = $tglRj->format('d/m/Y');
-                                    $tglRjAkhir = $tglRj->addDays($suketIstirahatHari)->format('d/m/Y');
+                                    // Safety: minimal 1 hari
+                                    if ($suketIstirahatHari < 1) {
+                                        $suketIstirahatHari = 1;
+                                    }
+
+                                    // 3. Mulai istirahat: 'hariIni' atau 'besok'
+                                    $mulai =
+                                        $dataDaftarTxn['suket']['suketIstirahat']['suketIstirahatMulai'] ?? 'hariIni';
+
+                                    if ($mulai === 'besok') {
+                                        // mulai besok
+                                        $tglMulai = $tglRj->copy()->addDay();
+                                    } else {
+                                        // default: mulai hari ini
+                                        $tglMulai = $tglRj->copy();
+                                    }
+
+                                    // 4. Akhir istirahat (inklusif)
+                                    // contoh: mulai 10, lama 2 hari => 10 & 11 => + (2 - 1)
+                                    $tglSelesai = $tglMulai->copy()->addDays($suketIstirahatHari - 1);
+
+                                    // 5. Format untuk ditampilkan
+                                    $tglRjAwal = $tglMulai->format('d/m/Y');
+                                    $tglRjAkhir = $tglSelesai->format('d/m/Y');
                                 @endphp
                                 <br>
                                 <p>
                                     Pada pemeriksa saya tanggal
-                                    {{ isset($tglRjAwal) ? $tglRjAwal : '-' }} secara klinis
+                                    {{ $tglRjAwal ?? '-' }} secara klinis
                                     dalam keadaan sakit
-                                    <br>
                                     dan perlu istirahat selama {{ $suketIstirahatHari }} (hari)
                                     <br>
-                                    dari tanggal {{ isset($tglRjAwal) ? $tglRjAwal : '-' }} s/d
-                                    {{ isset($tglRjAkhir) ? $tglRjAkhir : '-' }}
-                                    <br>
-                                    <br>
-
+                                    dari tanggal {{ $tglRjAwal ?? '-' }} s/d
+                                    {{ $tglRjAkhir ?? '-' }}
+                                    <br><br>
                                     Demikian surat keterangan ini saya buat untuk dipergunakan
                                     sebagaimana mestinya.
                                 </p>

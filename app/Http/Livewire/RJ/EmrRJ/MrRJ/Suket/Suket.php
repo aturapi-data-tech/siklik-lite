@@ -28,7 +28,11 @@ class Suket extends Component
     // dataDaftarPoliRJ RJ
     public array $dataDaftarPoliRJ = [];
 
-    // data SKDP / suket=>[]
+    public array $mulaiIstirahatOptions = [
+        ['id' => 'hariIni', 'desc' => 'Mulai hari ini'],
+        ['id' => 'besok',   'desc' => 'Mulai besok'],
+    ];
+
     public array $suket =
     [
         "suketSehatTab" => "Suket Sehat",
@@ -38,6 +42,7 @@ class Suket extends Component
         "suketIstirahatTab" => "Suket Istirahat",
         "suketIstirahat" => [
             "suketIstirahatHari" => "",
+            "suketIstirahatMulai" => "hariIni",
             "suketIstirahat" => ""
         ],
 
@@ -48,6 +53,8 @@ class Suket extends Component
     protected $rules = [
         // angka hari istirahat, boleh kosong tapi kalau diisi harus number wajar
         'dataDaftarPoliRJ.suket.suketIstirahat.suketIstirahatHari' => 'nullable|numeric|min:1|max:60',
+
+        'dataDaftarPoliRJ.suket.suketIstirahat.suketIstirahatMulai' => 'nullable|in:hariIni,besok',
 
         // tambahkan bila mau:
         'dataDaftarPoliRJ.suket.suketSehat.suketSehat'             => 'nullable|string|max:2000',
@@ -64,6 +71,7 @@ class Suket extends Component
 
     protected $validationAttributes = [
         'dataDaftarPoliRJ.suket.suketIstirahat.suketIstirahatHari' => 'Lama istirahat',
+        'dataDaftarPoliRJ.suket.suketIstirahat.suketIstirahatMulai' => 'Mulai istirahat',
         'dataDaftarPoliRJ.suket.suketSehat.suketSehat'             => 'Isi Surat Keterangan Sehat',
         'dataDaftarPoliRJ.suket.suketIstirahat.suketIstirahat'     => 'Isi Surat Istirahat',
     ];

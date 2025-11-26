@@ -14,6 +14,21 @@
         @enderror
     </div>
 
+    <div class="mt-2">
+        <span class="text-sm font-semibold">Mulai istirahat:</span>
+
+        <div class="flex mt-1 ml-2">
+            @foreach ($mulaiIstirahatOptions as $opt)
+                <x-radio-button :label="__($opt['desc'])" value="{{ $opt['id'] }}"
+                    wire:model="dataDaftarPoliRJ.suket.suketIstirahat.suketIstirahatMulai" />
+            @endforeach
+        </div>
+
+        @error('dataDaftarPoliRJ.suket.suketIstirahat.suketIstirahatMulai')
+            <x-input-error :messages=$message />
+        @enderror
+    </div>
+
 
     <div class="w-full mb-1">
 
