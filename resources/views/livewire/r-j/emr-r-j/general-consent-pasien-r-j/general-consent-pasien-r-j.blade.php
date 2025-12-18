@@ -171,7 +171,7 @@
 
                     <div class="w-56 h-auto">
                         <div class="text-sm text-right ">
-                            {{ env('SATUSEHAT_ORGANIZATION_NAMEX', 'RUMAH SAKIT ISLAM MADINAH') }}
+                            {{ env('SATUSEHAT_ORGANIZATION_NAMEX', 'KLINIK MADINAH PRATAMA') }}
                         </div>
                         <div class="text-sm text-right ">
                             {{ ' Ngunut , ' . $this->dataDaftarRJ['generalConsentPasienRJ']['signatureDate'] }}
